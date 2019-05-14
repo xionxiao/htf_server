@@ -289,13 +289,13 @@ if __name__ == "__main__":
     #print api.QueryData(0)
     rst = api.Query("资金")
     print rst
-    print str(rst[0]).decode("string_escape")
-    print rst[0][3]
-    print rst[0][3] == "冻结资金"
+    #print str(rst[0]).decode("string_escape")
+    #print rst[0][3]
+    #print rst[0][3] == "冻结资金"
     #print Ex(api.Query("股份")[0])
-    #print api.Query("当日委托")
+    print api.Query("当日委托")
     #print Ex(api.Query("当日成交")[0])
-    #print str(api.Query("可撤单")[0]).decode("string_escape")
+    print str(api.Query("可撤单")[0]).decode("string_escape")
     #print Ex(api.Query("股东代码")[0])
     #print Ex(api.Query("融资余额")[0])
     #print api.Query("融券余额") # 系统暂不支持该功能
