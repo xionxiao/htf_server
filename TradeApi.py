@@ -1,5 +1,5 @@
-ï»¿#!/usr/bin/python2
-#coding utf-8
+#!/usr/bin/python2
+# coding gbk
 from ctypes import *
 import datetime
 import time
@@ -37,15 +37,15 @@ class ResultBuffer(object):
         rst = ["Result", "result"]
         if name in rst:
             if type(self.Result) is c_char_p:
-                return [self._makeTable(self.Result.value.decode('gbk').encode('utf-8'))]
+                return [self._makeTable(self.Result.value)]
             else:
-                return [self._makeTable(i.decode('gbk').encode('utf-8')) for i in self.Result]
+                return [self._makeTable(i) for i in self.Result]
         err = ["ErrInfo", "errInfo", "error", "Error"]
         if name in err:
             if type(self.ErrInfo) is c_char_p:
                 return [self.ErrInfo.value]
             else:
-                return [i.decode('gbk').encode('utf-8') for i in self.ErrInfo]
+                return [i for i in self.ErrInfo]
         if type(name) is int:
             if not bool(self):
                 return self["Error"][name]
@@ -75,34 +75,34 @@ class ResultBuffer(object):
 
 class TradeApi(object):
     __clientId = -1
-    # æŸ¥è¯¢ç±»å‹
-    QUERY_TYPE = ("èµ„é‡‘",  # 0
-                  "è‚¡ä»½",  # 1 
-                  "å½“æ—¥å§”æ‰˜",  # 2
-                  "å½“æ—¥æˆäº¤",  # 3
-                  "å¯æ’¤å•",  # 4
-                  "è‚¡ä¸œä»£ç ",  # 5
-                  "èèµ„ä½™é¢",  # 6
-                  "èåˆ¸ä½™é¢",  # 7
-                  "å¯èè¯åˆ¸"   # 8
+    # ²éÑ¯ÀàĞÍ
+    QUERY_TYPE = ("×Ê½ğ",  # 0
+                  "¹É·İ",  # 1 
+                  "µ±ÈÕÎ¯ÍĞ",  # 2
+                  "µ±ÈÕ³É½»",  # 3
+                  "¿É³·µ¥",  # 4
+                  "¹É¶«´úÂë",  # 5
+                  "ÈÚ×ÊÓà¶î",  # 6
+                  "ÈÚÈ¯Óà¶î",  # 7
+                  "¿ÉÈÚÖ¤È¯"   # 8
                   )
-    # è®¢å•ç±»å‹
-    ORDER_TYPE = ("ä¹°å…¥", # 0
-                  "å–å‡º", # 1
-                  "èèµ„ä¹°å…¥", # 2
-                  "èåˆ¸å–å‡º", # 3
-                  "ä¹°åˆ¸è¿˜åˆ¸", # 4
-                  "å–åˆ¸è¿˜æ¬¾", # 5
-                  "ç°åˆ¸è¿˜åˆ¸", # 6
+    # ¶©µ¥ÀàĞÍ
+    ORDER_TYPE = ("ÂòÈë", # 0
+                  "Âô³ö", # 1
+                  "ÈÚ×ÊÂòÈë", # 2
+                  "ÈÚÈ¯Âô³ö", # 3
+                  "ÂòÈ¯»¹È¯", # 4
+                  "ÂôÈ¯»¹¿î", # 5
+                  "ÏÖÈ¯»¹È¯", # 6
                   )
-    # å†å²å§”æ‰˜ç±»å‹
-    HISTORY_QUERY_TYPE = ("å†å²å§”æ‰˜", # 0
-                          "å†å²æˆäº¤", # 1
-                          "äº¤å‰²å•", # 2
+    # ÀúÊ·Î¯ÍĞÀàĞÍ
+    HISTORY_QUERY_TYPE = ("ÀúÊ·Î¯ÍĞ", # 0
+                          "ÀúÊ·³É½»", # 1
+                          "½»¸îµ¥", # 2
                           )
-    # è‚¡ä¸œä»£ç 
-    GDDM_TYPE = {'æ·±å¸‚':'0603467002',   # æ·±å¸‚
-                 'æ²ªå¸‚':'E035674151'    # æ²ªå¸‚
+    # ¹É¶«´úÂë
+    GDDM_TYPE = {'ÉîÊĞ':'0603467002',   # ÉîÊĞ
+                 '»¦ÊĞ':'E035674151'    # »¦ÊĞ
                  }
     
     def __init__(self):
@@ -154,24 +154,24 @@ class TradeApi(object):
         return res
 
     def Query(self, u_str, *args, **kwargs):
-        """ äº¤æ˜“ä¿¡æ¯ï¼š
-                  "èµ„é‡‘"       0
-                  "è‚¡ä»½"       1
-                  "å½“æ—¥å§”æ‰˜"    2
-                  "å½“æ—¥æˆäº¤"    3
-                  "å¯æ’¤å•"     4
-                  "è‚¡ä¸œä»£ç "    5
-                  "èèµ„ä½™é¢"    6
-                  "èåˆ¸ä½™é¢"    7
-                  "å¯èè¯åˆ¸"    8
+        """ ½»Ò×ĞÅÏ¢£º
+                  "×Ê½ğ"       0
+                  "¹É·İ"       1
+                  "µ±ÈÕÎ¯ÍĞ"    2
+                  "µ±ÈÕ³É½»"    3
+                  "¿É³·µ¥"     4
+                  "¹É¶«´úÂë"    5
+                  "ÈÚ×ÊÓà¶î"    6
+                  "ÈÚÈ¯Óà¶î"    7
+                  "¿ÉÈÚÖ¤È¯"    8
 
-           å†å²å§”æ‰˜ï¼š å‚æ•° -- startTime=20150512, endTime=20150513
-                  "å†å²å§”æ‰˜"    11
-                  "å†å²æˆäº¤"    12
-                  "äº¤å‰²å•"      13
+           ÀúÊ·Î¯ÍĞ£º ²ÎÊı -- startTime=20150512, endTime=20150513
+                  "ÀúÊ·Î¯ÍĞ"    11
+                  "ÀúÊ·³É½»"    12
+                  "½»¸îµ¥"      13
 
-           äº”æ¡£è¡Œæƒ…ï¼š  å‚æ•° -- zqdm="000002"
-                  "è¡Œæƒ…"     21
+           ÎåµµĞĞÇé£º  ²ÎÊı -- zqdm="000002"
+                  "ĞĞÇé"     21
         """
         if u_str in self.QUERY_TYPE:
             x = self.QUERY_TYPE.index(u_str)
@@ -184,7 +184,7 @@ class TradeApi(object):
                 return self.QueryHistoryData(x, args[0], args[1])
             else:
                 return None
-        elif u_str == "è¡Œæƒ…":
+        elif u_str == "ĞĞÇé":
             if len(args) == 1:
                 return self.GetQuote(args[0])
             elif len(args) == 0 and kwargs['zqdm']:
@@ -196,9 +196,9 @@ class TradeApi(object):
         res = ResultBuffer()
         if not gddm:
             if zqdm[0] == '6':
-                gddm = self.GDDM_TYPE['æ²ªå¸‚']
+                gddm = self.GDDM_TYPE['»¦ÊĞ']
             else:
-                gddm = self.GDDM_TYPE['æ·±å¸‚']
+                gddm = self.GDDM_TYPE['ÉîÊĞ']
         self._dll.SendOrder(self.__clientId, orderType, priceType, gddm, zqdm, c_float(price), quantity, res.Result, res.ErrInfo)
         return res
 
@@ -220,9 +220,9 @@ class TradeApi(object):
             gddm = []
             for i in zqdm:
                 if i[0] == '6':
-                    gddm.append(self.GDDM_TYPE['æ²ªå¸‚'])
+                    gddm.append(self.GDDM_TYPE['»¦ÊĞ'])
                 else:
-                    gddm.append(self.GDDM_TYPE['æ·±å¸‚'])
+                    gddm.append(self.GDDM_TYPE['ÉîÊĞ'])
         _gddm = c_array(gddm, c_char_p)
 
         self._dll.SendOrders(self.__clientId, _orderType, _priceType, _gddm, _zqdm, _price, _quantity, count, res.Result, res.ErrInfo)
@@ -287,28 +287,28 @@ if __name__ == "__main__":
     api.Open()
     rst = api.Logon("119.147.80.108", 443, "184039030", "326326")
     #print api.QueryData(0)
-    #rst = api.Query("èµ„é‡‘")
-    #print rst
-    #print str(rst[0]).decode("string_escape")
-    #print rst[0][3].decode('utf-8')
-    #print rst[0][3] == "å†»ç»“èµ„é‡‘"
-    #print Ex(api.Query("è‚¡ä»½")[0])
-    #print api.Query("å½“æ—¥å§”æ‰˜")
-    #print Ex(api.Query("å½“æ—¥æˆäº¤")[0])
-    #print str(api.Query("å¯æ’¤å•")[0]).decode("string_escape")
-    #print Ex(api.Query("è‚¡ä¸œä»£ç ")[0])
-    #print Ex(api.Query("èèµ„ä½™é¢")[0])
-    #print api.Query("èåˆ¸ä½™é¢") # ç³»ç»Ÿæš‚ä¸æ”¯æŒè¯¥åŠŸèƒ½
-    #print Ex(api.Query("å¯èè¯åˆ¸")[0])
+    rst = api.Query("×Ê½ğ")
+    print rst
+    print str(rst[0]).decode("string_escape")
+    print rst[0][3]
+    print rst[0][3] == "¶³½á×Ê½ğ"
+    #print Ex(api.Query("¹É·İ")[0])
+    #print api.Query("µ±ÈÕÎ¯ÍĞ")
+    #print Ex(api.Query("µ±ÈÕ³É½»")[0])
+    #print str(api.Query("¿É³·µ¥")[0]).decode("string_escape")
+    #print Ex(api.Query("¹É¶«´úÂë")[0])
+    #print Ex(api.Query("ÈÚ×ÊÓà¶î")[0])
+    #print api.Query("ÈÚÈ¯Óà¶î") # ÏµÍ³Ôİ²»Ö§³Ö¸Ã¹¦ÄÜ
+    #print Ex(api.Query("¿ÉÈÚÖ¤È¯")[0])
 
     #rst = api.QueryHistoryData(0, "20150429", "20150504")
     #print rst
-    #print Ex(api.Query("å†å²å§”æ‰˜", "20150429", "20150504")[0])
-    #print Ex(api.Query("å†å²æˆäº¤", "20150429", "20150504")[0])
-    #print Ex(api.Query("äº¤å‰²å•", startDate="20150429", endDate="20150504")[0])
+    #print Ex(api.Query("ÀúÊ·Î¯ÍĞ", "20150429", "20150504")[0])
+    #print Ex(api.Query("ÀúÊ·³É½»", "20150429", "20150504")[0])
+    #print Ex(api.Query("½»¸îµ¥", startDate="20150429", endDate="20150504")[0])
 
     #print Ex(api.GetQuote("000002")[0])
-    #print api.Query("è¡Œæƒ…", zqdm="000002")
+    #print api.Query("ĞĞÇé", zqdm="000002")
 
     #print api.Repay("1000")
     #rst = api.CancelOrder(["1799","1798"])
@@ -316,9 +316,9 @@ if __name__ == "__main__":
     
     #print api.SendOrder(3, "000655", 20.22, 100)
     #print api.SendOrders([3,3,3], ["000655", "000625","600005"], [20.22, 10.11,6.4], [100,100,200])
-    print api.Buy("000690", 18.8, 100)
-    print api.Sell("000690", 10.10, 100)
-    print api.Short("600005", 6.4, 100)
+    #print api.Buy("000690", 18.8, 100)
+    #print api.Sell("000690", 10.10, 100)
+    #print api.Short("600005", 6.4, 100)
 
     #f.close()
     api.Logoff()
