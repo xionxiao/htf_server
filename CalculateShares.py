@@ -1,0 +1,51 @@
+# -*- coding: gbk -*-
+
+from TradeApi import *
+import time
+
+def calcShares():
+    api = TradeApi()
+    api.Open()
+    rst = api.Logon("180.166.192.130", 7708, "184039030", "326326")
+
+    # 在可撤单上筛选融券卖出
+    order = None
+    rst = api.Query("可撤单")
+    if not rst:
+        print rst
+        return
+
+    orders = []
+    for i in rst:
+        if i[13] == "融券卖出":
+            orders.append(i)
+
+    # 取得每只股票的代码
+    stocks = list(set([ i[1] for i in orders ]))
+    #print stocks
+
+    # 转换为字典，value[0] -- 涨停价; value[1] -- 股数
+    sdict = dict((i, [-1,0,""]) for i in stocks)
+    # 计算涨停价
+    rst = api.GetQuote(stocks)
+    if not rst:
+        return
+    for i in rst['result']:
+        rlimit = round(float(i[1][2]) * 1.1, 2)
+        sdict[i[1][0]][0] = rlimit
+        sdict[i[1][0]][2] = i[1][1]
+
+    # 累加股数
+    for i in orders:
+        if sdict[i[1]][0] == round(float(i[7]), 2):
+            sdict[i[1]][1] += int(float(i[8]))
+
+    for k,v in sdict.iteritems():
+        print k,v[2],v[1],v[0]
+    
+    api.Logoff()
+    api.Close()
+
+if __name__ == "__main__":
+    # 委托号， 股票代码， 涨停价， 股数
+    calcShares()

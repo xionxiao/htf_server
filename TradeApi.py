@@ -1,5 +1,5 @@
-#!/usr/bin/python2
-# coding gbk
+# -*- coding: gbk -*-
+
 from ctypes import *
 import datetime
 import time
@@ -50,10 +50,11 @@ class ResultBuffer(object):
             if not bool(self):
                 return self["Error"][name]
             else:
-                if type(self.Result) is list:
-                    return self['Result'][name]
-                else:
+                if type(self.Result) is c_char_p:
                     return self['Result'][0][name]
+                else:
+                    return self['Result'][name]
+                    
 
     def __nonzero__(self):
         if type(self.ErrInfo) is c_char_p:
@@ -287,15 +288,15 @@ if __name__ == "__main__":
     api.Open()
     rst = api.Logon("119.147.80.108", 443, "184039030", "326326")
     #print api.QueryData(0)
-    rst = api.Query("资金")
-    print rst
+    #rst = api.Query("资金")
+    #print rst
     #print str(rst[0]).decode("string_escape")
     #print rst[0][3]
     #print rst[0][3] == "冻结资金"
     #print Ex(api.Query("股份")[0])
-    print api.Query("当日委托")
+    #print api.Query("当日委托")
     #print Ex(api.Query("当日成交")[0])
-    print str(api.Query("可撤单")[0]).decode("string_escape")
+    #print str(api.Query("可撤单")[0]).decode("string_escape")
     #print Ex(api.Query("股东代码")[0])
     #print Ex(api.Query("融资余额")[0])
     #print api.Query("融券余额") # 系统暂不支持该功能
@@ -308,7 +309,10 @@ if __name__ == "__main__":
     #print Ex(api.Query("交割单", startDate="20150429", endDate="20150504")[0])
 
     #print Ex(api.GetQuote("000002")[0])
-    #print api.Query("行情", zqdm="000002")
+    rst = api.Query("行情", zqdm=["000002","600036"])
+    #print rst
+    print "-------------"
+    print str(rst[0]).decode('string_escape')
 
     #print api.Repay("1000")
     #rst = api.CancelOrder(["1799","1798"])
