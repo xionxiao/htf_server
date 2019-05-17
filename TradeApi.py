@@ -1,78 +1,9 @@
 # -*- coding: gbk -*-
 
 from ctypes import *
+from ResultBuffer import *
 import datetime
 import time
-
-def c_array(src_list, TYPE):
-    if type(src_list) is not list: return
-    count = len(src_list)
-    rst = (TYPE*count)()
-    for i in range(count): rst[i] = TYPE(src_list[i])
-    return rst
-
-class ResultBuffer(object):
-    def __init__(self, count=1):
-        if count == 1:
-            self.ErrInfo = c_char_p('\000'*256)
-            self.Result = c_char_p('\000'*1024*1024)
-            self.count = 1
-        elif count > 1:
-            self.ErrInfo = (c_char_p*count)()
-            self.Result = (c_char_p*count)()
-            self.count = count
-            for i in range(count):
-                self.ErrInfo[i] = c_char_p('\000'*256)
-                self.Result[i] = c_char_p('\000'*1024*1024)
-
-    def __len__(self):
-        return self.count
-
-    def _makeTable(self, tab_str):
-        rows = tab_str.split('\n')
-        tab = [ r.split('\t') for r in rows ]
-        return tab
-        
-    def __getitem__(self, name):
-        rst = ["Result", "result"]
-        if name in rst:
-            if type(self.Result) is c_char_p:
-                return [self._makeTable(self.Result.value)]
-            else:
-                return [self._makeTable(i) for i in self.Result]
-        err = ["ErrInfo", "errInfo", "error", "Error"]
-        if name in err:
-            if type(self.ErrInfo) is c_char_p:
-                return [self.ErrInfo.value]
-            else:
-                return [i for i in self.ErrInfo]
-        if type(name) is int:
-            if not bool(self):
-                return self["Error"][name]
-            else:
-                if type(self.Result) is c_char_p:
-                    return self['Result'][0][name]
-                else:
-                    return self['Result'][name]
-                    
-
-    def __nonzero__(self):
-        if type(self.ErrInfo) is c_char_p:
-            return self.ErrInfo.value == ""
-        else:
-            err = [ not bool(i) for i in self.ErrInfo]
-            return bool(sum(err))
-
-    def __str__(self):
-        if bool(self):
-            ss = ""
-            for i in self['Result']:
-                for j in i:
-                    ss += str(j).decode('string_escape')+'\n'
-            return ss
-        else:
-            return str(self['Error']).decode('string_escape')
-
 
 class TradeApi(object):
     __clientId = -1
