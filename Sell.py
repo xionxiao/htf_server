@@ -14,7 +14,7 @@ def Sell(stock, price, share):
     if api.Logon("59.173.7.38", 7708, "184039030", "326326"):
         # 计算涨停价
         rst = api.GetQuote(_stock)
-        raising_limit = round(float(rst[1][2]) * 1.1, 2)
+        raising_limit = round_up_decimal_2(float(rst[1][2]) * 1.1)
         print raising_limit
         
         # 在可撤单上筛选当前股票在涨停价格的卖单股数

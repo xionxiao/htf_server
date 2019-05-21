@@ -6,7 +6,16 @@ import xlrd
 class StckPool(object):
     """股票池"""
 
-    trader = None
+    _tradeAPI = None
+    # structure of pooled stocks
+    # { stock_code: 
+    #   stock_name:
+    #   total_stock_shares:
+    #   harden_price:
+    # }
+    _stock_pool = []
+
+
     
     def __init__(self):
         pass
@@ -23,8 +32,8 @@ class StckPool(object):
         pass
 
 
-if __name__ == "__main__":
-    xls = xlrd.open_workbook('05a.xls')
+def grabStocks(xls_file):
+    xls = xlrd.open_workbook(xls_file)
     table = xls.sheets()[0]
     stocks = [i.encode() for i in table.col_values(0)]
     shares = [int(i) for i in table.col_values(1)]
@@ -42,7 +51,8 @@ if __name__ == "__main__":
     for r in rst:
         if r[0] in stocks:
             i = stocks.index(r[0])
-            shares[i] = min(shares[i], int(r[2]))
+            print r[2]
+            shares[i] = min(shares[i], int(int(r[2])/100)*100)
 
     print shares
     
@@ -52,11 +62,14 @@ if __name__ == "__main__":
     if not rst:
         print("获取行情失败")
 
-    prices = [ round(float(p[1][2])*1.1,2) for p in rst ]
+    prices = [ round_up_decimal_2(float(p[1][2])*1.1) for p in rst ]
     print prices
-
+    
     rst = api.SendOrders(types, stocks, prices, shares)
     print rst
     
     api.Logoff()
     api.Close()
+
+if __name__ == "__main__":
+    print grabStocks('05a.xls')

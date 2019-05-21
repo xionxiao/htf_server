@@ -23,6 +23,8 @@ def calcShares():
     # 取得每只股票的代码
     stocks = list(set([ i[1] for i in orders ]))
     #print stocks
+    if not stocks:
+        return u"股票池为空"
 
     # 转换为字典，value[0] -- 涨停价; value[1] -- 股数
     sdict = dict((i, [-1,0,""]) for i in stocks)
@@ -31,21 +33,24 @@ def calcShares():
     if not rst:
         return
     for i in rst['result']:
-        rlimit = round(float(i[1][2]) * 1.1, 2)
+        rlimit = round_up_decimal_2(float(i[1][2]) * 1.1)
         sdict[i[1][0]][0] = rlimit
         sdict[i[1][0]][2] = i[1][1]
 
     # 累加股数
     for i in orders:
-        if sdict[i[1]][0] == round(float(i[7]), 2):
+        if sdict[i[1]][0] == round_up_decimal_2(float(i[7])):
             sdict[i[1]][1] += int(float(i[8]))
 
+    i = 1
     for k,v in sdict.iteritems():
-        print k,v[2],v[1],v[0]
+        print i,k,v[2],v[1],v[0]
+        i += 1
     
     api.Logoff()
     api.Close()
+    return ""
 
 if __name__ == "__main__":
     # 委托号， 股票代码， 涨停价， 股数
-    calcShares()
+    print calcShares()

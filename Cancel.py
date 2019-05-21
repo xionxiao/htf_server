@@ -37,7 +37,7 @@ def Cancel(order_id):
             # 获得当前涨停价
             print order[1]
             rst = api.Query("行情", str(order[1]))
-            price = round(float(rst[1][2]) * 1.1, 2)
+            price = round_up_decimal_2(float(rst[1][2]) * 1.1)
             print price
             back_amount = 0
             # 涨停价下单

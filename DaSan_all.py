@@ -1,6 +1,7 @@
 # -*- coding: gbk -*-
 
 from TradeApi import *
+from Utils import *
 import time
 
 def dasan_all():
@@ -28,7 +29,7 @@ def dasan_all():
         return u"查询行情失败"
     
     closing_price = [ float(q[1][2]) for q in quotes['result'] ]
-    raising_price = [ round(c * 1.1, 2) for c in closing_price ]
+    raising_price = [ round_up_decimal_2(c * 1.1) for c in closing_price ]
     print u"融券卖出订单"
     print zqdm_list
     print raising_price
@@ -51,7 +52,7 @@ def dasan_all():
     print order_ids
     print order_raising_price
     print order_shares
-    
+    return
     print "----------------"
     for i in range(len(order_ids)):
         print u"取消订单" + str(order_ids[i])

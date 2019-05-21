@@ -239,7 +239,7 @@ if __name__ == "__main__":
     #print Ex(api.Query("历史成交", "20150429", "20150504")[0])
     #print Ex(api.Query("交割单", startDate="20150429", endDate="20150504")[0])
 
-    #print Ex(api.GetQuote("000002")[0])
+    print Ex(api.GetQuote(["000002","000001"])[0])
     rst = api.Query("行情", zqdm=["000002","600036"])
     #print rst
     print "-------------"
