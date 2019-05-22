@@ -8,10 +8,13 @@ class StckPool(object):
 
     _tradeAPI = None
     # structure of pooled stocks
-    # { stock_code: 
-    #   stock_name:
-    #   total_stock_shares:
-    #   harden_price:
+    # { stock_code: 证券代码
+    #   stock_name: 证券名称
+    #   total_stock_shares: 证券数量
+    #   closing_price: 收盘价
+    #   harden_price: 涨停价
+    #   stock_share_limit: 融券上限
+    #   order_list: {order_id:share, order_id:share}
     # }
     _stock_pool = []
 
