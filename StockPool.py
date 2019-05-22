@@ -1,6 +1,7 @@
 # -*- coding: gbk -*-
 
 from TradeApi import *
+from Utils import *
 import xlrd
 
 class StckPool(object):
