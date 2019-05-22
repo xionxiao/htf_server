@@ -18,21 +18,27 @@ class StckPool(object):
     #   order_list: {order_id:share, order_id:share}
     # }
     _stock_pool = []
-
-
     
     def __init__(self):
         pass
     
-    def addToStockPool(self, stock_code, max_share):
+    def addToStockPool(self, stock_code, stock_share_limit):
         """在股票池中增加监控的股票"""
         pass
 
-    def setMaxShare(self, stock_code, max_share):
+    def setShareLimit(self, stock_code, max_share):
         """设置股票池存储股票最大值"""
         pass
 
     def getStockShare(self, stock_code):
+        pass
+
+    def getHardenPrice(self, stock_code):
+        """获得涨停价"""
+        pass
+
+    def getPooledStocks(self):
+        """获得股票池中的股票"""
         pass
 
 
