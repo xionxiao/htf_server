@@ -52,7 +52,7 @@ def dasan_all():
     print order_ids
     print order_raising_price
     print order_shares
-    return
+    
     print "----------------"
     for i in range(len(order_ids)):
         print u"È¡Ïû¶©µ¥" + str(order_ids[i])
