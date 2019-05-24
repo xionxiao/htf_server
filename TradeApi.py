@@ -49,7 +49,7 @@ class TradeApi(object):
     def GetEdition(self):
         rst = ResultBuffer()
         self._dll.GetEdition(rst.Result)
-        return rst['Result']
+        return rst
     
     def Logon(self, ip, port, account, password, version="9.01"):
         TxPassword = ""
@@ -63,7 +63,10 @@ class TradeApi(object):
         if self.__clientId != -1:
             self._dll.Logoff(self.__clientId)
 
-
+    def IsLogon(self):
+        print self.__clientId
+        return bool(self.__clientId != -1)
+    
     def QueryData(self, category):
         if self.__clientId == -1:
             return
@@ -218,9 +221,11 @@ if __name__ == "__main__":
     #sys.stdout=f
     api.Open()
     rst = api.Logon("119.147.80.108", 443, "184039030", "326326")
+    print rst
     #print api.QueryData(0)
-    #rst = api.Query("资金")
-    #print rst
+    rst = api.Query("资金")
+    print type(rst)
+    print rst
     #print str(rst[0]).decode("string_escape")
     #print rst[0][3]
     #print rst[0][3] == "冻结资金"
@@ -231,7 +236,7 @@ if __name__ == "__main__":
     #print Ex(api.Query("股东代码")[0])
     #print Ex(api.Query("融资余额")[0])
     #print api.Query("融券余额") # 系统暂不支持该功能
-    #print Ex(api.Query("可融证券")[0])
+    print Ex(api.Query("可融证券"))
 
     #rst = api.QueryHistoryData(0, "20150429", "20150504")
     #print rst
@@ -241,7 +246,8 @@ if __name__ == "__main__":
 
     print Ex(api.GetQuote(["000002","000001"])[0])
     rst = api.Query("行情", zqdm=["000002","600036"])
-    #print rst
+    print rst
+    print u"行情"
     print "-------------"
     print str(rst[0]).decode('string_escape')
 
