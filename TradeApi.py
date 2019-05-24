@@ -1,6 +1,7 @@
 # -*- coding: gbk -*-
 
 from ctypes import *
+from Utils import *
 from ResultBuffer import *
 import datetime
 import time
@@ -64,7 +65,6 @@ class TradeApi(object):
             self._dll.Logoff(self.__clientId)
 
     def IsLogon(self):
-        print self.__clientId
         return bool(self.__clientId != -1)
     
     def QueryData(self, category):
@@ -211,45 +211,48 @@ class TradeApi(object):
         return res
 
 if __name__ == "__main__":
-    def Ex(ss):
-        return str(ss).decode("string_escape")
-    
     api = TradeApi()
-    #print api.GetEdition()
+    rst = api.GetEdition()
+    printd(rst)
     #f = open('out.txt', 'w+')
     #import sys
     #sys.stdout=f
     api.Open()
     rst = api.Logon("119.147.80.108", 443, "184039030", "326326")
-    print rst
+    printd(rst)
     #print api.QueryData(0)
     rst = api.Query("资金")
-    print type(rst)
-    print rst
-    #print str(rst[0]).decode("string_escape")
-    #print rst[0][3]
-    #print rst[0][3] == "冻结资金"
-    #print Ex(api.Query("股份")[0])
-    #print api.Query("当日委托")
-    #print Ex(api.Query("当日成交")[0])
-    #print str(api.Query("可撤单")[0]).decode("string_escape")
-    #print Ex(api.Query("股东代码")[0])
-    #print Ex(api.Query("融资余额")[0])
-    #print api.Query("融券余额") # 系统暂不支持该功能
-    print Ex(api.Query("可融证券"))
+    printd(rst)
+    print rst[0].head[3] == "冻结资金"
+
+    print "========"
+    rst = api.Query("股份")
+   
+    printd(rst)
+    print "========"
+    printd(api.Query("当日委托"))
+    print "========"
+    printd(api.Query("当日成交"))
+    print "========"
+    printd(api.Query("可撤单")[0])
+    print "========"
+    printd(api.Query("股东代码")[0])
+    print "========"
+    printd(api.Query("融资余额"))
+    print "========"
+    printd(api.Query("融券余额")) # 系统暂不支持该功能
+    print "========"
+    printd(api.Query("可融证券")[0].head)
+    print "========"
 
     #rst = api.QueryHistoryData(0, "20150429", "20150504")
-    #print rst
-    #print Ex(api.Query("历史委托", "20150429", "20150504")[0])
-    #print Ex(api.Query("历史成交", "20150429", "20150504")[0])
-    #print Ex(api.Query("交割单", startDate="20150429", endDate="20150504")[0])
+    #printd(rst)
+    #printd(api.Query("历史委托", "20150429", "20150504")[0])
+    #printd(api.Query("历史成交", "20150429", "20150504")[0])
+    #printd(api.Query("交割单", startDate="20150429", endDate="20150504")[0])
 
-    print Ex(api.GetQuote(["000002","000001"])[0])
     rst = api.Query("行情", zqdm=["000002","600036"])
-    print rst
-    print u"行情"
-    print "-------------"
-    print str(rst[0]).decode('string_escape')
+    printd(rst)
 
     #print api.Repay("1000")
     #rst = api.CancelOrder(["1799","1798"])
