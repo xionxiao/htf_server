@@ -105,8 +105,12 @@ class TradeApi(object):
                   "历史成交"    12
                   "交割单"      13
 
-           五档行情：  参数 -- zqdm="000002"
+           五档行情：  参数 -- stock="000002"
                   "行情"     21
+                  "昨收价"    22
+                  "今开价"    23
+                  "当前价"    24
+                  "涨停价"    25
         """
         if u_str in self.QUERY_TYPE:
             x = self.QUERY_TYPE.index(u_str)
@@ -122,8 +126,40 @@ class TradeApi(object):
         elif u_str == "行情":
             if len(args) == 1:
                 return self.GetQuote(args[0])
-            elif len(args) == 0 and kwargs['zqdm']:
-                return self.GetQuote(kwargs['zqdm'])
+            elif len(args) == 0 and kwargs['stock']:
+                return self.GetQuote(kwargs['stock'])
+        elif u_str == "昨收价":
+            if len(args) == 1:
+                rst = self.GetQuote(args[0])
+                return round_up_decimal_2(float(rst[0][2]))
+            elif len(args) == 0 and kwargs['stock']:
+                rst = self.GetQuote(kwargs['stock'])
+                printd(rst)
+                return [ round_up_decimal_2(float(i[0][2])) for i in rst ]
+        elif u_str == "涨停价":
+            if len(args) == 1:
+                rst = self.GetQuote(args[0])
+                return round_up_decimal_2(float(rst[0][2]*1.1))
+            elif len(args) == 0 and kwargs['stock']:
+                rst = self.GetQuote(kwargs['stock'])
+                printd(rst)
+                return [ round_up_decimal_2(float(i[0][2])*1.1) for i in rst ]
+        elif u_str == "当前价":
+            if len(args) == 1:
+                rst = self.GetQuote(args[0])
+                return round_up_decimal_2(float(rst[0][5]))
+            elif len(args) == 0 and kwargs['stock']:
+                rst = self.GetQuote(kwargs['stock'])
+                printd(rst)
+                return [ round_up_decimal_2(float(i[0][5])) for i in rst ]
+        elif u_str == "今开价":
+            if len(args) == 1:
+                rst = self.GetQuote(args[0])
+                return round_up_decimal_2(float(rst[0][3]))
+            elif len(args) == 0 and kwargs['stock']:
+                rst = self.GetQuote(kwargs['stock'])
+                printd(rst)
+                return [ round_up_decimal_2(float(i[0][3])) for i in rst ] 
 
     def SendOrder(self, orderType, zqdm, price, quantity, priceType=0, gddm=''):
         if self.__clientId == -1:
@@ -194,6 +230,9 @@ class TradeApi(object):
             return
         if type(zqdm) is list:
             count = len(zqdm)
+            # Fix Bug when only one command in banch
+            if count == 1:
+                return self.GetQuote(zqdm[0])
             _zqdm = c_array(zqdm, c_char_p)
             res = ResultBuffer(count)
             self._dll.GetQuotes(self.__clientId, _zqdm, count, res.Result, res.ErrInfo)
@@ -251,7 +290,7 @@ if __name__ == "__main__":
     #printd(api.Query("历史成交", "20150429", "20150504")[0])
     #printd(api.Query("交割单", startDate="20150429", endDate="20150504")[0])
 
-    rst = api.Query("行情", zqdm=["000002","600036"])
+    rst = api.Query("当前价", stock=["000002","600036"])
     printd(rst)
 
     #print api.Repay("1000")
