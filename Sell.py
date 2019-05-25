@@ -82,5 +82,5 @@ def Sell(stock, price, share):
     return ret_val
 
 if __name__ == "__main__":
-    print Sell("601669", 16.80, 300)
+    print Sell("600", 37.53, 400)
     

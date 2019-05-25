@@ -1,6 +1,7 @@
 # -*- coding: gbk -*-
 
 from TradeApi import *
+from Utils import *
 import time
 
 def Cancel(order_id):
