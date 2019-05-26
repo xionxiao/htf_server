@@ -36,14 +36,67 @@ class StockPool(object):
         
     def acquire(self, stock, share):
         """ 获得相应数目股票, 返回撤消订单号和下单股数"""
-
-        if stock not in self._stock_pool:
+        assert num % 100 == 0
+        if not self._stock_pool.has_key(stock):
             return u"股票池中没有该股票"
 
-        if not self._stock_pool[stock]["融券数量"] > share:
-            return u"可用做空股票不足"
-        order_list = self._stock_pool[stock]["订单列表"]
-        print sorted(order_list.items(), key=lambda d: d[1]) 
+        order_dict = self._stock_pool[stock]["订单列表"]
+        sorted_order_dict = sorted(order_dict.items(), key=lambda d:d[1], reverse=True)
+        
+        keys = [ i[0] for i in sorted_dict ]
+        values = [ i[1] for i in sorted_dict ]
+        
+        greater_pos = None
+        out_key_list = []
+        out_value_list = []
+        if sum(values) < num:
+            return u"证券数量不足"
+        for i in range(len(sorted_dict)):
+            if not greater_pos:
+                if values[i] == num:
+                    out_key_list.append(keys[i])
+                    out_value_list.append(values[i])
+                    return out_key_list,out_value_list,0
+                elif values[i] > num:
+                    if i == len(values)-1:
+                        out_key_list.append(keys[i])
+                        out_value_list.append(values[i])
+                        return out_key_list,out_value_list,values[i]-num
+                    continue
+                else:
+                    greater_pos = i-1
+                    s = sum(values[i:])
+                    if s == num:
+                        out_key_list = keys[i:]
+                        out_value_list = values[i:]
+                        return out_key_list,out_value_list,0
+                    elif s < num:
+                        out_key_list = keys[greater_pos]
+                        out_value_list = values[greater_pos]
+                        return out_key_list,out_value_list,values[greater_pos]-num
+                    else:
+                        num = num - values[i]
+                        out_key_list.append(keys[i])
+                        out_value_list.append(values[i])
+                        continue
+
+            # 列表中元素值小于目标值的位置
+            if num == values[i]:
+                out_key_list.append(keys[i])
+                out_value_list.append(values[i])
+                return out_key_list,out_value_list,0
+            elif num < values[i]:
+                if i == len(values)-1:
+                    out_key_list.append(keys[i])
+                    out_value_list.append(values[i])
+                    return out_key_list,out_value_list,values[i]-num
+                continue
+            else:
+                num = num - values[i]
+                out_key_list.append(keys[i])
+                out_value_list.append(values[i])
+                if num == 0:
+                    return out_key_list,out_value_list,0
             
         
     def __cacheStock(self, stocks=None):
