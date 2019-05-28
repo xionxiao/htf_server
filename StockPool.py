@@ -3,9 +3,10 @@
 from TradeApi import *
 from Utils import *
 import xlrd
+import time
 
-class StockPool(object):
-    """股票池"""
+class StockPool(Singleton):
+    """ 管理可交易的股票 """
 
     _tradeApi = None
     # structure of pooled stocks
@@ -36,12 +37,14 @@ class StockPool(object):
         
     def acquire(self, stock, share):
         """ 获得相应数目股票, 返回撤消订单号和下单股数"""
-        assert num % 100 == 0
+        assert type(share) is int and share > 0
+        assert share % 100 == 0
         if not self._stock_pool.has_key(stock):
-            return u"股票池中没有该股票"
+            print u"股票池中没有该股票"
+            return [],[],0
 
         order_dict = self._stock_pool[stock]["订单列表"]
-        sorted_order_dict = sorted(order_dict.items(), key=lambda d:d[1], reverse=True)
+        sorted_dict = sorted(order_dict.items(), key=lambda d:d[1], reverse=True)
         
         keys = [ i[0] for i in sorted_dict ]
         values = [ i[1] for i in sorted_dict ]
@@ -49,53 +52,54 @@ class StockPool(object):
         greater_pos = None
         out_key_list = []
         out_value_list = []
-        if sum(values) < num:
-            return u"证券数量不足"
+        if sum(values) < share:
+            print u"证券数量不足"
+            return [],[],0
         for i in range(len(sorted_dict)):
             if not greater_pos:
-                if values[i] == num:
+                if values[i] == share:
                     out_key_list.append(keys[i])
                     out_value_list.append(values[i])
                     return out_key_list,out_value_list,0
-                elif values[i] > num:
+                elif values[i] > share:
                     if i == len(values)-1:
                         out_key_list.append(keys[i])
                         out_value_list.append(values[i])
-                        return out_key_list,out_value_list,values[i]-num
+                        return out_key_list,out_value_list,values[i]-share
                     continue
                 else:
                     greater_pos = i-1
                     s = sum(values[i:])
-                    if s == num:
+                    if s == share:
                         out_key_list = keys[i:]
                         out_value_list = values[i:]
                         return out_key_list,out_value_list,0
-                    elif s < num:
+                    elif s < share:
                         out_key_list = keys[greater_pos]
                         out_value_list = values[greater_pos]
-                        return out_key_list,out_value_list,values[greater_pos]-num
+                        return out_key_list,out_value_list,values[greater_pos]-share
                     else:
-                        num = num - values[i]
+                        share = share - values[i]
                         out_key_list.append(keys[i])
                         out_value_list.append(values[i])
                         continue
 
             # 列表中元素值小于目标值的位置
-            if num == values[i]:
+            if share == values[i]:
                 out_key_list.append(keys[i])
                 out_value_list.append(values[i])
                 return out_key_list,out_value_list,0
-            elif num < values[i]:
+            elif share < values[i]:
                 if i == len(values)-1:
                     out_key_list.append(keys[i])
                     out_value_list.append(values[i])
-                    return out_key_list,out_value_list,values[i]-num
+                    return out_key_list,out_value_list,values[i]-share
                 continue
             else:
-                num = num - values[i]
+                share = share - values[i]
                 out_key_list.append(keys[i])
                 out_value_list.append(values[i])
-                if num == 0:
+                if share == 0:
                     return out_key_list,out_value_list,0
             
         
@@ -180,6 +184,13 @@ class StockPool(object):
                 pool["融券数量"] += order_share
                 if pool["融券数量"] > pool["融券上限"]:
                     pool["融券上限"] = pool["融券数量"]
+
+    def removeOrder(self, order_id):
+        for k,v in self._stock_pool.iteritems():
+            if v["订单列表"].has_key(order_id):
+                v["订单列表"].pop(order_id)
+                return True
+        return False
     
     def setUpperLimit(self, stock_code, max_shares):
         """ 设置股票池中某只股票存储上限 """
@@ -199,6 +210,7 @@ class StockPool(object):
 
     def sync(self):
         """ 与服务器同步股票池 """
+        self._stock_pool = {}
         rst = self._tradeApi.Query("可撤单")
         if not rst:
             return rst
@@ -280,6 +292,14 @@ class StockPool(object):
         if not rst:
             return rst
 
+    def lock(self, stock, share):
+        """ 买单锁定股票 """
+        pass
+
+    def unLock(self, stock, share):
+        """ 解锁股票 """
+        pass
+
 if __name__ == "__main__":
     #print grabStocks('05a.xls')
     api = TradeApi()
@@ -287,13 +307,37 @@ if __name__ == "__main__":
     rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
     sp = StockPool(api)
     
-    xls = xlrd.open_workbook('05a.xls')
-    table = xls.sheets()[0]
-    stocks = [i.encode() for i in table.col_values(0)]
-    shares = [int(i) for i in table.col_values(1)]
+    #xls = xlrd.open_workbook('05a.xls')
+    #table = xls.sheets()[0]
+    #stocks = [i.encode() for i in table.col_values(0)]
+    #shares = [int(i) for i in table.col_values(1)]
     #sp.addStock(stocks, shares)
     sp.sync()
-    print sp.acquire('002294', 1000)
     printd([sp.getStock()])
+    print "======"
+    printd([sp.getStock()['002294']])
 
-    
+##    for i in range(1,3):
+##        sp.sync()
+##        printd([sp.getStock()['002294']])
+##        
+##        xx = i * 100
+##        pr = 41.73
+##        c,d,e = sp.acquire('002294', xx)
+##        print c
+##        print d
+##        print e
+##        if c:
+##            printd(api.CancelOrder(c))
+##            time.sleep(0.5)
+##            if e == 0:
+##                printd(api.Short('002294', pr, xx))
+##            else:
+##                printd(api.SendOrders([3,3],['002294','002294'],[pr,41.76], [xx, e]))
+##            for i in c:
+##                sp.removeOrder(i)
+##
+##            printd([sp.getStock()['002294']])
+##            time.sleep(1)
+##        else:
+##            print u"下单失败",xx,c,d,e
