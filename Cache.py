@@ -21,7 +21,7 @@ class Cache(Singleton):
         if api:
             assert type(api) is TradeApi
         if not self._tradeApi and not api:
-            raise Exception("Need creat with TradeApi First")
+            raise Exception("Need create with TradeApi First")
         self._tradeApi = api
 
     def add(self, stock):

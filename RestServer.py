@@ -9,6 +9,9 @@ import os
 from Buy import Buy
 from Sell import Sell
 from Cancel import Cancel
+from GetStockPool import getStockPool
+
+from StockPool import *
 
 from tornado.options import define, options
 define("port", default=8888, help="run on the given port", type=int)
@@ -19,9 +22,12 @@ class IndexHandler(tornado.web.RequestHandler):
 
 class QueryHandler(tornado.web.RequestHandler):
     def get(self):
-        types = self.get_argument('types')
-        print type(types)
-        #self.write('query ', types)
+        catalogues = self.get_argument('catalogues')
+        if catalogues == u"stockpool":
+            rst = getStockPool()
+            self.write(rst)
+        elif:
+            pass
         self.finish()
 
 class BuyHandler(tornado.web.RequestHandler):
@@ -59,6 +65,13 @@ class SWServer(tornado.web.Application):
     pass
 
 if __name__ == "__main__":
+    api = TradeApi()
+    api.Open()
+    rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
+    if not rst:
+        print rst
+    sp = StockPool(api)
+    
     tornado.options.parse_command_line()
     settings = {
     "static_path": os.path.join(os.path.dirname(__file__), "static").decode('gbk'),
