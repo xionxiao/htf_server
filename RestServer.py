@@ -4,6 +4,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
+import os
 
 from Buy import Buy
 from Sell import Sell
@@ -19,7 +20,9 @@ class IndexHandler(tornado.web.RequestHandler):
 class QueryHandler(tornado.web.RequestHandler):
     def get(self):
         types = self.get_argument('types')
-        self.write('query ', types)
+        print type(types)
+        #self.write('query ', types)
+        self.finish()
 
 class BuyHandler(tornado.web.RequestHandler):
     def post(self):
@@ -47,8 +50,9 @@ class CencelHandler(tornado.web.RequestHandler):
         order = self.get_argument('order').encode()
         self.write(u'³·µ¥ ' + order)
         print type(order)
-        rst = Cancel(order)
-        self.write(rst)
+        print order
+        #rst = Cancel(order)
+        #self.write(rst)
         self.finish()
 
 class SWServer(tornado.web.Application):
@@ -56,12 +60,15 @@ class SWServer(tornado.web.Application):
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()
+    settings = {
+    "static_path": os.path.join(os.path.dirname(__file__), "static").decode('gbk'),
+    }
     router = [(r"/", IndexHandler),
               (r"/buy", BuyHandler),
               (r"/sell", SellHandler),
               (r"/cancel", CencelHandler),
-              (r"/query/[0-9]{6}", QueryHandler)]
-    app = tornado.web.Application(handlers=router)
+              (r"/query", QueryHandler)]
+    app = tornado.web.Application(handlers=router, **settings)
     http_server = tornado.httpserver.HTTPServer(app)
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()

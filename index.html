@@ -1,131 +1,117 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<HTML>
- <HEAD>
-  <TITLE>股票交易</TITLE>
-  <meta charset="utf-8">
-  <style type="text/css">
-	#containner {
-		position: relative;
-	}
-    #buy {
-		width: 50%;
-		margin: 10 auto;
-		border: 1px solid gray
-	}
-    #sell {
-		width: 50%;
-		margin: 10 auto;
-		border: 1px solid gray;
-	}
-	#cancel {
-		width:50%;
-		margin: 10 auto;
-		border: 1px solid gray;
-	}
-	#output {
-		width:50%;
-		margin: 10 auto;
-		border: 1px solid gray;
-	}
-	.table {
-		border: 1px solid gray;
-	}
-  </style>
-  <SCRIPT LANGUAGE="JavaScript">
-  <!--
-	function OnKey(evt) {
-		console.log(evt.keyCode)
-		console.log(evt.altKey)
-		if (evt.altKey) {
-			switch (evt.keyCode)
-			{
-			case 49:
-				var item = document.getElementById("buy_stock");
-				item.focus()
-				break;
-			case 50:
-				var item = document.getElementById("sell_stock");
-				item.focus()
-				item.vaule=""
-				break;
-			case 51:
-				var item = document.getElementById("cancel_order");
-				item.focus()
-				break;
-			}
-		}
-	}
-  </SCRIPT>
- </HEAD>
+<!DOCTYPE html>
+<html>
+    <head> 
+        <title>股票交易</title> 
+        <meta charset="utf-8" /> 
+        <link href="static/css/bootstrap.min.css" rel="stylesheet" /> 
+        <!-- 包括所有已编译的插件 --> 
+        <script src="static/js/jquery.min.js"></script>
+        <script src="static/js/bootstrap.min.js"></script> 
+        <script src="static/js/trade.js"></script> 
+        <style type="text/css">
+            .table {
+                margin-bottom:1px;
+                margin-top:10px;
+            }
+            #stock-pool {
+                height: 245px;
+            }
+            #order-list {
+                height: 245px;
+            }
+            #result-panel {
+                height: 163px;
+            }
+            .glyphicon:hover {
+                color:#5bc0de;
+                cursor:hand;
+            }
+            .glyphicon:active {
+                color:white;
+            }
+            .panel-body {
+                overflow-y: auto;
+                max-height: 205px;
+            }
+        </style>
+    </head> 
+    <body onkeyup="KeyShortcuts(event)"> 
+        <div class="container"> 
+            <h1>股票交易</h1> 
+            <div class="row"> 
+                <div class="col-xs-4"> 
 
- <BODY onkeyup="OnKey(event)">
- <div id="containner">
- <div id="buy">
- <div style="width:100%; background-color:rgba(175,0,0,1); color:white;"><b>买入股票</b></div>
- <form method="post" action="http://localhost:8888/buy" name="Buy" target="output">
- <TABLE>
- <TR>
-	<TD>股票代码</TD>
-	<TD><input type="text" name="stock" id="buy_stock"></input></TD>
- </TR>
- <TR>
-	<TD>股票价格</TD>
-	<TD><input type="text" name="price"></input></TD>
- </TR>
- <TR>
-	<TD>买入数量</TD>
-	<TD><input type="text" name="share"></input></TD>
- </TR>
- <TR>
-	<TD>提交</TD>
-	<TD><input type="submit" value="买入股票"></input></TD>
- </TR>
- </TABLE>
- </form>
- </div>
+                    <div class="panel panel-danger">
+                        <div class="panel-heading"> 
+                            <h3 class="panel-title">买入股票</h3> 
+                        </div> 
+                        <div class="panel-body">
+                            <form id="form-buy" method="post" action="http://localhost:8888/buy" name="Buy" target="result-panel"> 
+                                <table class="table table-hover table-condensed"> 
+                                    <tr> <td>股票代码</td> <td><input class="input-sm form-control" type="text" name="stock" id="buy_stock" /></td> </tr> 
+                                    <tr> <td>股票价格</td> <td><input class="input-sm form-control" type="text" name="price" /></td> </tr> 
+                                    <tr> <td>买入数量</td> <td><input class="input-sm form-control" type="text" name="share" /></td> </tr> 
+                                    <tr> <td>提交</td> <td><input class="input-sm btn btn-danger" type="button" value="买入股票" onClick="ExcuteBuyStock()" /></td> </tr> 
+                                </table> 
+                            </form> 
+                        </div>
+                    </div>
 
- <div id="sell">
- <div style="width:100%; background-color:rgba(0,155,0,1);color:white;"><b>卖出股票<b></div>
- <form method="post" action="http://localhost:8888/sell" name="Sell" target="output">
- <TABLE>
- <TR>
-	<TD>股票代码</TD>
-	<TD><input type="text" name="stock" id="sell_stock"></input></TD>
- </TR>
- <TR>
-	<TD>股票价格</TD>
-	<TD><input type="text" name="price"></input></TD>
- </TR>
- <TR>
-	<TD>卖出数量</TD>
-	<TD><input type="text" name="share"></input></TD>
- </TR>
- <TR>
-	<TD>提交</TD>
-	<TD><input type="submit" value="卖出股票"></input></TD>
- </TR>
- </TABLE>
- </form>
- </div>
- 
- <div id="cancel">
- <div style="width:100%; background-color:rgba(0,0,215,1);color:white;"><b>撤消订单</b></div>
- <form method="post" action="http://localhost:8888/cancel" name="Cancel" target="output">
- <TABLE>
- <TR>
-	<TD>订单编号</TD>
-	<TD><input type="text" name="order" id="cancel_order"></input></TD>
-	<TD><input type="submit" value="撤消订单"></input></TD>
- </TR>
- </TABLE>
- </form>
- </div>
+                    <div class="panel panel-success">
+                        <div class="panel-heading"> 
+                            <h3 class="panel-title">卖出股票</h3> 
+                        </div> 
+                        <div class="panel-body">
+                            <form id="form-sell" method="post" action="http://localhost:8888/sell" name="Sell" target="output"> 
+                                <table class="table table-hover table-condensed"> 
+                                    <tr> <td>股票代码</td> <td><input class="input-sm form-control" type="text" name="stock" id="sell_stock" /></td> </tr> 
+                                    <tr> <td>股票价格</td> <td><input class="input-sm form-control" type="text" name="price" /></td> </tr> 
+                                    <tr> <td>卖出数量</td> <td><input class="input-sm form-control" type="text" name="share" /></td> </tr> 
+                                    <tr> <td>提交</td> <td><input class="input-sm btn btn-success" type="button" value="卖出股票" onClick="ExcuteSellStock();"/></td></tr> 
+                                </table> 
+                            </form> 
+                        </div>
+                    </div>
 
- <div id="output">
-	<div style="width:100%; background-color:rgba(155,155,215,1);color:white;"><b>返回结果</b></div>
-	<iframe frameborder=0 width=100% marginheight=0 marginwidth=0 scrolling="yes" name="output"></iframe>
- </div>
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">撤消订单</h3> 
+                        </div>
+                        <div class="panel-body">
+                            <form id="form-cancel" method="post" action="http://localhost:8888/cancel" name="Cancel" target="output"> 
+                                <table class="table table-hover table-condensed"> 
+                                    <tr> <td>订单编号</td> <td><input class="input-sm form-control" type="text" name="order" id="cancel_order" /></td> </tr> 
+                                    <tr> <td>提交</td> <td><input class="input-sm btn btn-info" type="button" value="撤消订单" onClick="ExcuteCancelOrder();"/></td> </tr> 
+                                </table> 
+                            </form> 
+                        </div>
+                    </div>
+                </div>
 
- </div>
- </BODY>
-</HTML>
+                <div class="col-xs-8 right"> 
+                    <div id="stock-pool" class="panel panel-default">
+                        <div class="panel-heading clearfix">
+                            <h3 class="panel-title">股票池<span class="glyphicon glyphicon-refresh pull-right" onclick="RefreshStockPool();"></span></h3>
+                        </div>
+                        <div class="panel-body">
+                        </div>
+                    </div>
+                    <div id="order-list" class="panel panel-default clearfix" height="500px">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">订单列表<span class="glyphicon glyphicon-refresh pull-right" onclick="RefreshOrderList();"></span></h3>
+                        </div>
+                        <div class="panel-body">
+                        </div>
+                    </div>
+                    <div id="result-panel" class="panel panel-default" height="500px">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">返回结果<span class="glyphicon glyphicon-remove pull-right" onclick="ClearResultPanel();"></span></h3>
+                        </div>
+                        <div class="panel-body">
+                        </div>
+                    </div>
+                </div> 
+            </div> 
+        </div> 
+    </body>
+</html>
