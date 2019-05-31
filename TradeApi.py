@@ -8,6 +8,9 @@ import time
 
 class TradeApi(Singleton):
     __clientId = -1
+    __ip = ""
+    __port = None
+    
     # 查询类型
     QUERY_TYPE = ("资金",  # 0
                   "股份",  # 1 
@@ -58,13 +61,15 @@ class TradeApi(Singleton):
         client = self._dll.Logon(ip, port, version, account, password, TxPassword, rst.ErrInfo)
         if client != -1:
             self.__clientId = client
+            self.__ip = ip
+            self.__port = port
         return rst
 
     def Logoff(self):
         if self.__clientId != -1:
             self._dll.Logoff(self.__clientId)
 
-    def IsLogon(self):
+    def isLogon(self):
         return bool(self.__clientId != -1)
     
     def QueryData(self, category):
@@ -275,8 +280,8 @@ if __name__ == "__main__":
     print "========"
     printd(api.Query("融资余额"))
     print "========"
-    printd(api.Query("融券余额")) # 系统暂不支持该功能
-    print "========"
+    #printd(api.Query("融券余额")) # 系统暂不支持该功能
+    #print "========"
     printd(api.Query("可融证券")[0].head)
     print "========"
 
