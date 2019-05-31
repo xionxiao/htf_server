@@ -1,6 +1,8 @@
 # -*- coding: gbk -*-
+from Utils import *
+from TradeApi import *
 
-class Cache(object):
+class Cache(Singleton):
     """ 缓存系统 """
 
     # structure of stock cache
@@ -15,10 +17,12 @@ class Cache(object):
     _stock_cache = {}
     _tradeApi = None
 
-    def __init__(self, tradeApi):
-        if not tradeApi.IsLogon():
-            raise Exception("Need logon first")
-        self._tradeApi = tradeApi
+    def __init__(self, api=None):
+        if api:
+            assert type(api) is TradeApi
+        if not self._tradeApi and not api:
+            raise Exception("Need creat with TradeApi First")
+        self._tradeApi = api
 
     def add(self, stock):
         rst = self._tradeApi.Query("行情", stock=stocks)
@@ -51,4 +55,31 @@ class Cache(object):
             return self._stock_cache[stock][variety]
         return None
 
+    def __getitem__(self, stock):
+        if self._stock_cache.has_key(stock):
+            return self._stock_cache[stock][variety]
+        return None
 
+    def has_key(self, stock):
+        return self._stock_cache.has_key(stock)
+
+    def cacheMarginableStocks(self):
+        """ 缓存可融证券的 证券代码，证券名称，昨收价，涨停价 """
+
+        rst = self._tradeApi.Query("可融证券")
+        if not rst:
+            return rst
+        stocks = rst[0]["证券代码"]
+        self.add(stocks)
+        return True
+
+
+if __name__ == "__main__":
+    api = TradeApi()
+    if not api.isLogon():
+        api.Open()
+        rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
+        printd(rst)
+    cache = Cache(api)
+    print cache.has_key("1234")
+    

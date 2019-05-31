@@ -2,6 +2,7 @@
 
 from TradeApi import *
 from Utils import *
+from Cache import *
 import xlrd
 import time
 
@@ -18,22 +19,13 @@ class StockPool(Singleton):
     #   }
     # }
     _stock_pool = {}
-    # structure of stock cache
-    # { stock_code: 证券代码为键值
-    #   {
-    #       证券代码: 600036
-    #       证券名称: 招商银行
-    #       涨停价: 19.98
-    #       昨收价: 18.16
-    #   }
-    # }
-    _stock_cache = {}
+    _cache = None
     
-    def __init__(self, tradeApi):
-        if not tradeApi.IsLogon():
-            raise Exception("Need logon first")
+    def __init__(self, tradeApi=None):
+        if not self._tradeApi and not tradeApi:
+            raise Exception("Need create with TradeApi first")
         self._tradeApi = tradeApi
-        self.__cacheStock()
+        self._cache = Cache(tradeApi)
         
     def acquire(self, stock, share):
         """ 获得相应数目股票, 返回撤消订单号和下单股数"""
@@ -101,41 +93,7 @@ class StockPool(Singleton):
                 out_value_list.append(values[i])
                 if share == 0:
                     return out_key_list,out_value_list,0
-            
-        
-    def __cacheStock(self, stocks=None):
-        """ 缓存可融证券的 证券代码，证券名称，昨收价，涨停价 """
 
-        if not stocks:
-            rst = self._tradeApi.Query("可融证券")
-            if not rst:
-                return rst
-            stocks = rst[0]["证券代码"]
-
-        rst = self._tradeApi.Query("行情", stock=stocks)
-
-        ret_val = []
-        for i in range(len(rst)):
-            r = rst[i]
-            if not r:
-                ret_val.append(r)
-                continue
-
-            _stock_code = r["证券代码"][0]
-            _stock_name = r["证券名称"][0]
-            _closing_price = float(r["昨收价"][0])
-            _harden_price = round_up_decimal_2(_closing_price*1.1)
-
-            cache = {
-                     "证券代码": _stock_code,
-                     "证券名称": _stock_name,
-                     "昨日收盘价": _closing_price,
-                     "涨停价": _harden_price,
-                    }
-            self._stock_cache[_stock_code] = cache
-
-        return ret_val
-    
     def addStock(self, stock_code, upper_limit):
         """在股票池中增加单只股票"""
         # 参数检查
@@ -146,17 +104,16 @@ class StockPool(Singleton):
         assert len(stock_code) == len(upper_limit)
 
         for i in range(len(stock_code)):
-            if self._stock_cache.has_key(stock_code[i]):
-                _upper_limit = upper_limit[i]
-                assert type(_upper_limit) is int and _upper_limit >= 0
-                stock = {
-                         "融券数量": 0,
-                         "融券上限": _upper_limit,
-                         "订单列表": {}
-                        }
-                self._stock_pool[stock_code[i]] = stock
+            _upper_limit = upper_limit[i]
+            assert type(_upper_limit) is int and _upper_limit >= 0
+            stock = {
+                     "融券数量": 0,
+                     "融券上限": _upper_limit,
+                     "订单列表": {}
+                    }
+            self._stock_pool[stock_code[i]] = stock
 
-    def getStock(self):
+    def getStocks(self):
         return self._stock_pool
 
     def addOrder(self, stock_code, order_id, order_price, order_share, order_type):
@@ -165,7 +122,7 @@ class StockPool(Singleton):
         assert type(order_price) is float
 
         pool = self._stock_pool
-        cache = self._stock_cache
+        cache = self._cache
 
         if not cache.has_key(stock_code):
             return u"订单不是可融证券"
@@ -217,10 +174,10 @@ class StockPool(Singleton):
 
         # 无可撤订单
         order_stocks = {}
-        if not rst[0]:
+        if not rst[0][0]:
             return
-
-        self.__cacheStock([ i[1] for i in rst[0] ])
+        
+        self._cache.Add(rst[0]["证券代码"])
         # 整理重复订单 {证券代码：[订单信息]}
         for record in rst[0]:
             stock_code = record[1]
@@ -233,7 +190,7 @@ class StockPool(Singleton):
 
     def fillAll(self):
         pool = self._stock_pool
-        cache = self._stock_cache
+        cache = self._cache
 
         stock_code = pool.keys()
         stock_share = [ pool[i]["融券上限"] for i in stock_code ]
@@ -303,8 +260,9 @@ class StockPool(Singleton):
 if __name__ == "__main__":
     #print grabStocks('05a.xls')
     api = TradeApi()
-    api.Open()
-    rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
+    if not api.isLogon():
+        api.Open()
+        rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
     sp = StockPool(api)
     
     #xls = xlrd.open_workbook('05a.xls')
@@ -313,9 +271,9 @@ if __name__ == "__main__":
     #shares = [int(i) for i in table.col_values(1)]
     #sp.addStock(stocks, shares)
     sp.sync()
-    printd([sp.getStock()])
+    printd([sp.getStocks()])
     print "======"
-    printd([sp.getStock()['002294']])
+    printd([sp.getStocks()['002294']])
 
 ##    for i in range(1,3):
 ##        sp.sync()
