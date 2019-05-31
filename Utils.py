@@ -8,10 +8,11 @@ class Singleton(object):
   __instance=None
   def __init__(self):
     pass
+  
   def __new__(cls,*args,**kwd):
-    if Singleton.__instance is None: 
-      Singleton.__instance=object.__new__(cls,*args,**kwd)
-    return Singleton.__instance
+    if not isinstance(cls.__instance, cls):
+      cls.__instance=object.__new__(cls,*args,**kwd)
+    return cls.__instance
 
 def round_up_decimal_2(float_number):
     """ 修复python round()四舍六入问题,保留两位小数 """

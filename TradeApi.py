@@ -6,7 +6,7 @@ from ResultBuffer import *
 import datetime
 import time
 
-class TradeApi(object):
+class TradeApi(Singleton):
     __clientId = -1
     # 查询类型
     QUERY_TYPE = ("资金",  # 0
