@@ -15,11 +15,21 @@ function ExcuteSellStock() {
 	console.log("Sell");
 	params = $('#form-sell').serialize();
 	console.log(params);
-	$.post("http://localhost:8888/sell",params, function(data){
-		$("#result-panel .panel-body").append(data);
-		$("#result-panel .panel-body").append("<br>");
-		RefreshStockPool()
-	})
+	price = $('#form-sell #sell_price').val();
+	console.log(price);
+	if (price) {
+		$.post("http://localhost:8888/sell",params, function(data){
+			$("#result-panel .panel-body").append(data);
+			$("#result-panel .panel-body").append("<br>");
+			RefreshStockPool();
+		});
+	} else {
+		$.post("http://localhost:8888/instant_sell",params, function(data){
+			$("#result-panel .panel-body").append(data);
+			$("#result-panel .panel-body").append("<br>");
+			RefreshStockPool();
+		});
+	}
 }
 
 function ExcuteCancelOrder() {
@@ -57,9 +67,8 @@ function ClearResultPanel() {
 }
 
 function KeyShortcuts(evt) {
-	console.log(evt.keyCode)
-	console.log(evt.altKey)
 	if (evt.altKey) {
+		console.log(evt.keyCode)
 		switch (evt.keyCode)
 		{
 		case 49:

@@ -63,11 +63,15 @@ class SellHandler(tornado.web.RequestHandler):
 
 class InstantSellHandler(tornado.web.RequestHandler):
     def post(self):
-        stock = self.get_argument('stock').encode()
-        share = int(self.get_argument('share'))
+        try:
+            stock = self.get_argument('stock').encode()
+            share = int(self.get_argument('share'))
+        except:
+            self.write(u"²ÎÊı´íÎó")
+            self.finish()
+            return
         self.write(u'¼´Ê±Âô¿Õ ' + str(stock) + "\t" + "\t" + str(share) + "\n")
         rst = InstantSell(stock, share)
-        print rst
         self.write(rst)
         self.finish()
 
