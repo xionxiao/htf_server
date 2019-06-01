@@ -1,21 +1,32 @@
 function ExcuteBuyStock() {
-	console.log("Buy")
+	console.log("Buy");
 	console.log($('#form-buy').serialize());
+	params = $('#form-buy');
+	console.log(params.val())
 	$.post("http://localhost:8888/buy",$('#form-buy').serialize(), function(data){
-		$("#result-panel .panel-body").empyt()
+		console.log(data)
+		$("#result-panel .panel-body").append(data);
+		$("#result-panel .panel-body").append("<br>");
 	})
 }
 
 function ExcuteSellStock() {
-	console.log("Sell")
-	console.log($('#form-sell').serialize());
-	$.post("http://localhost:8888/sell",$('#form-sell').serialize())
+	console.log("Sell");
+	params = $('#form-sell').serialize();
+	console.log(params);
+	$.post("http://localhost:8888/sell",params, function(data){
+		$("#result-panel .panel-body").append(data);
+		$("#result-panel .panel-body").append("<br>");
+	})
 }
 
 function ExcuteCancelOrder() {
-	console.log("Cancel")
+	console.log("Cancel");
 	console.log($('#form-cancel').serialize());
-	$.post("http://localhost:8888/cancel",$('#form-cancel').serialize())
+	$.post("http://localhost:8888/cancel",$('#form-cancel').serialize(), function(data){
+		$("#result-panel .panel-body").append(data);
+		$("#result-panel .panel-body").append("<br>");
+	})
 }
 
 function RefreshStockPool() {
@@ -40,8 +51,7 @@ function RefreshOrderList() {
 
 function ClearResultPanel() {
 	console.log("Clear Result Panel");
-	$("#result-panel .panel-body").empyt();
-	
+	$("#result-panel .panel-body").empty();
 }
 
 function KeyShortcuts(evt) {

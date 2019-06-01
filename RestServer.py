@@ -26,8 +26,6 @@ class QueryHandler(tornado.web.RequestHandler):
         if catalogues == u"stockpool":
             rst = getStockPool()
             self.write(rst)
-        elif:
-            pass
         self.finish()
 
 class BuyHandler(tornado.web.RequestHandler):
@@ -35,9 +33,17 @@ class BuyHandler(tornado.web.RequestHandler):
         stock = self.get_argument('stock').encode()
         price = self.get_argument('price')
         share = self.get_argument('share')
-        self.write(u'买入 ' + str(stock) + "\t" + str(price) + "\t" + str(share) + "\n")
+        try:
+            float(price)
+            int(share)
+        except:
+            self.write(u"参数错误")
+            self.finish()
+            return
+                
+        self.write(u'买入 ' + str(stock) + "\t" + str(price) + "\t" + str(share) + "\t\n")
         rst = Buy(stock, price, share)
-        self.write(str(rst).decode('gbk'))
+        self.write(rst)
         self.finish()
 
 class SellHandler(tornado.web.RequestHandler):
