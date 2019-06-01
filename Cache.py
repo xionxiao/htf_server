@@ -53,7 +53,9 @@ class Cache(Singleton):
         assert variety in ["证券代码","证券名称","昨日收盘价","涨停价"]
         if self._stock_cache.has_key(stock):
             return self._stock_cache[stock][variety]
-        return None
+        else:
+            self.add(stock)
+            return self._stock_cache[stock][variety]
 
     def __getitem__(self, stock):
         if self._stock_cache.has_key(stock):

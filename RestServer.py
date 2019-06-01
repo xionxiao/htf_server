@@ -48,11 +48,25 @@ class BuyHandler(tornado.web.RequestHandler):
 
 class SellHandler(tornado.web.RequestHandler):
     def post(self):
-        stock = self.get_argument('stock').encode()
-        price = float(self.get_argument('price'))
-        share = int(self.get_argument('share'))
-        self.write(u'Âô¿Õ ' + str(stock) + "\t" + str(price) + "\t" + str(share) + "\n")
+        try:
+            stock = self.get_argument('stock').encode()
+            price = float(self.get_argument('price'))
+            share = int(self.get_argument('share'))
+        except:
+            self.write(u"²ÎÊý´íÎó")
+            self.finish()
+            return
+        self.write(u'Âô¿Õ ' + str(stock) + "\t" + str(price) + "\t" + str(share) + "\t\n")
         rst = Sell(stock, price, share)
+        self.write(rst)
+        self.finish()
+
+class InstantSellHandler(tornado.web.RequestHandler):
+    def post(self):
+        stock = self.get_argument('stock').encode()
+        share = int(self.get_argument('share'))
+        self.write(u'¼´Ê±Âô¿Õ ' + str(stock) + "\t" + "\t" + str(share) + "\n")
+        rst = InstantSell(stock, share)
         print rst
         self.write(rst)
         self.finish()
@@ -63,7 +77,7 @@ class CencelHandler(tornado.web.RequestHandler):
         self.write(u'³·µ¥ ' + order)
         print type(order)
         print order
-        #rst = Cancel(order)
+        rst = Cancel(order)
         #self.write(rst)
         self.finish()
 
@@ -85,6 +99,7 @@ if __name__ == "__main__":
     router = [(r"/", IndexHandler),
               (r"/buy", BuyHandler),
               (r"/sell", SellHandler),
+              (r"/instant_sell", InstantSellHandler),
               (r"/cancel", CencelHandler),
               (r"/query", QueryHandler)]
     app = tornado.web.Application(handlers=router, **settings)
