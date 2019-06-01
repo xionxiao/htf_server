@@ -25,7 +25,7 @@ class Cache(Singleton):
         self._tradeApi = api
 
     def add(self, stock):
-        rst = self._tradeApi.Query("行情", stock=stocks)
+        rst = self._tradeApi.Query("行情", stock)
 
         ret_val = []
         for i in range(len(rst)):
@@ -59,7 +59,7 @@ class Cache(Singleton):
 
     def __getitem__(self, stock):
         if self._stock_cache.has_key(stock):
-            return self._stock_cache[stock][variety]
+            return self._stock_cache[stock]
         return None
 
     def has_key(self, stock):

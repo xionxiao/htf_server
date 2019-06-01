@@ -78,7 +78,7 @@ class CencelHandler(tornado.web.RequestHandler):
         print type(order)
         print order
         rst = Cancel(order)
-        #self.write(rst)
+        self.write(rst)
         self.finish()
 
 class SWServer(tornado.web.Application):

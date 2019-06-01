@@ -7,6 +7,7 @@ function ExcuteBuyStock() {
 		console.log(data)
 		$("#result-panel .panel-body").append(data);
 		$("#result-panel .panel-body").append("<br>");
+		RefreshStockPool()
 	})
 }
 
@@ -17,6 +18,7 @@ function ExcuteSellStock() {
 	$.post("http://localhost:8888/sell",params, function(data){
 		$("#result-panel .panel-body").append(data);
 		$("#result-panel .panel-body").append("<br>");
+		RefreshStockPool()
 	})
 }
 
@@ -26,6 +28,7 @@ function ExcuteCancelOrder() {
 	$.post("http://localhost:8888/cancel",$('#form-cancel').serialize(), function(data){
 		$("#result-panel .panel-body").append(data);
 		$("#result-panel .panel-body").append("<br>");
+		RefreshStockPool()
 	})
 }
 

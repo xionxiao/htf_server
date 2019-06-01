@@ -177,7 +177,7 @@ class StockPool(Singleton):
         if not rst[0][0]:
             return
         
-        self._cache.Add(rst[0]["证券代码"])
+        self._cache.add(rst[0]["证券代码"])
         # 整理重复订单 {证券代码：[订单信息]}
         for record in rst[0]:
             stock_code = record[1]

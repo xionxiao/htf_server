@@ -9,6 +9,7 @@ def Cancel(order_id):
     api = TradeApi()
     api.Open()
     api.Logon("59.173.7.38", 7708, "184039030", "326326")
+    cache = Cache()
     rst = api.Query("可撤单")
     order = None
     ret_val = ""
@@ -17,7 +18,6 @@ def Cancel(order_id):
     # 解析rst, 找到对应的order的行
     if order_id in rst[0]["委托编号"]:
         index = rst[0]["委托编号"].index(order_id)
-        print index
         order = rst[0][index]
     else:
         return u"没有此订单" + str(order_id)
@@ -36,11 +36,13 @@ def Cancel(order_id):
         if bool(rst):
             time.sleep(0.3)
             # 获得当前涨停价
-            cache = Cache()
             price = cache.get(order[1],"涨停价")
             # 涨停价下单
-            rst = api.Short(order[1], price, order[8])
-            ret_val = u"撤单成功，抢回 " + order[8]
+            rst = api.Short(order[1], price, int(float(order[8])))
+            if rst:
+                ret_val = u"撤单成功，抢回 " + order[8]
+            else:
+                ret_val = u"撤单成功, 抢回失败 " + str(rst)
         else:
             ret_val = u"撤单失败：\n" + str(rst).decode('string_escape')
 
