@@ -45,20 +45,45 @@ function ExcuteCancelOrder() {
 function RefreshStockPool() {
 	console.log("Refresh Stock Pool")
 	$.get("http://localhost:8888/query",{"catalogues":"stockpool"}, function(data) {
-		console.log(data);
 		obj = eval("("+data+")");
 		$("#stock-pool .panel-body table tbody").empty();
-		item_str = ""
+		item_str = "";
+		var color = "gray";
 		for ( i in obj) {
-			item_str += "<tr><td>"+i+"</td><td>"+obj[i]["融券数量"]+"</td></tr>";
+			item_str += "<tr id="+i+'" style="color:' + color +';"' + ">";
+			item_str += "<td>"+i+"</td>";
+			item_str += "<td>"+obj[i]["证券名称"]+"</td>";
+			item_str += "<td>"+obj[i]["涨停价"]+"</td>";
+			item_str += "<td>"+obj[i]["融券数量"]+"</td>";
+			item_str += "</tr>";
 		}
-		item_str += "<tr><td></td><td></td></tr>";
 		$("#stock-pool .panel-body table tbody").append(item_str);
 	})
 }
 
 function RefreshOrderList() {
 	console.log("Refresh Order List")
+	$.get("http://localhost:8888/query",{"catalogues":"orderlist"}, function(data) {
+		console.log(data);
+		obj = eval("("+data+")");
+		$("#order-list .panel-body table tbody").empty();
+		item_str = ""
+		for ( i in obj) {
+			var color = 'blue'
+			if (obj[i]["买卖标志"] == "买入") {
+					var color = 'red'
+			} 
+			item_str += "<tr id="+i+'" style="color:' + color +';"' + ">";
+			item_str += "<td>"+obj[i]["证券代码"]+"</td>";
+			item_str += "<td>"+obj[i]["证券名称"]+"</td>";
+			item_str += "<td>"+obj[i]["买卖标志"]+"</td>";
+			item_str += "<td>"+obj[i]["成交价格"]+"</td>";
+			item_str += "<td>"+obj[i]["成交数量"]+"</td>";
+			item_str += "<td>"+obj[i]["成交时间"]+"</td>";
+			item_str += "</tr>";
+		}
+		$("#order-list .panel-body table tbody").append(item_str);
+	})
 }
 
 function ClearResultPanel() {
@@ -88,4 +113,13 @@ function KeyShortcuts(evt) {
 	}
 }
 
-$(document).ready(RefreshStockPool);
+
+function Refresh() {
+	RefreshStockPool();
+	RefreshOrderList();
+}
+
+$(document).ready(function() {
+	Refresh()
+	setInterval("Refresh()", 2000);
+})

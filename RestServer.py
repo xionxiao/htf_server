@@ -10,6 +10,7 @@ from Buy import Buy
 from Sell import Sell
 from Cancel import Cancel
 from GetStockPool import getStockPool
+from QueryOrderList import queryOrderList
 
 from StockPool import *
 
@@ -25,6 +26,9 @@ class QueryHandler(tornado.web.RequestHandler):
         catalogues = self.get_argument('catalogues')
         if catalogues == u"stockpool":
             rst = getStockPool()
+            self.write(rst)
+        if catalogues == u"orderlist":
+            rst = queryOrderList()
             self.write(rst)
         self.finish()
 
@@ -79,8 +83,6 @@ class CencelHandler(tornado.web.RequestHandler):
     def post(self):
         order = self.get_argument('order').encode()
         self.write(u'³·µ¥ ' + order)
-        print type(order)
-        print order
         rst = Cancel(order)
         self.write(rst)
         self.finish()
