@@ -5,8 +5,7 @@ function ExcuteBuyStock() {
 	console.log(params.val())
 	$.post("http://localhost:8888/buy",$('#form-buy').serialize(), function(data){
 		console.log(data)
-		$("#result-panel .panel-body").append(data);
-		$("#result-panel .panel-body").append("<br>");
+		$("#result-panel .panel-body").prepend(data +  "<br>");
 		RefreshStockPool()
 	})
 }
@@ -19,14 +18,12 @@ function ExcuteSellStock() {
 	console.log(price);
 	if (price) {
 		$.post("http://localhost:8888/sell",params, function(data){
-			$("#result-panel .panel-body").append(data);
-			$("#result-panel .panel-body").append("<br>");
+			$("#result-panel .panel-body").prepend(data +  "<br>");
 			RefreshStockPool();
 		});
 	} else {
 		$.post("http://localhost:8888/instant_sell",params, function(data){
-			$("#result-panel .panel-body").append(data);
-			$("#result-panel .panel-body").append("<br>");
+			$("#result-panel .panel-body").prepend(data +  "<br>");
 			RefreshStockPool();
 		});
 	}
@@ -36,8 +33,7 @@ function ExcuteCancelOrder() {
 	console.log("Cancel");
 	console.log($('#form-cancel').serialize());
 	$.post("http://localhost:8888/cancel",$('#form-cancel').serialize(), function(data){
-		$("#result-panel .panel-body").append(data);
-		$("#result-panel .panel-body").append("<br>");
+		$("#result-panel .panel-body").prepend(data +  "<br>");
 		RefreshStockPool();
 	})
 }
