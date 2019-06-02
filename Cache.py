@@ -25,6 +25,8 @@ class Cache(Singleton):
         self._tradeApi = api
 
     def add(self, stock):
+        print "============"
+        printd(stock)
         rst = self._tradeApi.Query("ÐÐÇé", stock)
 
         ret_val = []

@@ -91,7 +91,7 @@ class SWServer(tornado.web.Application):
 if __name__ == "__main__":
     api = TradeApi()
     api.Open()
-    rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
+    rst = api.Logon("59.173.7.38", 7708, "184039030", "326326")
     if not rst:
         print rst
     sp = StockPool(api)

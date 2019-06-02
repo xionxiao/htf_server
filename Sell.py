@@ -48,7 +48,6 @@ def Sell(stock, price, share):
                 api.Short(_stock, _raising_price, e)
             return u"失败"
 
-    printd(rst)
     order_id = rst[0][0][0]
     print order_id
 
@@ -67,7 +66,7 @@ def Sell(stock, price, share):
                 else:
                     return u"废单 " + order_id + u" 抢回失败"
 
-    return u"成功"
+    return u"成功 " + order_id
 
 if __name__ == "__main__":
     print Sell("600", 37.53, 400)

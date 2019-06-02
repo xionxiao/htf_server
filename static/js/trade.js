@@ -38,7 +38,7 @@ function ExcuteCancelOrder() {
 	$.post("http://localhost:8888/cancel",$('#form-cancel').serialize(), function(data){
 		$("#result-panel .panel-body").append(data);
 		$("#result-panel .panel-body").append("<br>");
-		RefreshStockPool()
+		RefreshStockPool();
 	})
 }
 
@@ -87,3 +87,5 @@ function KeyShortcuts(evt) {
 		}
 	}
 }
+
+$(document).ready(RefreshStockPool);
