@@ -5,19 +5,17 @@ from Utils import *
 
 def Buy(stock, price, share):
     api = TradeApi()
-    api.Open()
+    if not api.isLogon():
+        api.Open()
+        api.Logon("59.173.7.38", 7708, "184039030", "326326")
     retval = u""
-    if api.Logon("59.173.7.38", 7708, "184039030", "326326"):
-        rst = api.Buy(stock, float(price), int(share))
-        printd(rst)
-        if rst:
-            retval = str(rst[0]["Î¯ÍÐ±àºÅ"][0])
-            print retval
-        else:
-            retval = str(rst[0]).decode("gbk")
-        
-    api.Logoff()
-    api.Close()
+    rst = api.Buy(stock, float(price), int(share))
+    if rst:
+        retval = str(rst[0]["Î¯ÍÐ±àºÅ"][0])
+        print retval
+    else:
+        retval = str(rst[0]).decode("gbk")
+
     return retval
 
 if __name__ == "__main__":
