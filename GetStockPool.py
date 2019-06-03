@@ -9,10 +9,9 @@ import json
 def getStockPool():
     api = TradeApi()
     if not api.isLogon():
-        api.Open()
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
         if not rst:
-            return ""
+            return u"连接服务器失败"
     sp = StockPool(api)
     cache = Cache(api)
     sp.sync()
@@ -26,10 +25,9 @@ def getStockPool():
 if __name__ == "__main__":
     api = TradeApi()
     if not api.isLogon():
-        api.Open()
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
         if not rst:
-            print rst
+            return u"连接服务器失败"
     sp = StockPool(api)
     sp.addStock('600036', 1000)
     print "----"

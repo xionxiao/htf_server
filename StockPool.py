@@ -261,7 +261,6 @@ if __name__ == "__main__":
     #print grabStocks('05a.xls')
     api = TradeApi()
     if not api.isLogon():
-        api.Open()
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
     sp = StockPool(api)
     

@@ -8,8 +8,8 @@ import json
 def queryOrderList():
     api = TradeApi()
     if not api.isLogon():
-        api.Open()
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
+
     sp = StockPool(api)
     sp_dict = sp.getStocks()
     order_list = {}
@@ -34,7 +34,6 @@ def queryOrderList():
 if __name__ == "__main__":
     api = TradeApi()
     if not api.isLogon():
-        api.Open()
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
     sp = StockPool(api)
     sp.sync()

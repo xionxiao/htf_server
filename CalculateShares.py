@@ -6,8 +6,10 @@ import time
 
 def calcShares():
     api = TradeApi()
-    api.Open()
-    rst = api.Logon("180.166.192.130", 7708, "184039030", "326326")
+    if not api.isLogon():
+        rst = api.Logon("180.166.192.130", 7708, "184039030", "326326")
+        if not rst:
+            return u"连接服务器失败"
 
     # 在可撤单上筛选融券卖出
     order = None

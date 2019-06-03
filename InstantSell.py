@@ -9,10 +9,9 @@ import time
 def InstantSell(stock, share):
     api = TradeApi()
     if not api.isLogon():
-        api.Open()
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
         if not rst:
-            return u"µÇÂ¼Ê§°Ü"
+            return u"Á¬½Ó·þÎñÆ÷Ê§°Ü"
     
     _stock = stock.encode()
     _share = int(share)

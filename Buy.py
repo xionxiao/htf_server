@@ -6,7 +6,6 @@ from Utils import *
 def Buy(stock, price, share):
     api = TradeApi()
     if not api.isLogon():
-        api.Open()
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
     retval = u""
     rst = api.Buy(stock, float(price), int(share))

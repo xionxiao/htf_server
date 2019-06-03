@@ -79,7 +79,6 @@ class Cache(Singleton):
 if __name__ == "__main__":
     api = TradeApi()
     if not api.isLogon():
-        api.Open()
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
         printd(rst)
     cache = Cache(api)

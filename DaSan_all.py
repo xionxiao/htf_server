@@ -6,8 +6,10 @@ import time
 
 def dasan_all():
     api = TradeApi()
-    api.Open()
-    rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
+    if not api.isLogon():
+        rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
+        if not rst:
+            return u"连接服务器失败"
     ret_val = ""
 
     # 在可撤单上筛选当前股票在涨停价格的卖单股数

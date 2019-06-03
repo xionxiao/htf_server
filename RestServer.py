@@ -93,10 +93,10 @@ class SWServer(tornado.web.Application):
 
 if __name__ == "__main__":
     api = TradeApi()
-    api.Open()
-    rst = api.Logon("59.173.7.38", 7708, "184039030", "326326")
-    if not rst:
-        print rst
+    if not rst.isLogon():
+        rst = api.Logon("59.173.7.38", 7708, "184039030", "326326")
+        if not rst:
+            print u"连接服务器失败"
     sp = StockPool(api)
     
     tornado.options.parse_command_line()

@@ -43,6 +43,10 @@ class TradeApi(Singleton):
     
     def __init__(self):
         self._dll = windll.LoadLibrary("trade.dll")
+        self.Open()
+
+    def __del__(self):
+        self.Close()
         
     def Open(self):
         self._dll.OpenTdx()
@@ -257,7 +261,6 @@ if __name__ == "__main__":
     #f = open('out.txt', 'w+')
     #import sys
     #sys.stdout=f
-    api.Open()
     rst = api.Logon("119.147.80.108", 443, "184039030", "326326")
     printd(rst)
     #print api.QueryData(0)

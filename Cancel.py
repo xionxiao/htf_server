@@ -8,7 +8,6 @@ import time
 def Cancel(order_id):
     api = TradeApi()
     if not api.isLogon():
-        api.Open()
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
     cache = Cache()
     rst = api.Query("¿É³·µ¥")
