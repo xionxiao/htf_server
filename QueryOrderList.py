@@ -17,6 +17,8 @@ def queryOrderList():
     if not rst:
         return u"查询当日委托失败"
     for o in rst[0]:
+        if len(o) == 0:
+            break
         item = {"证券代码": o[1],
                 "证券名称": o[2],
                 "买卖标志": o[4],

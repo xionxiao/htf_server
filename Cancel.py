@@ -35,7 +35,7 @@ def Cancel(order_id):
         rst = api.CancelOrder(order_id)
         # 如果撤单成功
         if bool(rst):
-            time.sleep(0.3)
+            time.sleep(0.5)
             # 获得当前涨停价
             price = cache.get(order[1],"涨停价")
             # 涨停价下单

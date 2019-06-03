@@ -85,7 +85,7 @@ class Result(object):
         else:
             # 处理非表格格式
             self.head = tab[0]
-            self.table = [""]
+            self.table = [[]]
             self._col = {}
 
     def __getitem__(self, name_or_index):
@@ -93,6 +93,7 @@ class Result(object):
             return self.table[name_or_index]
         elif name_or_index in self.head:
             return self._col[name_or_index]
+
 
     
 if __name__ == "__main__":

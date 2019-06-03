@@ -11,6 +11,7 @@ from Sell import Sell
 from Cancel import Cancel
 from GetStockPool import getStockPool
 from QueryOrderList import queryOrderList
+from InstantSell import InstantSell
 
 from StockPool import *
 
