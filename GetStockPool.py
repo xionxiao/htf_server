@@ -26,8 +26,6 @@ if __name__ == "__main__":
     api = TradeApi()
     if not api.isLogon():
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
-        if not rst:
-            return u"连接服务器失败"
     sp = StockPool(api)
     sp.addStock('600036', 1000)
     print "----"

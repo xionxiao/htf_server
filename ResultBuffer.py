@@ -101,8 +101,6 @@ if __name__ == "__main__":
     api = TradeApi()
     if not api.isLogon():
         rst = api.Logon("59.173.7.38", 7708, "184039030", "326326")
-        if not rst:
-            return u"连接服务器失败"
     
     rst = api.Query("可融证券")
     #printd(rst)

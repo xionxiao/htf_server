@@ -76,8 +76,6 @@ def dasan_all():
             success += 100
             print "success : " + str(success)
 
-    api.Logoff()
-    api.Close()
     return ret_val
 
 if __name__ == "__main__":

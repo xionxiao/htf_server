@@ -49,9 +49,7 @@ def calcShares():
     for k,v in sdict.iteritems():
         print i,k,v[2],v[1],v[0]
         i += 1
-    
-    api.Logoff()
-    api.Close()
+
     return ""
 
 if __name__ == "__main__":

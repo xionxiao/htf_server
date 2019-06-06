@@ -46,6 +46,7 @@ class TradeApi(Singleton):
         self.Open()
 
     def __del__(self):
+        self.Logoff()
         self.Close()
         
     def Open(self):
@@ -72,6 +73,7 @@ class TradeApi(Singleton):
     def Logoff(self):
         if self.__clientId != -1:
             self._dll.Logoff(self.__clientId)
+            self.__clientId = -1
 
     def isLogon(self):
         return bool(self.__clientId != -1)
@@ -261,8 +263,9 @@ if __name__ == "__main__":
     #f = open('out.txt', 'w+')
     #import sys
     #sys.stdout=f
-    rst = api.Logon("119.147.80.108", 443, "184039030", "326326")
-    printd(rst)
+    if not api.isLogon():
+        rst = api.Logon("119.147.80.108", 443, "184039030", "326326")
+        printd(rst)
     #print api.QueryData(0)
     rst = api.Query("×Ê½ð")
     printd(rst)
@@ -309,4 +312,3 @@ if __name__ == "__main__":
 
     #f.close()
     api.Logoff()
-    api.Close()

@@ -53,7 +53,7 @@ function RefreshStockPool() {
 			item_str += "<td>"+obj[i]["融券数量"]+"</td>";
 			item_str += "</tr>";
 		}
-		$("#stock-pool .panel-body table tbody").append(item_str);
+		$("#stock-pool .panel-body table tbody").prepend(item_str);
 	})
 }
 

@@ -37,6 +37,4 @@ if __name__ == "__main__":
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
     sp = StockPool(api)
     sp.sync()
-    print([queryOrderList()])
-    api.Logoff()
-    api.Close()
+    queryOrderList()
