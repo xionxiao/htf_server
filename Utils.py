@@ -3,8 +3,10 @@
 from ctypes import *
 from decimal import *
 from ResultBuffer import *
+import re
 
 class Singleton(object):
+  """ 单例模式 """
   __instance=None
   def __init__(self):
     pass
@@ -14,13 +16,20 @@ class Singleton(object):
       cls.__instance=object.__new__(cls,*args,**kwd)
     return cls.__instance
 
+
+def isValidStockCode(stock):
+    if not type(stock) is str:
+        return False
+    return bool(re.match("[036][0-9]{5}$", stock))
+
 def round_up_decimal_2(float_number):
     """ 修复python round()四舍六入问题,保留两位小数 """
     getcontext().rounding = ROUND_HALF_UP 
     return float('{:.2f}'.format(Decimal(str(float_number))))
 
 def c_array(src_list, TYPE):
-    if type(src_list) is not list: return
+    assert(type(src_list) is list)
+
     count = len(src_list)
     rst = (TYPE*count)()
     for i in range(count): rst[i] = TYPE(src_list[i])
@@ -58,3 +67,6 @@ def __print_Result(r):
 if __name__ == "__main__":
     x = round_up_decimal_2(44.665)
     print x
+    test_stock_code = ['300001','600036','000625','100001','6001036','6x0001']
+    for i in test_stock_code:
+      print i,isValidStockCode(i)
