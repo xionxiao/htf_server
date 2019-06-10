@@ -275,19 +275,19 @@ if __name__ == "__main__":
     rst = api.Query("股份")
    
     printd(rst)
-    print "========"
+    print u"======== 当日委托"
     printd(api.Query("当日委托"))
-    print "========"
+    print u"======== 当日成交"
     printd(api.Query("当日成交"))
-    print "========"
+    print u"======== 可撤单"
     printd(api.Query("可撤单")[0])
-    print "========"
+    print u"======== 股东代码"
     printd(api.Query("股东代码")[0])
-    print "========"
+    print u"======== 融资余额"
     printd(api.Query("融资余额"))
-    print "========"
-    #printd(api.Query("融券余额")) # 系统暂不支持该功能
     #print "========"
+    #printd(api.Query("融券余额")) # 系统暂不支持该功能
+    print u"======== 可融证券"
     printd(api.Query("可融证券")[0].head)
     print "========"
 

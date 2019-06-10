@@ -186,68 +186,18 @@ class StockPool(Singleton):
             order_price = round_up_decimal_2(float(record[7]))
             order_share = int(float(record[8]))
             self.addOrder(stock_code,order_id,order_price,order_share,order_type)
-            
-
-    def fillAll(self):
-        pool = self._stock_pool
-        cache = self._cache
-
-        stock_code = pool.keys()
-        stock_share = [ pool[i]["融券上限"] for i in stock_code ]
-
-        rst = self._tradeApi.Query("可融证券")
-        if not rst:
-            return rst
-
-        _stock_code = []
-        _harden_price = []
-        _stock_share = []
-        for s in stock_code:
-            if s in rst[0]['证券代码']:
-                index = rst[0]['证券代码'].index(s)
-                stock_info = rst[0][index]
-                _stock_code.append(s)
-                _harden_price.append(cache[s]["涨停价"])
-                _marginable_share = int(float(stock_info[2])/100)*100
-                _upper_limit = pool[s]["融券上限"]
-                _stock_share.append(min(_marginable_share, _upper_limit))
-
-        rst = self._tradeApi.SendOrders([3]*len(_stock_code), _stock_code, _harden_price, _stock_share)
-        if not rst:
-            printd(rst)
-            return rst
 
         
     def fill(self, stock_code, share):
         """ 从服务器获取股票 """
         assert type(share) is int and share > 0
-        
-        if not self._stock_pool.has_key(stock_code):
-            return u"没有可融股票：" + stock_code
-        
-        rst = self._tradeApi.Query("可融证券")
-        if not rst:
-            return rst
+        assert isValidStockCode(stock_code)
 
-        # 可融证券信息（字符串列表）
-        stock_info = None
-        if stock_code in rst[0]['证券代码']:
-            index = rst[0]['证券代码'].index(stock_code)
-            stock_info = rst[0][index]
-
-        if not stock_info:
-            return u"没找到相应股票"
-
-        _stock_code = stock_info[0]
-        _stock_name = stock_info[1]
-        _harden_price = self._stock_pool[_stock_code]["涨停价"]
-        # 可融证券数量，舍入到100的倍数
-        _marginable_share = int(float(stock_info[2])/100)*100
-        _share = min(int(share/100)*100, _marginable_share)
-
-        rst = self._tradeApi.Short(_stock_code, _harden_price, _share)
-        if not rst:
-            return rst
+        price = self._cache.get(stock_code, "涨停价")
+        rst = api.Short(stock_code, raising_price, share)
+        if rst:
+            order_id = rst[0][0][0]
+        return rst
 
     def lock(self, stock, share):
         """ 买单锁定股票 """
