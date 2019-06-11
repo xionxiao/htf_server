@@ -12,7 +12,7 @@ class Lv2Api(Singleton):
 
     def __init__(self):
         self._dll = windll.LoadLibrary('TdxHqApi.dll')
-        lv2.Connect("61.135.142.90", 443)
+        self.Connect("61.152.107.173", 7707)
 
     def Connect(self, ip, port):
         self.__ip = ip
@@ -76,12 +76,13 @@ class Lv2Api(Singleton):
         return rst
     
     def __del__(self):
+        print "call __del__"
         self.Disconnect()
 
 if __name__ == "__main__":
     lv2 = Lv2Api()
     printd(lv2.Connect("61.135.142.90", 443))
-    for i in range(30):
+    for i in range(100):
         print "================= ",time.strftime("%H:%M:%S")
         rst = lv2.GetQuotes10(['300001'])
         print u"ож╪ш", rst[0][0][3]

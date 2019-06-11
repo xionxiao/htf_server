@@ -193,8 +193,8 @@ class StockPool(Singleton):
         assert type(share) is int and share > 0
         assert isValidStockCode(stock_code)
 
-        price = self._cache.get(stock_code, "ÕÇÍ£¼Û")
-        rst = api.Short(stock_code, raising_price, share)
+        raising_price = self._cache.get(stock_code, "ÕÇÍ£¼Û")
+        rst = self._tradeApi.Short(stock_code, raising_price, share)
         if rst:
             order_id = rst[0][0][0]
         return rst
