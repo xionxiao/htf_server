@@ -7,7 +7,7 @@ from Cache import *
 import time
 
 def Sell(stock, price, share):
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
         if not rst:
@@ -17,8 +17,8 @@ def Sell(stock, price, share):
     _price = float(price)
     _share = int(share)
     ret_val = ""
-    sp = StockPool(api)
-    cache = Cache(api)
+    sp = StockPool.Instance()
+    cache = Cache.Instance()
     _raising_price = cache.get(_stock, "ÕÇÍ£¼Û")
     c,d,e = sp.acquire(_stock, _share)
     if not c:

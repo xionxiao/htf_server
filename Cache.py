@@ -2,7 +2,8 @@
 from Utils import *
 from TradeApi import *
 
-class Cache(Singleton):
+@Singleton
+class Cache():
     """ 缓存系统 """
 
     # structure of stock cache
@@ -17,12 +18,8 @@ class Cache(Singleton):
     _stock_cache = {}
     _tradeApi = None
 
-    def __init__(self, api=None):
-        if api:
-            assert type(api) is TradeApi
-        if not self._tradeApi and not api:
-            raise Exception("Need create with TradeApi First")
-        self._tradeApi = api
+    def __init__(self):
+        self._tradeApi = TradeApi.Instance()
 
     def add(self, stock):
         rst = self._tradeApi.Query("行情", stock)
@@ -77,10 +74,10 @@ class Cache(Singleton):
 
 
 if __name__ == "__main__":
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
         printd(rst)
-    cache = Cache(api)
+    cache = Cache.Instance()
     print cache.has_key("1234")
     

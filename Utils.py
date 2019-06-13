@@ -5,18 +5,18 @@ from decimal import *
 from ResultBuffer import *
 import re
 
-class Singleton(object):
-  """ 单例模式 """
-  __instance=None
-  def __init__(self):
-    pass
-  
-  def __new__(cls,*args,**kwd):
-    if not isinstance(cls.__instance, cls):
-      cls.__instance=object.__new__(cls,*args,**kwd)
-    return cls.__instance
+##class Singleton(object):
+##  """ 单例模式 """
+##  __instance=None
+##  def __init__(self):
+##    pass
+##  
+##  def __new__(cls,*args,**kwd):
+##    if not isinstance(cls.__instance, cls):
+##      cls.__instance=object.__new__(cls,*args,**kwd)
+##    return cls.__instance
 
-class SingletonDecorater:
+class Singleton:
     """
     A non-thread-safe helper class to ease implementing singletons.
     This should be used as a decorator -- not a metaclass -- to the

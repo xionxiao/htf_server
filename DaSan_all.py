@@ -5,7 +5,7 @@ from Utils import *
 import time
 
 def dasan_all():
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
         if not rst:

@@ -6,7 +6,7 @@ from Cache import *
 import time
 
 def Cancel(order_id):
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
     cache = Cache()

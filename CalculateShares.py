@@ -5,7 +5,7 @@ from Utils import *
 import time
 
 def calcShares():
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         rst = api.Logon("180.166.192.130", 7708, "184039030", "326326")
         if not rst:

@@ -98,7 +98,7 @@ class Result(object):
     
 if __name__ == "__main__":
     from TradeApi import TradeApi
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         rst = api.Logon("59.173.7.38", 7708, "184039030", "326326")
     

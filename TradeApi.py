@@ -6,7 +6,8 @@ from ResultBuffer import *
 import datetime
 import time
 
-class TradeApi(Singleton):
+@Singleton
+class TradeApi():
     __clientId = -1
     __ip = ""
     __port = None
@@ -257,7 +258,7 @@ class TradeApi(Singleton):
         return res
 
 if __name__ == "__main__":
-    api = TradeApi()
+    api = TradeApi.Instance()
     rst = api.GetEdition()
     printd(rst)
     #f = open('out.txt', 'w+')

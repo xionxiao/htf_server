@@ -6,13 +6,14 @@ from ResultBuffer import *
 import datetime
 import time
 
-@SingletonDecorater
-class Lv2Api(Singleton):
+@Singleton
+class MarketApi(Singleton):
     __ip = ""
     __port = None
 
     def __init__(self):
         self._dll = windll.LoadLibrary('TdxHqApi.dll')
+            
 
     def Connect(self, ip, port):
         self.__ip = ip
@@ -80,7 +81,7 @@ class Lv2Api(Singleton):
         self.Disconnect()
 
 if __name__ == "__main__":
-    lv2 = Lv2Api.Instance()
+    lv2 = MarketApi.Instance()
     for i in range(1):
         print "================= ",time.strftime("%H:%M:%S")
         rst = lv2.GetQuotes10(['300001'])

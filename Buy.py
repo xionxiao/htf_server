@@ -4,7 +4,7 @@ from TradeApi import *
 from Utils import *
 
 def Buy(stock, price, share):
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
     retval = u""

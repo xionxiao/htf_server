@@ -4,11 +4,11 @@ from TradeApi import *
 from Utils import *
 from StockPool import *
 from Cache import *
-from Lv2Api import *
+from MarketApi import *
 import time
 
 def InstantSell(stock, share):
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
         if not rst:
@@ -104,7 +104,7 @@ def InstantSell(stock, share):
     return ret_val
 
 def checkOrderStatus(order_id, count = 3, check_interval=0.1):
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
         if not rst:
@@ -119,8 +119,9 @@ def checkOrderStatus(order_id, count = 3, check_interval=0.1):
         #time.sleep(check_interval)
     return False
 
+lv2 = MarketApi.Instance()
+lv2.Connect("61.135.142.90", 443)
 def getProperPrice(stock, count=1):
-    lv2 = Lv2Api.Instance()
     # 获取最合适价格
     for i in range(count):
         rst = lv2.GetQuotes5(stock)
@@ -142,18 +143,19 @@ def getProperPrice(stock, count=1):
     return price
 
 if __name__ == "__main__":
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
     
-    sp = StockPool(api)
-    cache = Cache(api)
+    sp = StockPool.Instance()
+    cache = Cache.Instance()
     sp.sync()
 
-    print "============"
-    t1 = time.time()
-    print getProperPrice("600546")
-    print u"延时 ",time.time() - t1
+    for i in range(10):
+        print "============"
+        t1 = time.time()
+        print getProperPrice("600546")
+        print u"延时 ",time.time() - t1
     #print InstantSell("600372", 100)
     #print u"延时 ",time.time() - t1
     

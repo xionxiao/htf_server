@@ -6,7 +6,8 @@ from Cache import *
 import xlrd
 import time
 
-class StockPool(Singleton):
+@Singleton
+class StockPool():
     """ 管理可交易的股票 """
 
     _tradeApi = None
@@ -21,11 +22,9 @@ class StockPool(Singleton):
     _stock_pool = {}
     _cache = None
     
-    def __init__(self, tradeApi=None):
-        if not self._tradeApi and not tradeApi:
-            raise Exception("Need create with TradeApi first")
-        self._tradeApi = tradeApi
-        self._cache = Cache(tradeApi)
+    def __init__(self):
+        self._tradeApi = TradeApi.Instance()
+        self._cache = Cache.Instance()
         
     def acquire(self, stock, share):
         """ 获得相应数目股票, 返回撤消订单号和下单股数"""
@@ -209,10 +208,10 @@ class StockPool(Singleton):
 
 if __name__ == "__main__":
     #print grabStocks('05a.xls')
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
-    sp = StockPool(api)
+    sp = StockPool.Instance()
     
     #xls = xlrd.open_workbook('05a.xls')
     #table = xls.sheets()[0]

@@ -92,11 +92,11 @@ class SWServer(tornado.web.Application):
     pass
 
 if __name__ == "__main__":
-    api = TradeApi()
+    api = TradeApi.Instance()
     if not api.isLogon():
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
 
-    sp = StockPool(api)
+    sp = StockPool()
     
     tornado.options.parse_command_line()
     settings = {
