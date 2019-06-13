@@ -7,8 +7,6 @@ from Cache import *
 from Lv2Api import *
 import time
 
-lv2 = Lv2Api()
-
 def InstantSell(stock, share):
     api = TradeApi()
     if not api.isLogon():
@@ -122,11 +120,12 @@ def checkOrderStatus(order_id, count = 3, check_interval=0.1):
     return False
 
 def getProperPrice(stock, count=1):
+    lv2 = Lv2Api.Instance()
     # 获取最合适价格
     for i in range(count):
         rst = lv2.GetQuotes5(stock)
         if not rst:
-            return u"获取行情失败"
+            return -1
         # 现价
         instant_price = round_up_decimal_2(float(rst[0][0][3]))
         bid_1 = round_up_decimal_2(float(rst[0][0][18]))
@@ -151,9 +150,10 @@ if __name__ == "__main__":
     cache = Cache(api)
     sp.sync()
 
+    print "============"
     t1 = time.time()
-    #print getProperPrice("600546")
-    #print u"延时 ",time.time() - t1
-    print InstantSell("600372", 100)
+    print getProperPrice("600546")
     print u"延时 ",time.time() - t1
+    #print InstantSell("600372", 100)
+    #print u"延时 ",time.time() - t1
     
