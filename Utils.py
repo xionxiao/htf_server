@@ -60,6 +60,12 @@ def isValidStockCode(stock):
         return False
     return bool(re.match("[036][0-9]{5}$", stock))
 
+def isValidIpAddress(ip):
+    if not type(ip) is str:
+        return False
+    re_str = r'^((\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])$'
+    return bool(re.match(re_str, ip))
+
 def round_up_decimal_2(float_number):
     """ 修复python round()四舍六入问题,保留两位小数 """
     getcontext().rounding = ROUND_HALF_UP 
@@ -108,6 +114,10 @@ if __name__ == "__main__":
 ##    test_stock_code = ['300001','600036','000625','100001','6001036','6x0001']
 ##    for i in test_stock_code:
 ##        print i,isValidStockCode(i)
+
+    test_ip_addr = ['10.255.1.255:80', '192.168.1.100', '300.180.260.1','127.0.0.256',10.250]
+    for i in test_ip_addr:
+        print i, isValidIpAddress(i)
 
     @Singleton
     class Class1():
