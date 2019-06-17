@@ -5,17 +5,6 @@ from decimal import *
 from ResultBuffer import *
 import re
 
-##class Singleton(object):
-##  """ 单例模式 """
-##  __instance=None
-##  def __init__(self):
-##    pass
-##  
-##  def __new__(cls,*args,**kwd):
-##    if not isinstance(cls.__instance, cls):
-##      cls.__instance=object.__new__(cls,*args,**kwd)
-##    return cls.__instance
-
 class Singleton:
     """
     A non-thread-safe helper class to ease implementing singletons.
@@ -65,6 +54,20 @@ def isValidIpAddress(ip):
         return False
     re_str = r'^((\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])$'
     return bool(re.match(re_str, ip))
+
+def isValidDate(date):
+    if type(date) is not str:
+        return False
+    re_str = r'^\d{4}(0\d{1}|1[0-2])([0-2]\d{1}|3[0,1])$'
+    return bool(re.match(re_str, date))
+
+def getMarketID(stock):
+    u""" 判断股票市场： 返回 1-上海  0-深圳  错误代码将弹出异常"""
+    assert(isValidStockCode(stock))
+    if stock[0] == '6':
+        return 1
+    else: # 0,3 创业板为深圳
+        return 0
 
 def round_up_decimal_2(float_number):
     """ 修复python round()四舍六入问题,保留两位小数 """
