@@ -119,5 +119,5 @@ function Refresh() {
 
 $(document).ready(function() {
 	Refresh()
-	setInterval("Refresh()", 5000);
+	setInterval("Refresh()", 2000);
 })
