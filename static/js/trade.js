@@ -1,9 +1,11 @@
+var host = "http://" + window.location.host;
+
 function ExcuteBuyStock() {
 	console.log("Buy");
 	console.log($('#form-buy').serialize());
 	params = $('#form-buy');
-	console.log(params.val())
-	$.post("http://localhost:8888/buy",$('#form-buy').serialize(), function(data){
+	console.log(params.val());
+	$.post(host + "/buy",$('#form-buy').serialize(), function(data){
 		console.log(data)
 		$("#result-panel .panel-body").prepend(data +  "<br>");
 		RefreshStockPool()
@@ -17,12 +19,12 @@ function ExcuteSellStock() {
 	price = $('#form-sell #sell_price').val();
 	console.log(price);
 	if (price) {
-		$.post("http://localhost:8888/sell",params, function(data){
+		$.post(host + "/sell",params, function(data){
 			$("#result-panel .panel-body").prepend(data +  "<br>");
 			RefreshStockPool();
 		});
 	} else {
-		$.post("http://localhost:8888/instant_sell",params, function(data){
+		$.post(host + "instant_sell",params, function(data){
 			$("#result-panel .panel-body").prepend(data +  "<br>");
 			RefreshStockPool();
 		});
@@ -32,15 +34,15 @@ function ExcuteSellStock() {
 function ExcuteCancelOrder() {
 	console.log("Cancel");
 	console.log($('#form-cancel').serialize());
-	$.post("http://localhost:8888/cancel",$('#form-cancel').serialize(), function(data){
+	$.post(host + "/cancel",$('#form-cancel').serialize(), function(data){
 		$("#result-panel .panel-body").prepend(data +  "<br>");
 		RefreshStockPool();
 	})
 }
 
 function RefreshStockPool() {
-	console.log("Refresh Stock Pool")
-	$.get("http://localhost:8888/query",{"catalogues":"stockpool"}, function(data) {
+	console.log("Refresh Stock Pool");
+	$.get(host + "/query",{"catalogues":"stockpool"}, function(data) {
 		obj = eval("("+data+")");
 		$("#stock-pool .panel-body table tbody").empty();
 		item_str = "";
@@ -59,7 +61,7 @@ function RefreshStockPool() {
 
 function RefreshOrderList() {
 	console.log("Refresh Order List")
-	$.get("http://localhost:8888/query",{"catalogues":"orderlist"}, function(data) {
+	$.get(host + "/query",{"catalogues":"orderlist"}, function(data) {
 		console.log(data);
 		obj = eval("("+data+")");
 		$("#order-list .panel-body table tbody").empty();
@@ -117,5 +119,5 @@ function Refresh() {
 
 $(document).ready(function() {
 	Refresh()
-	setInterval("Refresh()", 2000);
+	setInterval("Refresh()", 5000);
 })
