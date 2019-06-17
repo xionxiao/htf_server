@@ -10,7 +10,7 @@ def queryOrderList():
     if not api.isLogon():
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
 
-    sp = StockPool(api)
+    sp = StockPool.Instance()
     sp_dict = sp.getStocks()
     order_list = {}
     rst = api.Query("当日成交")
@@ -35,6 +35,6 @@ if __name__ == "__main__":
     api = TradeApi.Instance()
     if not api.isLogon():
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
-    sp = StockPool()
+    sp = StockPool.Instance()
     sp.sync()
     queryOrderList()
