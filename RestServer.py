@@ -96,7 +96,7 @@ if __name__ == "__main__":
     if not api.isLogon():
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
 
-    sp = StockPool()
+    sp = StockPool.Instance()
     
     tornado.options.parse_command_line()
     settings = {
