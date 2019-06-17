@@ -43,6 +43,7 @@ class TradeApi():
                  }
     
     def __init__(self):
+        u""" When load fails this may throw WindowsError exception"""
         self._dll = windll.LoadLibrary("trade.dll")
         self.Open()
 
@@ -61,15 +62,20 @@ class TradeApi():
         self._dll.GetEdition(rst.Result)
         return rst
     
-    def Logon(self, ip, port, account, password, version="9.01"):
-        TxPassword = ""
+    def Logon(self, ip, port, account, password, TxPassword="", version="9.01"):
+        u""" 登录服务器 """
+        assert(isValidIpAddress(ip))
+        assert(type(port) is int)
+        assert(type(account) is str)
+        assert(type(password) is str)
+        
         rst = ResultBuffer()
         client = self._dll.Logon(ip, port, version, account, password, TxPassword, rst.ErrInfo)
-        if client != -1:
-            self.__clientId = client
-            self.__ip = ip
-            self.__port = port
-        return rst
+        if client == -1:
+            raise Exception,"Logon failed: " + rst.ErrInfo.value
+        self.__clientId = client
+        self.__ip = ip
+        self.__port = port
 
     def Logoff(self):
         if self.__clientId != -1:
@@ -77,31 +83,51 @@ class TradeApi():
             self.__clientId = -1
 
     def isLogon(self):
+        u""" 检查是否已登录 """
+        # 如果 clientId 失效，在调用其他API时会抛出WindowsError异常， Error -1073741816
         return bool(self.__clientId != -1)
     
     def QueryData(self, category):
-        if self.__clientId == -1:
-            return
+        u""" 查询各种交易数据
+             0资金  1股份   2当日委托  3当日成交    4可撤单   5股东代码  6融资余额   7融券余额  8可融证券
+        """
+        assert(self.__clientId != -1)
+        assert(type(category) in (int, list))
+        
         if type(category) is list:
             count = len(category)
+            assert(count>0)
+            for cat in category:
+                assert(cat in range(len(self.QUERY_TYPE)))
             _category = c_array(category, c_int)
             res = ResultBuffer(count)
             self._dll.QueryDatass(self.__clientId, _category, count, res.Result, res.ErrInfo)
             return res
         else:
+            assert(category in range(len(self.QUERY_TYPE)))
             res = ResultBuffer()
             self._dll.QueryData(self.__clientId, category, res.Result, res.ErrInfo)
+            if not rst:
+                raise Exception, "QueryData failed:" + rst.ErrInfo.value
             return res
     
     def QueryHistoryData(self, histQueryType, startDate, endDate):
-        if self.__clientId == -1:
-            return
+        u""" 查询历史交易数据：
+             0历史委托  1历史成交   2交割单
+             日期格式: 20140301
+        """
+        assert(self.__clientId != -1)
+        assert(category in range(len(self.HISTORY_QUERY_TYPE)))
+        assert(isValidDate(startDate))
+        assert(isValidDate(endDate))
         res = ResultBuffer()
         self._dll.QueryHistoryData(self.__clientId, histQueryType, startDate, endDate, res.Result, res.ErrInfo)
+        if not rst:
+            raise Exception, "获取历史交易数据失败" + rst.ErrInfo.value
         return res
 
     def Query(self, u_str, *args, **kwargs):
-        """ 交易信息：
+        u""" 交易信息：
                   "资金"       0
                   "股份"       1
                   "当日委托"    2
@@ -265,8 +291,8 @@ if __name__ == "__main__":
     #import sys
     #sys.stdout=f
     if not api.isLogon():
-        rst = api.Logon("119.147.80.108", 443, "184039030", "326326")
-        printd(rst)
+        api.Logon("59.173.7.38", 7708, "184039030", "326326")
+        
     #print api.QueryData(0)
     rst = api.Query("资金")
     printd(rst)
@@ -286,8 +312,8 @@ if __name__ == "__main__":
     printd(api.Query("股东代码")[0])
     print u"======== 融资余额"
     printd(api.Query("融资余额"))
-    #print "========"
-    #printd(api.Query("融券余额")) # 系统暂不支持该功能
+    print "========"
+    printd(api.Query("融券余额")) # 系统暂不支持该功能
     print u"======== 可融证券"
     printd(api.Query("可融证券")[0].head)
     print "========"
