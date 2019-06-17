@@ -292,50 +292,54 @@ if __name__ == "__main__":
     #sys.stdout=f
     if not api.isLogon():
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
+    try:    
+        print api.QueryData(0)
+        rst = api.Query("资金")
+        printd(rst)
+        print rst[0].head[3] == "冻结资金"
+
+        print "========"
+        rst = api.Query("股份")
+       
+        printd(rst)
+        print u"======== 当日委托"
+        printd(api.Query("当日委托"))
+        print u"======== 当日成交"
+        printd(api.Query("当日成交"))
+        print u"======== 可撤单"
+        printd(api.Query("可撤单")[0])
+        print u"======== 股东代码"
+        printd(api.Query("股东代码")[0])
+        print u"======== 融资余额"
+        printd(api.Query("融资余额"))
+        print "========"
+        printd(api.Query("融券余额")) # 系统暂不支持该功能
+        print u"======== 可融证券"
+        printd(api.Query("可融证券")[0].head)
+        print "========"
+
+        #rst = api.QueryHistoryData(0, "20150429", "20150504")
+        #printd(rst)
+        #printd(api.Query("历史委托", "20150429", "20150504")[0])
+        #printd(api.Query("历史成交", "20150429", "20150504")[0])
+        #printd(api.Query("交割单", startDate="20150429", endDate="20150504")[0])
+
+        rst = api.Query("当前价", stock="000002")
+        printd(rst)
+
+        #print api.Repay("1000")
+        #rst = api.CancelOrder(["1799","1798"])
+        #print rst
         
-    #print api.QueryData(0)
-    rst = api.Query("资金")
-    printd(rst)
-    print rst[0].head[3] == "冻结资金"
-
-    print "========"
-    rst = api.Query("股份")
-   
-    printd(rst)
-    print u"======== 当日委托"
-    printd(api.Query("当日委托"))
-    print u"======== 当日成交"
-    printd(api.Query("当日成交"))
-    print u"======== 可撤单"
-    printd(api.Query("可撤单")[0])
-    print u"======== 股东代码"
-    printd(api.Query("股东代码")[0])
-    print u"======== 融资余额"
-    printd(api.Query("融资余额"))
-    print "========"
-    printd(api.Query("融券余额")) # 系统暂不支持该功能
-    print u"======== 可融证券"
-    printd(api.Query("可融证券")[0].head)
-    print "========"
-
-    #rst = api.QueryHistoryData(0, "20150429", "20150504")
-    #printd(rst)
-    #printd(api.Query("历史委托", "20150429", "20150504")[0])
-    #printd(api.Query("历史成交", "20150429", "20150504")[0])
-    #printd(api.Query("交割单", startDate="20150429", endDate="20150504")[0])
-
-    rst = api.Query("当前价", stock="000002")
-    printd(rst)
-
-    #print api.Repay("1000")
-    #rst = api.CancelOrder(["1799","1798"])
-    #print rst
-    
-    #print api.SendOrder(3, "000655", 20.22, 100)
-    #print api.SendOrders([3,3,3], ["000655", "000625","600005"], [20.22, 10.11,6.4], [100,100,200])
-    #print api.Buy("000690", 18.8, 100)
-    #print api.Sell("000690", 10.10, 100)
-    #print api.Short("600005", 6.4, 100)
+        #print api.SendOrder(3, "000655", 20.22, 100)
+        #print api.SendOrders([3,3,3], ["000655", "000625","600005"], [20.22, 10.11,6.4], [100,100,200])
+        #print api.Buy("000690", 18.8, 100)
+        #print api.Sell("000690", 10.10, 100)
+        #print api.Short("600005", 6.4, 100)
+    except:
+        pass
+    finally:
+        print "Log off"
+        api.Logoff()
 
     #f.close()
-    api.Logoff()
