@@ -57,8 +57,8 @@
                             <form id="form-buy" method="post" action="http://localhost:8888/buy" name="Buy" target="result-panel" autocomplete="off"> 
                                 <table class="table table-hover table-condensed"> 
                                     <tr> <td>股票代码</td> <td><input class="input-sm form-control" type="text" name="stock" id="buy_stock" autocomplete="on"/></td> </tr> 
-                                    <tr> <td>股票价格</td> <td><input class="input-sm form-control" type="text" name="price" /></td> </tr> 
-                                    <tr> <td>买入数量</td> <td><input class="input-sm form-control" type="text" name="share" /></td> </tr> 
+									<tr> <td>买入数量</td> <td><input class="input-sm form-control" type="text" name="share" /></td> </tr> 
+                                    <tr> <td>股票价格</td> <td><input class="input-sm form-control" type="text" name="price" /></td> </tr>  
                                     <tr> <td>提交</td> <td><input class="input-sm btn btn-danger" type="button" value="买入股票" onClick="ExcuteBuyStock()" /></td> </tr> 
                                 </table> 
                             </form> 
@@ -72,9 +72,9 @@
                         <div class="panel-body">
                             <form id="form-sell" method="post" action="http://localhost:8888/sell" name="Sell" target="output" autocomplete="off"> 
                                 <table class="table table-hover table-condensed "> 
-                                    <tr> <td>股票代码</td> <td><input class="input-sm form-control" type="text" name="stock" id="sell_stock" autocomplete="on"/></td> </tr> 
-                                    <tr> <td>股票价格</td> <td><input class="input-sm form-control" type="text" name="price" id="sell_price" /></td> </tr> 
-                                    <tr> <td>卖出数量</td> <td><input class="input-sm form-control" type="text" name="share" /></td> </tr> 
+                                    <tr> <td>股票代码</td> <td><input class="input-sm form-control" type="text" name="stock" id="sell_stock" autocomplete="on"/></td> </tr>
+									<tr> <td>卖出数量</td> <td><input class="input-sm form-control" type="text" name="share" /></td> </tr>
+                                    <tr> <td>股票价格</td> <td><input class="input-sm form-control" type="text" name="price" id="sell_price" /></td> </tr>
                                     <tr> <td>提交</td> <td><input class="input-sm btn btn-success" type="button" value="卖出股票" onClick="ExcuteSellStock();"/></td></tr> 
                                 </table> 
                             </form> 
