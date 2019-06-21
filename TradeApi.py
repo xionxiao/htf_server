@@ -196,6 +196,7 @@ class TradeApi():
                 return [ round_up_decimal_2(float(i[0][3])) for i in rst ] 
 
     def SendOrder(self, orderType, zqdm, price, quantity, priceType=0, gddm=''):
+        # TODO: 参数检查
         if self.__clientId == -1:
             return
         res = ResultBuffer()
@@ -205,6 +206,9 @@ class TradeApi():
             else:
                 gddm = self.GDDM_TYPE['深市']
         self._dll.SendOrder(self.__clientId, orderType, priceType, gddm, zqdm, c_float(price), quantity, res.Result, res.ErrInfo)
+        if not rst:
+            # TODO: TradeException详细信息
+            raise TradeException
         return res
 
     def SendOrders(self, orderType, zqdm, price, quantity, priceType=0, gddm=[]):
