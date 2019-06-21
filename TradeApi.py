@@ -7,6 +7,7 @@ import datetime
 import time
 
 class LogonException(Exception):
+    u""" µÇÂ¼Òì³£ """
     pass
 
 class QueryException(Exception):
