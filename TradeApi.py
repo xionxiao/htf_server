@@ -6,6 +6,14 @@ from ResultBuffer import *
 import datetime
 import time
 
+class QueryException(Exception):
+    u""" 查询异常 """
+    pass
+
+class TradeException(Exception):
+    u""" 交易异常 """
+    pass
+
 @Singleton
 class TradeApi():
     __clientId = -1
@@ -43,7 +51,7 @@ class TradeApi():
                  }
     
     def __init__(self):
-        u""" When load fails this may throw WindowsError exception"""
+        """ When load fails this may throw WindowsError exception """
         self._dll = windll.LoadLibrary("trade.dll")
         self.Open()
 
@@ -52,6 +60,7 @@ class TradeApi():
         self.Close()
         
     def Open(self):
+        """ May throw AttributeError exception if dll not match """
         self._dll.OpenTdx()
 
     def Close(self):
@@ -294,11 +303,12 @@ if __name__ == "__main__":
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
         
     #print api.QueryData(0)
+    print u"======== 资金"
     rst = api.Query("资金")
     printd(rst)
     print rst[0].head[3] == "冻结资金"
 
-    print "========"
+    print u"======== 股份"
     rst = api.Query("股份")
    
     printd(rst)
@@ -312,7 +322,7 @@ if __name__ == "__main__":
     printd(api.Query("股东代码")[0])
     print u"======== 融资余额"
     printd(api.Query("融资余额"))
-    print "========"
+    print u"======== 融券余额"
     printd(api.Query("融券余额")) # 系统暂不支持该功能
     print u"======== 可融证券"
     printd(api.Query("可融证券")[0].head)
