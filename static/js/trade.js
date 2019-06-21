@@ -94,19 +94,47 @@ function KeyShortcuts(evt) {
 		console.log(evt.keyCode)
 		switch (evt.keyCode)
 		{
-		case 49:
+		case 49: // Alt+1
 			var item = document.getElementById("buy_stock");
 			item.focus()
 			break;
-		case 50:
+		case 50:  // Alt+2
 			var item = document.getElementById("sell_stock");
 			item.focus()
 			item.vaule=""
 			break;
-		case 51:
+		case 51:  // Alt+3
 			var item = document.getElementById("cancel_order");
 			item.focus()
 			break;
+		}
+		return
+	}
+	if ($("#sell_price").is(":focus"))
+	{
+		evt.preventDefault()
+		var val = parseFloat($("#sell_price").val());
+		console.log(val);
+		if (isNaN(val))
+			val = 0.01;
+		switch (evt.keyCode)
+		{
+		case 38: // UP
+			val += 0.01;
+			console.log(val);
+			$("#sell_price").val(val.toFixed(2));
+			evt.preventDefault();
+			break
+		case 40: // DOWN
+			val -= 0.01;
+			if (val < 0)
+			{
+				val = 0.01;
+			}
+			console.log(val)
+			$("#sell_price").val(val.toFixed(2));
+			evt.preventDefault();
+			break
 		}
 	}
 }
@@ -119,5 +147,5 @@ function Refresh() {
 
 $(document).ready(function() {
 	Refresh()
-	setInterval("Refresh()", 2000);
+	setInterval("Refresh()", 10000);
 })
