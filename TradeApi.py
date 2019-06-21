@@ -6,6 +6,9 @@ from ResultBuffer import *
 import datetime
 import time
 
+class LogonException(Exception):
+    pass
+
 class QueryException(Exception):
     u""" 查询异常 """
     pass
@@ -81,7 +84,7 @@ class TradeApi():
         rst = ResultBuffer()
         client = self._dll.Logon(ip, port, version, account, password, TxPassword, rst.ErrInfo)
         if client == -1:
-            raise Exception,"Logon failed: " + rst.ErrInfo.value
+            raise LogonException,"Logon failed: " + rst.ErrInfo.value
         self.__clientId = client
         self.__ip = ip
         self.__port = port
@@ -101,25 +104,36 @@ class TradeApi():
              0资金  1股份   2当日委托  3当日成交    4可撤单   5股东代码  6融资余额   7融券余额  8可融证券
         """
         assert(self.__clientId != -1)
-        assert(type(category) in (int, list))
+        assert(type(category) is int)
         
-        if type(category) is list:
-            count = len(category)
-            assert(count>0)
-            for cat in category:
-                assert(cat in range(len(self.QUERY_TYPE)))
-            _category = c_array(category, c_int)
-            res = ResultBuffer(count)
-            self._dll.QueryDatass(self.__clientId, _category, count, res.Result, res.ErrInfo)
-            return res
-        else:
-            assert(category in range(len(self.QUERY_TYPE)))
-            res = ResultBuffer()
-            self._dll.QueryData(self.__clientId, category, res.Result, res.ErrInfo)
-            if not rst:
-                raise Exception, "QueryData failed:" + rst.ErrInfo.value
-            return res
-    
+        assert(category in range(len(self.QUERY_TYPE)))
+        res = ResultBuffer()
+        self._dll.QueryData(self.__clientId, category, res.Result, res.ErrInfo)
+        if not rst:
+            # Todo: 更好的QueryException构造函数
+            raise QueryException, "查询"+self.QUERY_TYPE[category]+"失败" + rst.ErrInfo.value
+        return res
+
+    def QueryDatas(self, categories):
+        u""" 查询各种交易数据:
+             categories is query type list.
+             0资金  1股份   2当日委托  3当日成交    4可撤单   5股东代码  6融资余额   7融券余额  8可融证券
+        """
+        assert(self.__clientId != -1)
+        assert(type(categories) is list)
+        
+        count = len(categories)
+        assert(count>0)
+        for cat in categories:
+            assert(cat in range(len(self.QUERY_TYPE)))
+        _category = c_array(category, c_int)
+        res = ResultBuffer(count)
+        self._dll.QueryDatass(self.__clientId, _category, count, res.Result, res.ErrInfo)
+        if not res:
+            # TODO: 处理是哪个查询失败
+            raise QueryException
+        return res
+
     def QueryHistoryData(self, histQueryType, startDate, endDate):
         u""" 查询历史交易数据：
              0历史委托  1历史成交   2交割单
@@ -132,7 +146,7 @@ class TradeApi():
         res = ResultBuffer()
         self._dll.QueryHistoryData(self.__clientId, histQueryType, startDate, endDate, res.Result, res.ErrInfo)
         if not rst:
-            raise Exception, "获取历史交易数据失败" + rst.ErrInfo.value
+            raise QueryException, "获取历史交易数据失败" + rst.ErrInfo.value
         return res
 
     def Query(self, u_str, *args, **kwargs):
