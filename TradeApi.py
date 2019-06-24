@@ -6,17 +6,27 @@ from ResultBuffer import *
 import datetime
 import time
 
-class LogonException(Exception):
-    u""" 登录异常 """
+class Error(Exception):
     pass
 
-class QueryException(Exception):
-    u""" 查询异常 """
+class LogonError(Error):
+    u""" 登录错误 """
     pass
 
-class TradeException(Exception):
-    u""" 交易异常 """
-    pass
+class QueryError(Error):
+    u""" 查询错误 """
+    def __init__(self, query_type, error_info, *args, **kwargs):
+        self._query_type = query_type
+        self._error_info = error_info
+
+    def __str__(self):
+        ret_val = "查询" + self._query_type + "失败: " + self._error_info
+        return ret_val
+
+class TradeError(Error):
+    u""" 交易错误 """
+    def __init__(self, orderType, stock, price, quantitiy, priceType):
+        pass
 
 @Singleton
 class TradeApi():
@@ -77,15 +87,15 @@ class TradeApi():
     
     def Logon(self, ip, port, account, password, TxPassword="", version="9.01"):
         u""" 登录服务器 """
-        assert(isValidIpAddress(ip))
-        assert(type(port) is int)
-        assert(type(account) is str)
-        assert(type(password) is str)
+        assert isValidIpAddress(ip), 'Not a valid IP address'
+        assert type(port) is int, 'Port must be int'
+        assert type(account) is str
+        assert type(password) is str
         
         rst = ResultBuffer()
         client = self._dll.Logon(ip, port, version, account, password, TxPassword, rst.ErrInfo)
         if client == -1:
-            raise LogonException,"Logon failed: " + rst.ErrInfo.value
+            raise LogonError,"Logon failed: " + rst.ErrInfo.value
         self.__clientId = client
         self.__ip = ip
         self.__port = port
@@ -104,15 +114,15 @@ class TradeApi():
         u""" 查询各种交易数据
              0资金  1股份   2当日委托  3当日成交    4可撤单   5股东代码  6融资余额   7融券余额  8可融证券
         """
-        assert(self.__clientId != -1)
-        assert(type(category) is int)
+        assert self.__clientId != -1, "Does not logon, need logon first!"
+        assert type(category) is int
+        assert category in range(len(self.QUERY_TYPE))
         
-        assert(category in range(len(self.QUERY_TYPE)))
         res = ResultBuffer()
         self._dll.QueryData(self.__clientId, category, res.Result, res.ErrInfo)
-        if not rst:
+        if not res:
             # Todo: 更好的QueryException构造函数
-            raise QueryException, "查询"+self.QUERY_TYPE[category]+"失败" + rst.ErrInfo.value
+            raise QueryError, "查询"+self.QUERY_TYPE[category]+"失败" + rst.ErrInfo.value
         return res
 
     def QueryDatas(self, categories):
@@ -120,19 +130,19 @@ class TradeApi():
              categories is query type list.
              0资金  1股份   2当日委托  3当日成交    4可撤单   5股东代码  6融资余额   7融券余额  8可融证券
         """
-        assert(self.__clientId != -1)
-        assert(type(categories) is list)
+        assert self.__clientId != -1, "Does not logon, need logon first!"
+        assert type(categories) is list
+        assert len(categories) > 0
         
         count = len(categories)
-        assert(count>0)
         for cat in categories:
-            assert(cat in range(len(self.QUERY_TYPE)))
+            assert cat in range(len(self.QUERY_TYPE))
         _category = c_array(category, c_int)
         res = ResultBuffer(count)
         self._dll.QueryDatass(self.__clientId, _category, count, res.Result, res.ErrInfo)
         if not res:
             # TODO: 处理是哪个查询失败
-            raise QueryException
+            raise QueryError
         return res
 
     def QueryHistoryData(self, histQueryType, startDate, endDate):
@@ -147,7 +157,7 @@ class TradeApi():
         res = ResultBuffer()
         self._dll.QueryHistoryData(self.__clientId, histQueryType, startDate, endDate, res.Result, res.ErrInfo)
         if not rst:
-            raise QueryException, "获取历史交易数据失败" + rst.ErrInfo.value
+            raise QueryError, "获取历史交易数据失败" + rst.ErrInfo.value
         return res
 
     def Query(self, u_str, *args, **kwargs):
@@ -220,6 +230,13 @@ class TradeApi():
                 return [ round_up_decimal_2(float(i[0][3])) for i in rst ] 
 
     def SendOrder(self, orderType, zqdm, price, quantity, priceType=0, gddm=''):
+        # 0上海限价委托 深圳限价委托
+        # 1(市价委托)深圳对方最优价格
+        # 2(市价委托)深圳本方最优价格
+        # 3(市价委托)深圳即时成交剩余撤销
+        # 4(市价委托)上海五档即成剩撤 深圳五档即成剩撤
+        # 5(市价委托)深圳全额成交或撤销
+        # 6(市价委托)上海五档即成转限价
         # TODO: 参数检查
         if self.__clientId == -1:
             return
@@ -232,7 +249,7 @@ class TradeApi():
         self._dll.SendOrder(self.__clientId, orderType, priceType, gddm, zqdm, c_float(price), quantity, res.Result, res.ErrInfo)
         if not rst:
             # TODO: TradeException详细信息
-            raise TradeException
+            raise TradeError
         return res
 
     def SendOrders(self, orderType, zqdm, price, quantity, priceType=0, gddm=[]):
