@@ -59,11 +59,38 @@ function RefreshStockPool() {
 	})
 }
 
+function CompareFactory(propertyName) {
+	return function(object1, object2) {
+		var value1 = object1[propertyName];
+		var value2 = object2[propertyName];
+		if (value1 < value2) {
+			return -1;
+		} else if (value1 > value2) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+}
+
+function compareDate(t1, t2) {
+	now = new Date();
+	today = now.toDateString() + " ";
+	c1 = Date.parse(today + t1["成交时间"]);
+	c2 = Date.parse(today + t2["成交时间"]);
+	return c2 - c1
+}
+
 function RefreshOrderList() {
 	console.log("Refresh Order List")
 	$.get(host + "/query",{"catalogues":"orderlist"}, function(data) {
-		console.log(data);
+		//console.log(data);
 		obj = eval("("+data+")");
+		obj_array = []
+		for (i in obj) {
+			obj_array.push(obj[i]);
+		}
+		obj = obj_array.sort(compareDate);
 		$("#order-list .panel-body table tbody").empty();
 		item_str = ""
 		for ( i in obj) {
@@ -147,5 +174,5 @@ function Refresh() {
 
 $(document).ready(function() {
 	Refresh()
-	setInterval("Refresh()", 10000);
+	setInterval("Refresh()", 5000);
 })
