@@ -101,6 +101,7 @@ if __name__ == "__main__":
     tornado.options.parse_command_line()
     settings = {
     "static_path": os.path.join(os.path.dirname(__file__), "static").decode('gbk'),
+    "debug": True
     }
     router = [(r"/", IndexHandler),
               (r"/buy", BuyHandler),
