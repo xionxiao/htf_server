@@ -16,6 +16,7 @@ class LogonError(Error):
 class QueryError(Error):
     u""" 查询错误 """
     def __init__(self, query_type, error_info, *args, **kwargs):
+        # TODO: 处理History Query
         self._query_type = query_type
         self._error_info = error_info
 
@@ -59,10 +60,13 @@ class TradeApi():
                           "历史成交", # 1
                           "交割单", # 2
                           )
-    # 股东代码
-    GDDM_TYPE = {'深市':'0603467002',   # 深市
-                 '沪市':'E035674151'    # 沪市
-                 }
+    # 股东代码 长江证券
+    GDDM_CJZQ = { '深市':'0603467002', '沪市':'E035674151' }
+    
+    # 股东代码 国泰君安
+    GDDM_GTJA = { '深市':'0603710116', '沪市':'E037015793' }
+
+    GDDM_TYPE = GDDM_CJZQ
     
     def __init__(self):
         """ When load fails this may throw WindowsError exception """
@@ -122,8 +126,8 @@ class TradeApi():
         self._dll.QueryData(self.__clientId, category, res.Result, res.ErrInfo)
         if not res:
             # Todo: 更好的QueryException构造函数
-            raise QueryError, "查询"+self.QUERY_TYPE[category]+"失败" + rst.ErrInfo.value
-        return res
+            raise QueryError(self.QUERY_TYPE(category), rst.ErrInfo.value)
+        return res[0]
 
     def QueryDatas(self, categories):
         u""" 查询各种交易数据:
@@ -156,8 +160,9 @@ class TradeApi():
         assert(isValidDate(endDate))
         res = ResultBuffer()
         self._dll.QueryHistoryData(self.__clientId, histQueryType, startDate, endDate, res.Result, res.ErrInfo)
-        if not rst:
-            raise QueryError, "获取历史交易数据失败" + rst.ErrInfo.value
+        if not res:
+            # TODO: more information
+            raise QueryError(self.HISTORY_QUERY_TYPE(histQueryType), rst.ErrInfo.value)
         return res
 
     def Query(self, u_str, *args, **kwargs):
@@ -341,7 +346,7 @@ if __name__ == "__main__":
         print api.QueryData(0)
         rst = api.Query("资金")
         printd(rst)
-        print rst[0].head[3] == "冻结资金"
+        print rst.head[3] == "冻结资金"
 
         print u"======== 股份"
         rst = api.Query("股份")
@@ -352,15 +357,15 @@ if __name__ == "__main__":
         print u"======== 当日成交"
         printd(api.Query("当日成交"))
         print u"======== 可撤单"
-        printd(api.Query("可撤单")[0])
+        printd(api.Query("可撤单"))
         print u"======== 股东代码"
-        printd(api.Query("股东代码")[0])
+        printd(api.Query("股东代码"))
         print u"======== 融资余额"
         printd(api.Query("融资余额"))
         #print u"======== 融券余额"
         #printd(api.Query("融券余额")) # 系统暂不支持该功能
         print u"======== 可融证券"
-        printd(api.Query("可融证券")[0].head)
+        printd(api.Query("可融证券").head)
         print "========"
 
         #rst = api.QueryHistoryData(0, "20150429", "20150504")
@@ -381,8 +386,10 @@ if __name__ == "__main__":
         #print api.Buy("000690", 18.8, 100)
         #print api.Sell("000690", 10.10, 100)
         #print api.Short("600005", 6.4, 100)
-    except:
-        pass
+    except Exception as e:
+        print "!!!!!!!!!!!!!!!!!!!!!"
+        print e
+        raise "Error"
     finally:
         print "Log off"
         api.Logoff()
