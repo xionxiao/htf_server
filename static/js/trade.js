@@ -84,7 +84,6 @@ function compareDate(t1, t2) {
 function RefreshOrderList() {
 	console.log("Refresh Order List")
 	$.get(host + "/query",{"catalogues":"orderlist"}, function(data) {
-		//console.log(data);
 		obj = eval("("+data+")");
 		obj_array = []
 		for (i in obj) {
@@ -137,18 +136,32 @@ function KeyShortcuts(evt) {
 		}
 		return
 	}
+	switch (evt.keyCode)
+	{
+	case  38: // UP
+		PressKeyUp();
+		evt.preventDefault();
+		break;
+	case 40: // DOWN
+		PressKeyDown();
+		evt.preventDefault();
+		break
+	case 27: // ESC
+		PressEsc();
+		evt.preventDefault();
+		break;
+	}
+	/*
 	if ($("#sell_price").is(":focus"))
 	{
 		evt.preventDefault()
 		var val = parseFloat($("#sell_price").val());
-		console.log(val);
 		if (isNaN(val))
-			val = 0.01;
+			val = 0.00;
 		switch (evt.keyCode)
 		{
 		case 38: // UP
 			val += 0.01;
-			console.log(val);
 			$("#sell_price").val(val.toFixed(2));
 			evt.preventDefault();
 			break
@@ -156,16 +169,62 @@ function KeyShortcuts(evt) {
 			val -= 0.01;
 			if (val < 0)
 			{
-				val = 0.01;
+				val = 0.00;
 			}
-			console.log(val)
 			$("#sell_price").val(val.toFixed(2));
 			evt.preventDefault();
 			break
 		}
 	}
+	*/
 }
 
+function PressKeyUp() {
+	var focus = $(":focus");
+	if ( focus[0] && (focus[0].id == "sell_price" || focus[0].id == "buy_price")) {
+		var value = parseFloat(focus.val());
+		if (isNaN(value))
+			value = 0.00;
+		value += 0.01;
+		focus.val(value.toFixed(2));
+	}
+	if ( focus[0] && (focus[0].id == "sell_share" || focus[0].id == "buy_share")) {
+		var value = parseFloat(focus.val());
+		if (isNaN(value))
+			value = 0;
+		value += 100;
+		focus.val(value);
+	}
+}
+
+function PressKeyDown() {
+	var focus = $(":focus");
+	if ( focus[0] && (focus[0].id == "sell_price" || focus[0].id == "buy_price")) {
+		var value = parseFloat(focus.val());
+		value -= 0.01;
+		if (isNaN(value) || value < 0)
+			value = 0.00
+		focus.val(value.toFixed(2));
+	}
+	if ( focus[0] && (focus[0].id == "sell_share" || focus[0].id == "buy_share")) {
+		var value = parseFloat(focus.val());
+		value -= 100;
+		if (isNaN(value) || value <= 0)
+			value = 100
+		focus.val(value);
+	}
+
+}
+
+function PressEsc() {
+	var focus = $(":focus");
+	var ids = ["buy_stock", "buy_price", "buy_share", "sell_stock", "sell_price", "sell_share", "cancel_order"];
+	console.log(focus[0].id);
+	if (focus[0] && ids.indexOf(focus[0].id) > 0) {
+		console.log("clear");
+		focus.val("");
+	}
+}
 
 function Refresh() {
 	RefreshStockPool();
