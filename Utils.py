@@ -106,8 +106,8 @@ def __print_ResultBuffer(r):
     print ""
 
 def __print_Result(r):
-    print str(r.head).decode('string_escape')
-    print str(r.table).decode('string_escape')
+    print str(r.attr).decode('string_escape')
+    print str(r.items).decode('string_escape')
 
 
 

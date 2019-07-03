@@ -8,103 +8,119 @@ import time
 class ResultBuffer(object):
     def __init__(self, count=1):
         assert count > 0
+        self._ResultList = []
         if count == 1:
             self.ErrInfo = c_char_p('\000'*256)
             self.Result = c_char_p('\000'*1024*1024)
-            self.count = 1
+            self.Count = 1
         else:
             self.ErrInfo = (c_char_p*count)()
             self.Result = (c_char_p*count)()
-            self.count = count
+            self.Count = count
             for i in range(count):
                 self.ErrInfo[i] = c_char_p('\000'*256)
                 self.Result[i] = c_char_p('\000'*1024*1024)
 
     def __len__(self):
-        return self.count
+        return self.Count
 
-    _ResultList = []
-    def _parseResult(self):
+    def getResults(self):
+        # parse only once
         if not self._ResultList:
-            if self.count == 1:
-                self._ResultList = [ Result(self.Result.value) ]
+            if self.Count == 1:
+                if self.ErrInfo.value != "":
+                    self._ResultList = [ Error(self.ErrInfo.value) ]
+                else:
+                    self._ResultList = [ Result(self.Result.value) ]
             else:
-                self._ResultList = [ Result(i) for i in self.Result ]
+                for i in range(self.Count):
+                    if self.ErrInfo[i] == "":
+                        self._ResultList.append(Result(self.Result[i]))
+                    else:
+                        self._ResultList.append(Error(self.ErrInfo[i]))
         return self._ResultList
 
-    _ErrorList = []
-    def _parseError(self):
-        if not self._ErrorList:
-            if self.count == 1:
-                self._ErrorList = [ self.ErrInfo.value ]
-            else:
-                self._ErrorList = [ i for i in self.ErrInfo ]
-        return self._ErrorList
-        
     def __getitem__(self, index):
         """ 返回Result对象 """
         assert type(index) is int
         assert index >= 0
-        # Return result
-        if bool(self): 
-            result_list = self._parseResult()
-            return result_list[index]
-        # Return Error
-        else:
-            error_list = self._parseError()
-            return error_list[index]
+        result_list = self.getResults()
+        return result_list[index]
 
     def __nonzero__(self):
-        if type(self.ErrInfo) is c_char_p:
-            return self.ErrInfo.value == ""
-        else:
-            err = [ not bool(i) for i in self.ErrInfo ]
-            return bool(sum(err))
+        res = self.getResults()
+        return sum([bool(r) for r in res])
 
-class Result(object):
-    """ 解析返回结果后得到的二维表格 """
-    
-    head = []
-    table = []
+class FeedBack(object):
     def __init__(self, result_string):
+        self.raw = result_string
+
+    def __nonzero__(self):
+        raise NotImplemented
+
+class Result(FeedBack):
+    u""" 解析返回结果的二维表格
+        Result.attr -> 包含的属性，即表头
+        Result[n] -> 返回第n行，结果为dict
+        Result[n]["Key"] -> 返回具体内容
+        Result.raw -> 原始返回字符串
+        Result.attr -> 返回keys,等价于Result[0].keys()
+        Result.items -> 返回数据的列表，数据为dict
+        Result.length -> len(Result) 返回有多少条数据（不包括头）
+    """
+    def __init__(self, result_string):
+        FeedBack.__init__(self, result_string)
+        self.attr = []  # list of GBK string
+        self.items = [] # list of dict
+        self.length = 0
         rows = result_string.split('\n')
-        tab = [ r.split('\t') for r in rows ]
-        if not len(tab) == 1:
-            # ["表头1","表头2"]
-            self.head = tab[0]
-            # [[第一行],[第二行],...]
-            self.table = tab[1:]
-            # {"表头":[元素列表]}
-            self._col = {}
-            for i in self.head:
-                self._col[i] = []
-            for r in self.table:
-                for i in range(len(self.head)):
-                    c = r[i] if i<len(r) else ""
-                    self._col[self.head[i]].append(c)
+        assert len(rows) > 1
+        self.attr = rows[0].split('\t')
+        for row in rows[1:]:
+            dic = {}
+            row_content = row.split('\t')
+            for col in range(len(self.attr)):
+                dic[self.attr[col]] = row_content[col]
+            self.items.append(dic)
+        self.length = len(self.items)
+        
+    def __getitem__(self, index):
+        return self.items[index]
+
+    def __len__(self):
+        return len(self.items)
+
+    def __nonzero__(self):
+        if self.attr and self.items and self.length:
+            return True
         else:
-            # 处理非表格格式
-            self.head = tab[0]
-            self.table = [[]]
-            self._col = {}
+            return False
 
-    def __getitem__(self, name_or_index):
-        if type(name_or_index) is int:
-            return self.table[name_or_index]
-        elif name_or_index in self.head:
-            return self._col[name_or_index]
+class Error(FeedBack):
+    def __init__(self, error_string):
+        FeedBack.__init__(self, error_string)
 
+    def __nonzero__(self):
+        return False
 
+    def __str__(self):
+        return self.raw
     
 if __name__ == "__main__":
-    from TradeApi import TradeApi
+    from TradeApi import *
     api = TradeApi.Instance()
     if not api.isLogon():
-        rst = api.Logon("59.173.7.38", 7708, "184039030", "326326")
-    
-    rst = api.Query("可融证券")
-    #printd(rst)
-    printd(rst[0])
-    printd(rst[0].head)
-    printd(rst[0][0])
-    printd(rst[0]['证券名称'])
+        api.Logon("59.173.7.38", 7708, "184039030", "326326")
+    try:
+        time.sleep(10)
+        rst = api.SendOrders([0,0], ["000655","600036"], [20.22,12.5], [100,200])
+        print type(rst)
+        printd(rst)
+        print type(rst[0])
+        printd(rst[0])
+        printd(type(rst.getResults()))
+    except Error as e:
+        print type(e),e
+    finally:
+        print "Log off"
+        api.Logoff()
