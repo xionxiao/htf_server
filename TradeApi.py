@@ -33,13 +33,6 @@ class TradeApi():
                           "历史成交", # 1
                           "交割单", # 2
                           )
-    # 股东代码 长江证券
-    #GDDM_CJZQ = { '深市':'0603467002', '沪市':'E035674151' }
-    
-    # 股东代码 国泰君安
-    #GDDM_GTJA = { '深市':'0603710116', '沪市':'E037015793' }
-
-    #GDDM_TYPE = GDDM_CJZQ
     
     def __init__(self):
         self._clientId = -1
@@ -71,11 +64,11 @@ class TradeApi():
         rst = ResultBuffer()
         client = self._dll.Logon(ip, port, version, account, password, TxPassword, rst.ErrInfo)
         if client == -1:
-            raise LogonError,"Logon failed: " + rst.ErrInfo.value
+            raise LogonError(ip, port, rst[0])
         self._clientId = client
         self._ip = ip
         self._port = port
-        # TODO: 获得股东代码
+        # 获得股东代码
         rst = self.QueryData(5)
         if rst[0]["资金帐号"] == "1":
             self._shareholder["沪市"] = rst[0]["股东代码"]
@@ -106,8 +99,7 @@ class TradeApi():
         res = ResultBuffer()
         self._dll.QueryData(self._clientId, category, res.Result, res.ErrInfo)
         if not res:
-            # Todo: 更好的QueryException构造函数
-            raise QueryError
+            raise QueryError(category, res[0])
         return res[0]
 
     def QueryDatas(self, categories):
@@ -126,8 +118,7 @@ class TradeApi():
         res = ResultBuffer(count)
         self._dll.QueryDatass(self._clientId, _category, count, res.Result, res.ErrInfo)
         if not res:
-            # TODO: 处理是哪个查询失败
-            raise QueryError
+            raise BatchQueryError(categories, res.getResults())
         return res.getResults()
 
     def QueryHistoryData(self, histQueryType, startDate, endDate):
@@ -143,8 +134,7 @@ class TradeApi():
         res = ResultBuffer()
         self._dll.QueryHistoryData(self._clientId, histQueryType, startDate, endDate, res.Result, res.ErrInfo)
         if not res:
-            # TODO: more information
-            raise QueryError
+            raise QueryError(histQueryType, res[0], startDate=startDate, endDate=endDate)
         return res[0]
 
     def GetQuote(self, stocks):
@@ -161,17 +151,16 @@ class TradeApi():
             res = ResultBuffer(count)
             self._dll.GetQuotes(self._clientId, _stocks, count, res.Result, res.ErrInfo)
             if not res:
-                # TODO: 详细的错误信息
-                raise QueryError
+                raise QueryError("quote", res.getResults(), stocks=stocks)
             return res.getResults()
         else:
             res = ResultBuffer()
             self._dll.GetQuote(self._clientId, stocks, res.Result, res.ErrInfo)
             if not res:
-                # TODO: "详细的错误信息"
-                raise QueryError
+                raise BatchQueryError("quote", res[0], stock=stocks) 
             return res[0]
 
+    # 获取股东代码
     def _getShareholderID(self, stock):
         market_id = getMarketID(stock, True)
         return self._shareholder[market_id]
@@ -196,7 +185,7 @@ class TradeApi():
             # 6(市价委托)上海五档即成转限价
          """
         
-        # TODO: 参数检查
+        # 参数检查
         assert self.isLogon()
         assert type(category) is int and category in range(7)
         assert type(priceType) is int and priceType in range(7)
@@ -205,16 +194,15 @@ class TradeApi():
         assert type(quantity) is int and quantity > 0
         
         res = ResultBuffer()
-        # TODO: 自动处理股东代码
+        # 处理股东代码
         shareholder = self._getShareholderID(stock)
         self._dll.SendOrder(self._clientId, category, priceType, shareholder, stock, c_float(price), quantity, res.Result, res.ErrInfo)
         if not res:
-            print res[0]
-            # TODO: TradeException详细信息
-            raise TradeError
+            raise TradeError(category, stock, price, quantity, priceType, res[0])
         return res[0]
 
     def SendOrders(self, categories, stocks, prices, quantities, priceTypes=[0], shareholder=['']):
+        u""" 批量下单接口 """
         assert self.isLogon()
         assert type(categories) is list
         assert type(stocks) is list
@@ -253,8 +241,7 @@ class TradeApi():
         res = ResultBuffer(count)
         self._dll.SendOrders(self._clientId, _categories, _priceTypes, _shareholder, _stocks, _prices, _quantities, count, res.Result, res.ErrInfo)
         if not res:
-            # TODO: TradeException
-            raise TradeError
+            raise BatchTradeError(categories, stocks, prices, quantities, priceTypes, res.getResults())
         return res.getResults()
     
     def CancelOrder(self, orderId):
@@ -269,29 +256,31 @@ class TradeApi():
             _orderId = c_array(orderId, c_char_p)
             self._dll.CancelOrders(self._clientId, _orderId, count, res.Result, res.ErrInfo)
             if not res:
-                raise TradeError
+                raise CancelError(res[0], order_id=orderId)
             return res.getResults()
         elif type(orderId) is str:
             res = ResultBuffer()
             self._dll.CancelOrder(self._clientId, orderId, res.Result, res.ErrInfo)
             if not res:
-                raise TradeError
+                raise CancelError(res.getResults(), order_id=orderId)
             return res[0]
             
     def Repay(self, amount):
         assert self.isLogon()
         res = ResultBuffer()
         self._dll.Repay(self._clientId, amount, res.Result, res.ErrInfo)
-        return res
+        if not res:
+            raise RepayError(res[0], amount=amount)
+        return res[0]
 
 if __name__ == "__main__":
     api = TradeApi.Instance()
     #f = open('out.txt', 'w+')
     #import sys
     #sys.stdout=f
-    if not api.isLogon():
-        api.Logon("59.173.7.38", 7708, "184039030", "326326")
     try:
+        if not api.isLogon():
+            api.Logon("59.173.7.38", 7708, "184039030", "326326")
         rst = api.QueryData(5)
         print rst
 ##        rst = api.Query("资金")
@@ -339,7 +328,7 @@ if __name__ == "__main__":
         #print api.Short("600005", 6.4, 100)
     except ErrorExp as e:
         print "!!!!!!!!!!!!!!!!!!!!!"
-        print type(e),e
+        print e.feedback
     finally:
         print "Log off"
         api.Logoff()
