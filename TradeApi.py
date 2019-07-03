@@ -34,18 +34,18 @@ class TradeApi():
                           "交割单", # 2
                           )
     # 股东代码 长江证券
-    GDDM_CJZQ = { '深市':'0603467002', '沪市':'E035674151' }
+    #GDDM_CJZQ = { '深市':'0603467002', '沪市':'E035674151' }
     
     # 股东代码 国泰君安
-    GDDM_GTJA = { '深市':'0603710116', '沪市':'E037015793' }
+    #GDDM_GTJA = { '深市':'0603710116', '沪市':'E037015793' }
 
-    GDDM_TYPE = GDDM_CJZQ
+    #GDDM_TYPE = GDDM_CJZQ
     
     def __init__(self):
         self._clientId = -1
         self._ip = ""
         self._port = None
-        self._stock_holder = None # 股东代码
+        self._shareholder = {"沪市":None, "深市":None} # 股东代码
         # When load fails this may throw WindowsError exception
         self._dll = windll.LoadLibrary("trade.dll")
         self.Open()
@@ -76,8 +76,14 @@ class TradeApi():
         self._ip = ip
         self._port = port
         # TODO: 获得股东代码
-        # rst = self.QueryData(5)
-
+        rst = self.QueryData(5)
+        if rst[0]["资金帐号"] == "1":
+            self._shareholder["沪市"] = rst[0]["股东代码"]
+            self._shareholder["深市"] = rst[1]["股东代码"]
+        else:
+            self._shareholder["沪市"] = rst[1]["股东代码"]
+            self._shareholder["深市"] = rst[0]["股东代码"]
+    
     def Logoff(self):
         if self._clientId != -1:
             self._dll.Logoff(self._clientId)
@@ -166,7 +172,11 @@ class TradeApi():
                 raise QueryError
             return res[0]
 
-    def SendOrder(self, category, stock, price, quantity, priceType=0, gddm=''):
+    def _getShareholderID(self, stock):
+        market_id = getMarketID(stock, True)
+        return self._shareholder[market_id]
+    
+    def SendOrder(self, category, stock, price, quantity, priceType=0, shareholder=''):
         u"""
         category:
             # 0买入
@@ -196,55 +206,52 @@ class TradeApi():
         
         res = ResultBuffer()
         # TODO: 自动处理股东代码
-        if not gddm:
-            if stock[0] == '6':
-                gddm = self.GDDM_TYPE['沪市']
-            else:
-                gddm = self.GDDM_TYPE['深市']
-        self._dll.SendOrder(self._clientId, category, priceType, gddm, stock, c_float(price), quantity, res.Result, res.ErrInfo)
+        shareholder = self._getShareholderID(stock)
+        self._dll.SendOrder(self._clientId, category, priceType, shareholder, stock, c_float(price), quantity, res.Result, res.ErrInfo)
         if not res:
+            print res[0]
             # TODO: TradeException详细信息
             raise TradeError
         return res[0]
 
-    def SendOrders(self, categories, stocks, prices, quantities, priceTypes=[0], gddm=['']):
+    def SendOrders(self, categories, stocks, prices, quantities, priceTypes=[0], shareholder=['']):
         assert self.isLogon()
         assert type(categories) is list
         assert type(stocks) is list
         assert type(prices) is list
         assert type(quantities) is list
-        assert type(priceType) is list
-        assert type(gddm) is list
+        assert type(priceTypes) is list
+        assert type(shareholder) is list
         
         count = len(categories)
-        assert len(stocks)==count and len(price)==count and len(quantity)==count
+        assert len(stocks)==count and len(prices)==count and len(quantities)==count
 
+        if len(priceTypes) == 1:
+            priceTypes = priceTypes * count
         for i in range(count):
             assert isValidStockCode(stocks[i])
             assert isinstance(prices[i], numbers.Number)
             assert type(quantities[i]) is int and quantities[i]>0
-            assert type(priceTypes[i]) is int and priceType[i] in range(7)
+            assert type(priceTypes[i]) is int and priceTypes[i] in range(7)
 
         # Bug when only one command in banch
         if count == 1:
-            return [self.SendOrder(categories[0], zqdm[0], price[0], quantity[0], priceTypes[0], gddm[0])]
+            return [self.SendOrder(categories[0], stocks[0], prices[0], quantities[0], priceTypes[0], shareholder[0])]
         
         _categories = c_array(categories, c_int)
         _stocks = c_array(stocks, c_char_p)
         _prices = c_array(prices, c_float)
         _quantities = c_array(quantities, c_int)
-        _priceTypes = c_array(pirceTypes, c_int)
-        if not gddm:
-            gddm = []
-            for i in zqdm:
-                if i[0] == '6':
-                    gddm.append(self.GDDM_TYPE['沪市'])
-                else:
-                    gddm.append(self.GDDM_TYPE['深市'])
-        _gddm = c_array(gddm, c_char_p)
+        _priceTypes = c_array(priceTypes, c_int)
+        if len(shareholder) == 1:
+            shareholder = []
+            for i in stocks:
+                shareholder.append(self._getShareholderID(i))
+        
+        _shareholder = c_array(shareholder, c_char_p)
         
         res = ResultBuffer(count)
-        self._dll.SendOrders(self._clientId, _categories, _priceTypes, _gddm, _stocks, _prices, _quantities, count, res.Result, res.ErrInfo)
+        self._dll.SendOrders(self._clientId, _categories, _priceTypes, _shareholder, _stocks, _prices, _quantities, count, res.Result, res.ErrInfo)
         if not res:
             # TODO: TradeException
             raise TradeError
@@ -285,7 +292,8 @@ if __name__ == "__main__":
     if not api.isLogon():
         api.Logon("59.173.7.38", 7708, "184039030", "326326")
     try:
-        print type(api.QueryData(5))
+        rst = api.QueryData(5)
+        print rst
 ##        rst = api.Query("资金")
 ##        printd(rst)
 ##        print rst.attr[3] == "冻结资金"
@@ -323,9 +331,9 @@ if __name__ == "__main__":
         #rst = api.CancelOrder(["1799","1798"])
         #print rst
         
-        #rst = api.SendOrder(3, "000655", 20.22, 100)
+        #rst = api.SendOrder(3, "000655", 0.22, 100)
         #print rst
-        #print api.SendOrders([3,3,3], ["000655", "000625","600005"], [20.22, 10.11,6.4], [100,100,200])
+        #print api.SendOrders([3,3,3], ["000655", "000625","600005"], [0.22, 0.11,0.4], [100,100,200])
         #print api.Buy("000690", 18.8, 100)
         #print api.Sell("000690", 10.10, 100)
         #print api.Short("600005", 6.4, 100)
