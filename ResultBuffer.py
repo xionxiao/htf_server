@@ -42,7 +42,8 @@ class ResultBuffer(object):
 
     def __getitem__(self, index):
         """ 返回Result对象 """
-        assert type(index) is int
+        if not isinstance(index, int):
+            raise TypeError
         assert index >= 0
         result_list = self.getResults()
         return result_list[index]
@@ -53,10 +54,15 @@ class ResultBuffer(object):
 
 class FeedBack(object):
     def __init__(self, result_string):
+        if not isinstance(result_string, str):
+            raise TypeError
         self.raw = result_string
 
     def __nonzero__(self):
         raise NotImplemented
+
+    def __str__(self):
+        return self.raw
 
 class Result(FeedBack):
     u""" 解析返回结果的二维表格

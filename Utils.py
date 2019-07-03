@@ -61,12 +61,16 @@ def isValidDate(date):
     re_str = r'^\d{4}(0\d{1}|1[0-2])([0-2]\d{1}|3[0,1])$'
     return bool(re.match(re_str, date))
 
-def getMarketID(stock):
+def getMarketID(stock, byName=False):
     u""" 判断股票市场： 返回 1-上海  0-深圳  错误代码将弹出异常"""
-    assert(isValidStockCode(stock))
+    assert isValidStockCode(stock)
     if stock[0] == '6':
+        if byName:
+            return "沪市"
         return 1
     else: # 0,3 创业板为深圳
+        if byName:
+            return "深市"
         return 0
 
 def round_up_decimal_2(float_number):
@@ -75,7 +79,7 @@ def round_up_decimal_2(float_number):
     return float('{:.2f}'.format(Decimal(str(float_number))))
 
 def c_array(src_list, TYPE):
-    assert(type(src_list) is list)
+    assert type(src_list) is list
 
     count = len(src_list)
     rst = (TYPE*count)()
