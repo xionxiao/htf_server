@@ -71,11 +71,11 @@ class TradeApi():
         # 获得股东代码
         rst = self.QueryData(5)
         if rst[0]["资金帐号"] == "1":
-            self._shareholder["沪市"] = rst[0]["股东代码"]
-            self._shareholder["深市"] = rst[1]["股东代码"]
-        else:
             self._shareholder["沪市"] = rst[1]["股东代码"]
             self._shareholder["深市"] = rst[0]["股东代码"]
+        else:
+            self._shareholder["沪市"] = rst[0]["股东代码"]
+            self._shareholder["深市"] = rst[1]["股东代码"]
     
     def Logoff(self):
         if self._clientId != -1:
