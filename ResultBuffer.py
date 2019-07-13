@@ -49,8 +49,12 @@ class ResultBuffer(object):
         return result_list[index]
 
     def __nonzero__(self):
-        res = self.getResults()
-        return sum([bool(r) for r in res])
+        if self.Count == 1:
+            return bool(self.ErrInfo)
+        for i in range(self.Count):
+            if self.ErrInfo[i]:
+                return False
+        return True
 
 class FeedBack(object):
     def __init__(self, result_string):
@@ -80,7 +84,6 @@ class Result(FeedBack):
         self.items = [] # list of dict
         self.length = 0
         rows = result_string.split('\n')
-        assert len(rows) > 1
         self.attr = rows[0].split('\t')
         for row in rows[1:]:
             dic = {}
@@ -97,7 +100,7 @@ class Result(FeedBack):
         return len(self.items)
 
     def __nonzero__(self):
-        if self.attr and self.items and self.length:
+        if self.attr: # 只有一行，items=[], length=0
             return True
         else:
             return False
