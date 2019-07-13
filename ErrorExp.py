@@ -3,12 +3,12 @@ import datetime
 
 class ErrorExp(Exception):
     def __init__(self, feedback, **kwargs):
-        self.timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        self.timestamp = datetime.datetime.now()
         self.feedback = feedback
         self.extra = kwargs
 
     def __str__(self):
-        return str(self.feedback)
+        return str(self.timestamp) + '\n' + str(self.feedback)
 
 class LogonError(ErrorExp):
     u""" µÇÂ¼´íÎó """
@@ -28,9 +28,9 @@ class QueryError(ErrorExp):
         self.query_type = query_type
 
     def __str__(self):
-        ret_val = "Query " + str(self.query_type) + " failed:\n    " + str(self.feedback) + "\n"
+        ret_val = "Query " + str(self.query_type) + " failed:\n" + super(QueryError, self).__str__() + "\n"
         if self.extra:
-            ret_val += "with:\n    " + str(self.extra)
+            ret_val += "with params:\n" + str(self.extra)
         return ret_val
 
 class BatchQueryError(QueryError):

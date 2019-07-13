@@ -1,39 +1,34 @@
 <!DOCTYPE html>
 <html>
     <head> 
-        <title>股票交易</title> 
+        <title>股票行情</title> 
         <meta charset="utf-8" /> 
         <link href="static/css/bootstrap.min.css" rel="stylesheet" /> 
         <!-- 包括所有已编译的插件 --> 
         <script src="static/js/jquery.min.js"></script>
         <script src="static/js/bootstrap.min.js"></script> 
-        <script src="static/js/trade.js"></script> 
+        <script src="static/js/fetch.js"></script> 
         <style type="text/css">
+			.container-fluid {
+				margin-top:20px;
+			}
+			.col-xs-2 {
+				padding:0px 5px 0px 5px;
+			}
+			.panel {
+				margin-bottom: 10px;
+			}
             .table {
-                margin-bottom:1px;
-                margin-top:10px;
+                margin-bottom:0px;
+                margin-top:0px;
+				font-size:12px;
             }
-            #stock-pool {
-                height: 245px;
-            }
-			#stock-pool .panel-body {
-                overflow-y: auto;
-				max-height: 205px;
-            }
-            #order-list {
-                height: 245px;
-            }
-			#order-list .panel-body {
-                overflow-y: auto;
-				max-height: 205px;
-            }
-            #result-panel {
-                height: 163px;
-            }
-			#result-panel .panel-body{
-                overflow-y: auto;
-				max-height: 123px;
-            }
+			#col-3 .panel{
+				min-height: 205px;
+			}
+			#col-3 #order-list {
+				height: 300px;
+			}
             .glyphicon:hover {
                 color:#5bc0de;
                 cursor:hand;
@@ -41,93 +36,249 @@
             .glyphicon:active {
                 color:white;
             }
+			.green {
+				color:darkgreen;
+			}
+			.red {
+				color:red;
+			}
+			.blue {
+				color:blue;
+			}
+			.table-line {
+				border-top: 2px solid gray;
+			}
+			#left-transaction table {
+				font-size: 6px;
+			}
         </style>
     </head> 
     <body onkeyup="KeyShortcuts(event)"> 
-        <div class="container"> 
-            <h1>股票交易</h1> 
+        <div class="container-fluid"> 
             <div class="row"> 
-                <div class="col-xs-4"> 
-
-                    <div class="panel panel-danger">
-                        <div class="panel-heading"> 
-                            <h3 class="panel-title">买入股票</h3> 
-                        </div> 
-                        <div class="panel-body">
-                            <form id="form-buy" method="post" action="http://localhost:8888/buy" name="Buy" target="result-panel" autocomplete="off"> 
-                                <table class="table table-hover table-condensed"> 
-                                    <tr> <td>股票代码</td> <td><input class="input-sm form-control" type="text" name="stock" id="buy_stock" autocomplete="on"/></td> </tr> 
-									<tr> <td>买入数量</td> <td><input class="input-sm form-control" type="text" name="share" id="buy_share" /></td> </tr> 
-                                    <tr> <td>股票价格</td> <td><input class="input-sm form-control" type="text" name="price" id="buy_price" /></td> </tr>  
-                                    <tr> <td>提交</td> <td><input class="input-sm btn btn-danger" type="button" value="买入股票" onClick="ExcuteBuyStock()" /></td> </tr> 
-                                </table> 
-                            </form> 
-                        </div>
-                    </div>
-
-                    <div class="panel panel-success">
-                        <div class="panel-heading"> 
-                            <h3 class="panel-title">卖出股票</h3> 
-                        </div> 
-                        <div class="panel-body">
-                            <form id="form-sell" method="post" action="http://localhost:8888/sell" name="Sell" target="output" autocomplete="off"> 
-                                <table class="table table-hover table-condensed "> 
-                                    <tr> <td>股票代码</td> <td><input class="input-sm form-control" type="text" name="stock" id="sell_stock" autocomplete="on"/></td> </tr>
-									<tr> <td>卖出数量</td> <td><input class="input-sm form-control" type="text" name="share" id="sell_share" /></td> </tr>
-                                    <tr> <td>股票价格</td> <td><input class="input-sm form-control" type="text" name="price" id="sell_price" /></td> </tr>
-                                    <tr> <td>提交</td> <td><input class="input-sm btn btn-success" type="button" value="卖出股票" onClick="ExcuteSellStock();"/></td></tr> 
-                                </table> 
-                            </form> 
-                        </div>
-                    </div>
-
-                    <div class="panel panel-info">
+				<!-- 左边交易窗口 -->
+                <div class="col-xs-2"> 
+                    <div class="panel panel-danger" id="left-quote">
                         <div class="panel-heading">
-                            <h3 class="panel-title">撤消订单</h3> 
-                        </div>
-                        <div class="panel-body">
-                            <form id="form-cancel" method="post" action="http://localhost:8888/cancel" name="Cancel" target="output"> 
-                                <table class="table table-hover table-condensed"> 
-                                    <tr> <td>订单编号</td> <td><input class="input-sm form-control" type="text" name="order" id="cancel_order" /></td> </tr> 
-                                    <tr> <td>提交</td> <td><input class="input-sm btn btn-info" type="button" value="撤消订单" onClick="ExcuteCancelOrder();"/></td> </tr> 
-                                </table> 
-                            </form> 
-                        </div>
+							<h3 class="panel-title"><span id="name">招商银行</span><span class="pull-right" id="code">600036</span></h3>
+						</div>
+						<input id="left-input" class="form-control input-sm" type="text" placeholder="输入股票代码" />
+						<table class="table table-hover table-condensed" id="left-quote-table"> 
+							<tr> <td class="green">卖十</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖九</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖八</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖七</td> <td></td> <td></td> </tr>
+							<tr> <td class="green">卖六</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖五</td> <td></td> <td></td> </tr>
+							<tr> <td class="green">卖四</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖三</td> <td></td> <td></td> </tr>
+							<tr> <td class="green">卖二</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖一</td> <td></td> <td></td> </tr>
+							<tr class="table-line"> <td class="red">买一</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买二</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买三</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买四</td> <td></td> <td></td> </tr>
+							<tr> <td class="red" >买五</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买六</td> <td></td> <td></td> </tr>
+							<tr> <td class="red" >买七</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买八</td> <td></td> <td></td> </tr>
+							<tr> <td class="red" >买九</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买十</td> <td></td> <td></td> </tr>
+						</table>                       
                     </div>
-                </div>
+				</div> <!-- col-1 -->
 
-                <div class="col-xs-8 right"> 
-                    <div id="stock-pool" class="panel panel-default">
-                        <div class="panel-heading clearfix">
-                            <h3 class="panel-title">股票池<span class="glyphicon glyphicon-refresh pull-right" onclick="RefreshStockPool();"></span></h3>
-                        </div>
-                        <div class="panel-body">
-							<table class="table table-hover table-condensed">
-								<tbody>
-								</tbody>
-							</table>
-                        </div>
-                    </div>
-                    <div id="order-list" class="panel panel-default clearfix" height="500px">
+				<div class="col-xs-2"> 
+                    <div class="panel panel-info" id="left-transaction">
                         <div class="panel-heading">
-                            <h3 class="panel-title">订单列表<span class="glyphicon glyphicon-refresh pull-right" onclick="RefreshOrderList();"></span></h3>
-                        </div>
-                        <div class="panel-body">
-							<table class="table table-hover table-condensed">
-								<tbody>
-								</tbody>
-							</table>
-                        </div>
+							<h3 class="panel-title">逐笔成交</h3>
+						</div> 
+						<table class="table table-hover table-condensed"> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+						</table> 
                     </div>
-                    <div id="result-panel" class="panel panel-default" height="500px">
+					
+					<!-- Sell Panel -->
+					<div class="panel panel-success" id="left-sell">
                         <div class="panel-heading">
-                            <h3 class="panel-title">返回结果<span class="glyphicon glyphicon-remove pull-right" onclick="ClearResultPanel();"></span></h3>
-                        </div>
-                        <div class="panel-body">
-                        </div>
+							<h3 class="panel-title">卖出<span class="pull-right">ALT+1</span></h3>
+						</div>  
+						<table class="table table-hover table-condensed"> 
+							<tr> 
+								<td>价格</td> 
+								<td><input type="text" class="input-sm form-control" id="left-sell-price"></td> 
+							</tr>
+							<tr>
+								<td>股数</td> 
+								<td><input type="text" class="input-sm form-control" id="left-sell-shares"></td> 
+							</tr>
+						</table>
                     </div>
-                </div> 
-            </div> 
-        </div> 
+					<!-- Buy Panel -->
+					<div class="panel panel-danger">
+                        <div class="panel-heading">
+							<h3 class="panel-title">买入<span class="pull-right">ALT+2</span></h3>
+						</div> 
+							<table class="table table-hover table-condensed"> 
+								<tr> 
+									<td>价格</td> 
+									<td><input type="text" class="input-sm form-control" id="left-buy-price"></td> 
+								</tr>
+								<tr>
+									<td>股数</td> 
+									<td><input type="text" class="input-sm form-control" id="left-buy-shares"></td> 
+								</tr>
+							</table> 
+                    </div>
+					<!-- indicator -->
+					<div class="panel panel-default">
+                        <div class="panel-heading">
+							<h3 class="panel-title">可用股数 <span class="pull-right" id="left-available-shares">6000</span></h3>
+						</div>  
+                    </div>
+				</div> <!-- col-2 -->
+
+				<!-- 中间信息窗口 -->
+				<div class="col-xs-4" id="col-3" id="return-info">
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">返回信息</h3>
+						</div>                          
+						<div class="panel-body">
+						</div>
+					</div>
+
+                    <div class="panel panel-default" id="order-list">
+                        <div class="panel-heading">
+							<h3 class="panel-title">挂单</h3>
+						</div>                         
+						<table class="table table-hover"> 
+							<tr> <th>时间</th> <th>单号</th> <th>名称</th> <th>代码</th> <th>价格</th> <th>数量</th> <th>买卖</th> </tr>
+							<tr> <td>10:30:30</td> <td>1528</td> <td>招商银行</td> <td>600036</td> <td>17.30</td> <td>10000</td> <td>卖出</td> </tr>  
+						</table> 
+					</div>
+					
+					<div class="panel panel-default" id="stock-position">
+						<div class="panel-heading">
+							<h3 class="panel-title">持仓</h3>
+						</div> 						
+						<table class="table table-hover"> 
+							<tr> <th>名称</th> <th>代码</th> <th>方向</th> <th>持仓均价</th> <th>持仓数量</th> <th>参考盈亏</th></tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>  
+						</table> 
+                    </div>
+
+				</div> <!-- col-3 col-4 -->
+
+				<!-- 右边交易窗口 -->
+				<div class="col-xs-2"> 
+                    <div class="panel panel-danger" id="right-quote">
+                        <div class="panel-heading">
+							<h3 class="panel-title"><span id="name">招商银行</span><span class="pull-right" id="code">600036</span></h3>
+						</div>  
+						<input id="right-input" class="form-control input-sm" type="text" placeholder="输入股票代码" />
+						<table class="table table-hover table-condensed" id="right-quote-table"> 
+							<tr> <td class="green">卖十</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖九</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖八</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖七</td> <td></td> <td></td> </tr>
+							<tr> <td class="green">卖六</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖五</td> <td></td> <td></td> </tr>
+							<tr> <td class="green">卖四</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖三</td> <td></td> <td></td> </tr>
+							<tr> <td class="green">卖二</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖一</td> <td></td> <td></td> </tr>
+							<tr class="table-line"> <td class="red">买一</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买二</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买三</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买四</td> <td></td> <td></td> </tr>
+							<tr> <td class="red" >买五</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买六</td> <td></td> <td></td> </tr>
+							<tr> <td class="red" >买七</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买八</td> <td></td> <td></td> </tr>
+							<tr> <td class="red" >买九</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买十</td> <td></td> <td></td> </tr>
+						</table>                       
+                    </div>
+				</div> <!-- col-4 -->
+
+				<div class="col-xs-2"> 
+                    <div class="panel panel-info" id="right-transaction">
+                        <div class="panel-heading">
+							<h3 class="panel-title">逐笔成交</h3>
+						</div> 
+						<table class="table table-hover table-condensed"> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+						</table> 
+                    </div>
+					
+					<!-- Sell Panel -->
+					<div class="panel panel-success">
+                        <div class="panel-heading">
+							<h3 class="panel-title">卖出<span class="pull-right">ALT+3</span></h3>
+						</div>  
+						<table class="table table-hover table-condensed"> 
+							<tr> 
+								<td>价格</td> 
+								<td><input type="text" class="input-sm form-control" id="right-sell-price"></td> 
+							</tr>
+							<tr>
+								<td>股数</td> 
+								<td><input type="text" class="input-sm form-control" id="right-sell-shares"></td> 
+							</tr>
+						</table>
+                    </div>
+					<!-- Buy Panel -->
+					<div class="panel panel-danger">
+                        <div class="panel-heading">
+							<h3 class="panel-title">买入<span class="pull-right">ALT+4</span></h3>
+						</div> 
+							<table class="table table-hover table-condensed"> 
+								<tr> 
+									<td>价格</td> 
+									<td><input type="text" class="input-sm form-control" id="right-buy-price"></td> 
+								</tr>
+								<tr>
+									<td>股数</td> 
+									<td><input type="text" class="input-sm form-control" id="right-buy-shares"></td> 
+								</tr>
+							</table> 
+                    </div>
+					<!-- indicator -->
+					<div class="panel panel-default">
+                        <div class="panel-heading">
+							<h3 class="panel-title">可用股数 <span class="pull-right" id="right-available-shares">6000</span></h3>
+						</div>  
+                    </div>
+				</div> <!-- col-2 -->
+
+            </div> <!-- row -->
+        </div> <!-- container -->
     </body>
 </html>
