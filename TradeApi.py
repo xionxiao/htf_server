@@ -224,7 +224,10 @@ class TradeApi():
 
         # Bug when only one command in banch
         if count == 1:
-            return [self.SendOrder(categories[0], stocks[0], prices[0], quantities[0], priceTypes[0], shareholder[0])]
+            res = self.SendOrder(categories[0], stocks[0], prices[0], quantities[0], priceTypes[0], shareholder[0])
+            if not res:
+                raise BatchTradeError(categories, stocks, prices, quantities, priceTypes, [res])
+            return [res]
         
         _categories = c_array(categories, c_int)
         _stocks = c_array(stocks, c_char_p)
