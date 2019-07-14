@@ -3,7 +3,7 @@
 from ctypes import *
 from Utils import *
 from ResultBuffer import *
-from ErrorExp import *
+from ErrorException import *
 import datetime
 import time
 
@@ -166,7 +166,7 @@ if __name__ == "__main__":
         for i in rst:
             printd([i])
         print len(rst)
-    except ErrorExp as e:
+    except ErrorException as e:
         print e
 ##    printd(rst.attr)
 ##    while(True):

@@ -3,7 +3,7 @@
 from ctypes import *
 from Utils import *
 from ResultBuffer import *
-from ErrorExp import *
+from ErrorException import *
 import datetime, time, numbers
 
 @Singleton
@@ -329,7 +329,7 @@ if __name__ == "__main__":
         #print api.Buy("000690", 18.8, 100)
         #print api.Sell("000690", 10.10, 100)
         #print api.Short("600005", 6.4, 100)
-    except ErrorExp as e:
+    except ErrorException as e:
         print "!!!!!!!!!!!!!!!!!!!!!"
         print e.feedback
     finally:
