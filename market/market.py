@@ -1,11 +1,14 @@
 # -*- coding: gbk -*-
 
 from ctypes import *
-from Utils import *
-from ResultBuffer import *
-from ErrorException import *
-import datetime
-import time
+import sys
+sys.path.append("..")
+
+from common.error import *
+from common.utils import *
+from common.utils import c_array
+from common.resultbuffer import *
+import os,datetime,time
 
 @Singleton
 class MarketApi(Singleton):
@@ -14,7 +17,8 @@ class MarketApi(Singleton):
         self._port = None
         self._isConnected = False
         # 失败抛出WindowsError异常
-        self._dll = windll.LoadLibrary('TdxHqApi.dll')
+        path = os.path.split(os.path.realpath(__file__))[0]
+        self._dll = windll.LoadLibrary(path + '\\market.dll')
 
     def Connect(self, ip, port):
         """ 连接服务器 """
@@ -161,47 +165,12 @@ if __name__ == "__main__":
     lv2 = MarketApi.Instance()
     lv2.Connect("119.97.185.4",7709)
     try:
-        rst = lv2.GetTransactionData('600036',0,20)
-        printd(rst.attr)
-        for i in rst:
-            printd([i])
+        rst = lv2.GetMinuteTimeData('600036')
+        print(str(rst.attr).decode("gbk"))
+        for i in rst.attr:
+            print(i)
         print len(rst)
     except ErrorException as e:
-        print e
-##    printd(rst.attr)
-##    while(True):
-##        os.system('cls')
-##        out_str = u"==== "
-##        out_str += time.strftime("%H:%M:%S")
-##        out_str += "\n"
-##        rst = lv2.GetQuotes10('601699')
-##        rst = rst[0]
-##        out_str += u"现价 " + rst["现价"][:-4] + "\n"
-##        out_str += u"--\n"
-##
-##        out_str += u"卖十 " + rst["卖十价"][:-4] + " " + rst["卖十量"] + "\n"
-##        out_str += u"卖九 " + rst["卖九价"][:-4] + " " + rst["卖九量"] + "\n"
-##        out_str += u"卖八 " + rst["卖八价"][:-4] + " " + rst["卖八量"] + "\n"
-##        out_str += u"卖七 " + rst["卖七价"][:-4] + " " + rst["卖七量"] + "\n"
-##        out_str += u"卖六 " + rst["卖六价"][:-4] + " " + rst["卖六量"] + "\n"
-##        out_str += u"卖五 " + rst["卖五价"][:-4] + " " + rst["卖五量"] + "\n"
-##        out_str += u"卖四 " + rst["卖四价"][:-4] + " " + rst["卖四量"] + "\n"
-##        out_str += u"卖三 " + rst["卖三价"][:-4] + " " + rst["卖三量"] + "\n"
-##        out_str += u"卖二 " + rst["卖二价"][:-4] + " " + rst["卖二量"] + "\n"
-##        out_str += u"卖一 " + rst["卖一价"][:-4] + " " + rst["卖一量"] + "\n"
-##        out_str += u"--\n"
-##        out_str += u"买一 " + rst["买一价"][:-4] + " " + rst["买一量"] + "\n"
-##        out_str += u"买二 " + rst["买二价"][:-4] + " " + rst["买二量"] + "\n"
-##        out_str += u"买三 " + rst["买三价"][:-4] + " " + rst["买三量"] + "\n"
-##        out_str += u"买四 " + rst["买四价"][:-4] + " " + rst["买四量"] + "\n"
-##        out_str += u"买五 " + rst["买五价"][:-4] + " " + rst["买五量"] + "\n"
-##        out_str += u"买六 " + rst["买六价"][:-4] + " " + rst["买六量"] + "\n"
-##        out_str += u"买七 " + rst["买七价"][:-4] + " " + rst["买七量"] + "\n"
-##        out_str += u"买八 " + rst["买八价"][:-4] + " " + rst["买八量"] + "\n"
-##        out_str += u"买九 " + rst["买九价"][:-4] + " " + rst["买九量"] + "\n"
-##        out_str += u"买十 " + rst["买十价"][:-4] + " " + rst["买十量"] + "\n"
-##        
-##        print out_str
-##        time.sleep(0.5)
+        print
 
     lv2.Disconnect()

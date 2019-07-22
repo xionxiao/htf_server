@@ -2,8 +2,11 @@
 
 from ctypes import *
 from decimal import *
-from ResultBuffer import *
-import re
+from resultbuffer import *
+import re,json
+
+__all__ = ["Singleton", "isValidStockCode", "isValidIpAddress", "isValidDate",
+           "getMarketID","round_up_decimal_2","dumpUTF8Json"]
 
 class Singleton:
     """
@@ -86,6 +89,9 @@ def c_array(src_list, TYPE):
     for i in range(count): rst[i] = TYPE(src_list[i])
     return rst
 
+def dumpUTF8Json(obj):
+    return json.dumps(obj, encoding="gbk").decode('utf8')
+
 def printd(obj):
     """Debug print"""
     if type(obj) is ResultBuffer:
@@ -140,4 +146,6 @@ if __name__ == "__main__":
     c2 = Class2.Instance()
     c11 = Class1.Instance()
     c22 = Class2.Instance()
+
+    printd(c1)
         

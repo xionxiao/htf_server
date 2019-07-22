@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+    <head> 
+        <title>股票行情</title> 
+        <meta charset="utf-8" /> 
+        <link href="static/css/bootstrap.min.css" rel="stylesheet" /> 
+        <!-- 包括所有已编译的插件 --> 
+        <script src="static/js/jquery.min.js"></script>
+        <script src="static/js/bootstrap.min.js"></script> 
+        <script src="static/js/fetch.js"></script> 
+        <style type="text/css">
+			.container {
+				margin-top:20px;
+			}
+			.col-xs-2 {
+				padding:0px 5px 0px 5px;
+			}
+			.panel {
+				margin-bottom: 10px;
+			}
+            .table {
+                margin-bottom:0px;
+                margin-top:0px;
+				font-size:12px;
+            }
+			#col-3 .panel{
+				min-height: 205px;
+			}
+			#col-3 #order-list {
+				height: 300px;
+			}
+            .glyphicon:hover {
+                color:#5bc0de;
+                cursor:hand;
+            }
+            .glyphicon:active {
+                color:white;
+            }
+			.green {
+				color:darkgreen;
+			}
+			.red {
+				color:red;
+			}
+			.blue {
+				color:blue;
+			}
+			.table-line {
+				border-top: 2px solid gray;
+			}
+			#left-transaction table {
+				font-size: 6px;
+			}
+        </style>
+    </head> 
+    <body onkeyup="KeyShortcuts(event)"> 
+        <div class="container"> 
+            <div class="row"> 
+				<!-- 左边交易窗口 -->
+                <div class="col-xs-2"> 
+                    <div class="panel panel-danger" id="left-quote">
+                        <div class="panel-heading">
+							<h3 class="panel-title"><span id="name">招商银行</span><span class="pull-right" id="code">600036</span></h3>
+						</div>
+						<input id="left-input" class="form-control input-sm" type="text" placeholder="输入股票代码" />
+						<table class="table table-hover table-condensed" id="left-quote-table"> 
+							<tr> <td class="green">卖十</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖九</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖八</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖七</td> <td></td> <td></td> </tr>
+							<tr> <td class="green">卖六</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖五</td> <td></td> <td></td> </tr>
+							<tr> <td class="green">卖四</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖三</td> <td></td> <td></td> </tr>
+							<tr> <td class="green">卖二</td> <td></td> <td></td> </tr> 
+							<tr> <td class="green">卖一</td> <td></td> <td></td> </tr>
+							<tr class="table-line"> <td class="red">买一</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买二</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买三</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买四</td> <td></td> <td></td> </tr>
+							<tr> <td class="red" >买五</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买六</td> <td></td> <td></td> </tr>
+							<tr> <td class="red" >买七</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买八</td> <td></td> <td></td> </tr>
+							<tr> <td class="red" >买九</td> <td></td> <td></td> </tr> 
+							<tr> <td class="red" >买十</td> <td></td> <td></td> </tr>
+						</table>                       
+                    </div>
+				</div> <!-- col-1 -->
+
+				<div class="col-xs-2"> 
+                    <div class="panel panel-info" id="left-transaction">
+                        <div class="panel-heading">
+							<h3 class="panel-title">逐笔成交</h3>
+						</div> 
+						<table class="table table-hover table-condensed"> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+						</table> 
+                    </div>
+					
+				</div> <!-- col-xs-2 -->
+
+				<!-- 中间信息窗口 -->
+				<div class="col-xs-4" id="col-3" id="return-info">
+				</div> <!-- col-xs-4 -->
+
+				<!-- 右边交易窗口 -->
+				<div class="col-xs-2"> 
+				</div> <!-- col-xs-2 -->
+
+            </div> <!-- row -->
+        </div> <!-- container -->
+    </body>
+</html>

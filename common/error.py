@@ -1,6 +1,8 @@
 # -*- coding: gbk -*-
 import datetime
 
+__all__ = ["ErrorException", "LogonError", "QueryError", "BatchQueryError", "TradeError", "BatchTradeError", "CancelError", "BatchCancelError", "RepayError"]
+
 class ErrorException(Exception):
     def __init__(self, feedback, **kwargs):
         self.timestamp = datetime.datetime.now()

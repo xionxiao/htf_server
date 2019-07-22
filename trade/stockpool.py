@@ -1,37 +1,36 @@
 # -*- coding: gbk -*-
 
-from TradeApi import *
-from Utils import *
-from Cache import *
+from trade import TradeApi
+from common import *
+from common.cache import Cache
 import xlrd
 import time
 
+class StockPoolAcquireError(ErrorException):
+    pass
+
 @Singleton
 class StockPool():
-    """ 管理可交易的股票 """
-
-    _tradeApi = None
-    # structure of pooled stocks
-    # { stock_code: 证券代码为键值
-    #   {
-    #       融券数量: 500
-    #       融券上限: 1000
-    #       订单列表: {order_id:share, order_id:share}
-    #   }
-    # }
-    _stock_pool = {}
-    _cache = None
-    
-    def __init__(self):
-        self._tradeApi = TradeApi.Instance()
-        self._cache = Cache.Instance()
+    """ 管理可交易的股票 """    
+    def __init__(self, api):
+        self._tradeApi = api
+        self._cache = Cache()
+        # structure of pooled stocks
+        # { stock_code: 证券代码为键值
+        #   {
+        #       融券数量: 500
+        #       融券上限: 1000
+        #       订单列表: {order_id:share, order_id:share}
+        #   }
+        # }
+        self._stock_pool = {}
         
     def acquire(self, stock, share):
         """ 获得相应数目股票, 返回撤消订单号和下单股数"""
         assert type(share) is int and share > 0
         assert share % 100 == 0
         if not self._stock_pool.has_key(stock):
-            print u"股票池中没有该股票"
+            raise StockPoolAcquireError("Don't have stock " + stock)
             return [],[],0
 
         order_dict = self._stock_pool[stock]["订单列表"]
@@ -44,6 +43,7 @@ class StockPool():
         out_key_list = []
         out_value_list = []
         if sum(values) < share:
+            # raise exception
             print u"证券数量不足"
             return [],[],0
         for i in range(len(sorted_dict)):
@@ -168,13 +168,14 @@ class StockPool():
         """ 与服务器同步股票池 """
         self._stock_pool = {}
         rst = self._tradeApi.Query("可撤单")
-        if not rst:
-            return rst
 
-        # 无可撤订单
         order_stocks = {}
-        if not rst[0][0]:
+        # 无可撤订单
+        if len(rst) == 0:
             return
+
+        for record in rst:
+            self.addOrder(record)
         
         self._cache.add(rst[0]["证券代码"])
         # 整理重复订单 {证券代码：[订单信息]}

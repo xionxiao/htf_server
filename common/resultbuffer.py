@@ -1,9 +1,11 @@
 # -*- coding: gbk -*-
 
 from ctypes import *
-from Utils import *
+from utils import *
 import datetime
 import time
+
+__all__ = ["ResultBuffer", "Feedback", "Result", "Error"]
 
 class ResultBuffer(object):
     def __init__(self, count=1):
@@ -50,13 +52,13 @@ class ResultBuffer(object):
 
     def __nonzero__(self):
         if self.Count == 1:
-            return bool(self.ErrInfo)
+            return not bool(self.ErrInfo.value)
         for i in range(self.Count):
             if self.ErrInfo[i]:
                 return False
         return True
 
-class FeedBack(object):
+class Feedback(object):
     def __init__(self, result_string):
         if not isinstance(result_string, str):
             raise TypeError
@@ -68,7 +70,7 @@ class FeedBack(object):
     def __str__(self):
         return self.raw
 
-class Result(FeedBack):
+class Result(Feedback):
     u""" 解析返回结果的二维表格
         Result.attr -> 包含的属性，即表头
         Result[n] -> 返回第n行，结果为dict
@@ -79,7 +81,7 @@ class Result(FeedBack):
         Result.length -> len(Result) 返回有多少条数据（不包括头）
     """
     def __init__(self, result_string):
-        FeedBack.__init__(self, result_string)
+        Feedback.__init__(self, result_string)
         self.attr = []  # list of GBK string
         self.items = [] # list of dict
         self.length = 0
@@ -105,9 +107,9 @@ class Result(FeedBack):
         else:
             return False
 
-class Error(FeedBack):
+class Error(Feedback):
     def __init__(self, error_string):
-        FeedBack.__init__(self, error_string)
+        Feedback.__init__(self, error_string)
 
     def __nonzero__(self):
         return False
