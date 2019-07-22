@@ -96,7 +96,10 @@ class Result(Feedback):
         self.length = len(self.items)
         
     def __getitem__(self, index):
-        return self.items[index]
+        if type(index) is int:
+            return self.items[index]
+        elif len(self) == 1:
+            return self.items[0][index]
 
     def __len__(self):
         return len(self.items)

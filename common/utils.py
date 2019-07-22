@@ -6,7 +6,7 @@ from resultbuffer import *
 import re,json
 
 __all__ = ["Singleton", "isValidStockCode", "isValidIpAddress", "isValidDate",
-           "getMarketID","round_up_decimal_2","dumpUTF8Json"]
+           "getMarketID","round_up_decimal_2","dumpUTF8Json", "c_array"]
 
 class Singleton:
     """
