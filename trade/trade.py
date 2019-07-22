@@ -3,8 +3,9 @@
 from ctypes import *
 import sys,os
 sys.path.append("..")
-from common import *
-from common.utils import c_array
+from common.error import *
+from common.utils import *
+from common.resultbuffer import *
 import datetime, time, numbers
 
 @Singleton
@@ -16,7 +17,7 @@ class TradeApi():
         self._shareholder = {"沪市":None, "深市":None} # 股东代码
         # When load fails this may throw WindowsError exception
         path = os.path.split(os.path.realpath(__file__))[0]
-        self._dll = windll.LoadLibrary(path + "\\trade.dll")
+        self._dll = windll.LoadLibrary(path + "\\trade_yinhe.dll")
         self.Open()
 
     def __del__(self):
@@ -30,15 +31,19 @@ class TradeApi():
     def Close(self):
         self._dll.CloseTdx()
     
-    def Logon(self, ip, port, account, password, TxPassword="", version="9.01"):
+    def Logon(self, ip, port, branch, account, password, tradeAccount="", TxPassword="", version="9.01"):
         u""" 登录服务器 """
         assert isValidIpAddress(ip)
         assert type(port) is int
         assert type(account) is str
         assert type(password) is str
-        
+        assert type(branch) is int
+        assert type(tradeAccount) is str
+
+        if tradeAccount == "":
+            tradeAccount = account
         rst = ResultBuffer()
-        client = self._dll.Logon(ip, port, version, account, password, TxPassword, rst.ErrInfo)
+        client = self._dll.Logon(ip, c_short(port), version, c_short(branch), account, tradeAccount, password, TxPassword, rst.ErrInfo)
         if client == -1:
             raise LogonError(ip, port, rst[0])
         self._clientId = client
@@ -319,35 +324,7 @@ class TradeApi():
                 return self.GetQuote(args[0])
             elif len(args) == 0 and kwargs['stock']:
                 return self.GetQuote(kwargs['stock'])
-        elif u_str == "昨收价":
-            if len(args) == 1:
-                rst = self.GetQuote(args[0])
-                return round_up_decimal_2(float(rst[0][2]))
-            elif len(args) == 0 and kwargs['stock']:
-                rst = self.GetQuote(kwargs['stock'])
-                return [ round_up_decimal_2(float(i[0][2])) for i in rst ]
-        elif u_str == "涨停价":
-            if len(args) == 1:
-                rst = self.GetQuote(args[0])
-                return round_up_decimal_2(float(rst[0][2]*1.1))
-            elif len(args) == 0 and kwargs['stock']:
-                rst = self.GetQuote(kwargs['stock'])
-                return [ round_up_decimal_2(float(i[0][2])*1.1) for i in rst ]
-        elif u_str == "当前价":
-            if len(args) == 1:
-                rst = self.GetQuote(args[0])
-                return round_up_decimal_2(float(rst[0][5]))
-            elif len(args) == 0 and kwargs['stock']:
-                rst = self.GetQuote(kwargs['stock'])
-                return [ round_up_decimal_2(float(i[0][5])) for i in rst ]
-        elif u_str == "今开价":
-            if len(args) == 1:
-                rst = self.GetQuote(args[0])
-                return round_up_decimal_2(float(rst[0][3]))
-            elif len(args) == 0 and kwargs['stock']:
-                rst = self.GetQuote(kwargs['stock'])
-                return [ round_up_decimal_2(float(i[0][3])) for i in rst ] 
-
+        
 if __name__ == "__main__":
     api = TradeApi.Instance()
     #f = open('out.txt', 'w+')
@@ -355,43 +332,44 @@ if __name__ == "__main__":
     #sys.stdout=f
     try:
         if not api.isLogon():
-            api.Logon("59.173.7.38", 7708, "184039030", "326326")
+            api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", "221199993903", version="2.19")
         rst = api.QueryData(5)
-        print rst
-##        rst = api.Query("资金")
-##        printd(rst)
-##        print rst.attr[3] == "冻结资金"
-
-##        print u"======== 股份"
-##        rst = api.Query("股份")
-##       
-##        printd(rst)
-##        print u"======== 当日委托"
-##        printd(api.Query("当日委托"))
-        #print(u"======== 当日成交")
-        #print(api.Query("当日成交"))
+        print(rst)
+        rst = api.Query("资金")
+        print(rst)
+        print(rst.attr[4] == "冻结资金")
+        print(u"======== 股份")
+        rst = api.Query("股份")
+        print(rst)
+        print(u"======== 当日委托")
+        print(api.Query("当日委托"))
+        print(u"======== 当日成交")
+        print(api.Query("当日成交"))
         print(u"======== 可撤单")
         rst = api.Query("可撤单")
-        print rst
-##        print u"======== 股东代码"
-##        printd(api.Query("股东代码"))
-##        print u"======== 融资余额"
-##        printd(api.Query("融资余额"))
-##        #print u"======== 融券余额"
-##        #printd(api.Query("融券余额")) # 系统暂不支持该功能
-        print u"======== 可融证券"
+        print(rst)
+        print(u"======== 股东代码")
+        print(api.Query("股东代码"))
+        print(u"======== 融资余额")
+        print(api.Query("融资余额"))
+        #print(u"======== 融券余额")
+        #print(api.Query("融券余额")) # 系统暂不支持该功能
+        print(u"======== 可融证券")
         print(api.Query("可融证券"))
-##        print "========"
 
-        #rst = api.QueryHistoryData(0, "20150429", "20150504")
-        #printd(rst)
+        print(u"======== 历史委托")
+        rst = api.QueryHistoryData(0, "20150429", "20150504")
+        print(rst)
         rst = api.Query("历史委托", "20150708", "20150709")
-        print len(rst)
-        #printd(api.Query("历史成交", "20150429", "20150504")[0])
-        #printd(api.Query("交割单", startDate="20150429", endDate="20150504")[0])
+        print(len(rst))
+        print(u"======== 历史成交")
+        print(api.Query("历史成交", "20150429", "20150501"))
+        print(u"======== 交割单")
+        print(api.Query("交割单", startDate="20150429", endDate="20150501"))
 
-        #rst = api.Query("当前价", stock="000002")
-        #printd(rst)
+        print(u"======== 行情")
+        rst = api.Query("行情", "000002")
+        print(rst)
 
         #print api.Repay("1000")
         #rst = api.CancelOrder(["1799","1798"])
