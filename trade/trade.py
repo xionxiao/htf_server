@@ -51,12 +51,14 @@ class TradeApi():
         self._port = port
         # 获得股东代码
         rst = self.QueryData(5)
-        if rst[0]["资金帐号"] == "1":
+        if rst[0]["股东代码"][0] == "E":
+            self._shareholder["沪市"] = rst[0]["股东代码"]
+            self._shareholder["深市"] = rst[1]["股东代码"]
+        elif rst[0]["股东代码"][0] == "0":
             self._shareholder["沪市"] = rst[1]["股东代码"]
             self._shareholder["深市"] = rst[0]["股东代码"]
         else:
-            self._shareholder["沪市"] = rst[0]["股东代码"]
-            self._shareholder["深市"] = rst[1]["股东代码"]
+            raise LogonError(ip, port, rst, extra="wrong shareholder")
     
     def Logoff(self):
         if self._clientId != -1:
@@ -332,7 +334,7 @@ if __name__ == "__main__":
     #sys.stdout=f
     try:
         if not api.isLogon():
-            api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", "221199993903", version="2.19")
+            api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
         rst = api.QueryData(5)
         print(rst)
         rst = api.Query("资金")

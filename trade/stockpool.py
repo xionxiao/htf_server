@@ -1,9 +1,9 @@
 # -*- coding: gbk -*-
 
 from trade import TradeApi
-from common import *
-from common.cache import Cache
-import xlrd
+from common.error import *
+from common.utils import *
+from query import c_query
 import time
 
 class StockPoolAcquireError(ErrorException):
@@ -12,9 +12,8 @@ class StockPoolAcquireError(ErrorException):
 @Singleton
 class StockPool():
     """ 管理可交易的股票 """    
-    def __init__(self, api):
-        self._tradeApi = api
-        self._cache = Cache()
+    def __init__(self):
+        self._tradeApi = TradeApi.Instance()
         # structure of pooled stocks
         # { stock_code: 证券代码为键值
         #   {
@@ -26,7 +25,7 @@ class StockPool():
         self._stock_pool = {}
         
     def acquire(self, stock, share):
-        """ 获得相应数目股票, 返回撤消订单号和下单股数"""
+        """ 获得相应数目股票, 返回撤消订单号,撤消订单股数，补充下单股数(涨停价)"""
         assert type(share) is int and share > 0
         assert share % 100 == 0
         if not self._stock_pool.has_key(stock):
@@ -117,16 +116,10 @@ class StockPool():
 
     def addOrder(self, stock_code, order_id, order_price, order_share, order_type):
         """ 向订单列表增加订单 """
-        assert type(order_share) is int and order_share >= 0
-        assert type(order_price) is float
-
         pool = self._stock_pool
-        cache = self._cache
 
-        if not cache.has_key(stock_code):
-            return u"订单不是可融证券"
-
-        if order_type == "融券卖出" and order_price == cache[stock_code]["涨停价"]:
+        harden_price = c_query("涨停价", stock_code)
+        if order_type == "融券卖出" and order_price == harden_price:
             if not pool.has_key(stock_code):
                 pool[stock_code] = {"融券上限":order_share,
                                     "融券数量":order_share,
@@ -167,24 +160,18 @@ class StockPool():
     def sync(self):
         """ 与服务器同步股票池 """
         self._stock_pool = {}
-        rst = self._tradeApi.Query("可撤单")
-
-        order_stocks = {}
-        # 无可撤订单
-        if len(rst) == 0:
+        try:
+            rst = self._tradeApi.Query("可撤单")
+        except QueryError as e:
             return
 
-        for record in rst:
-            self.addOrder(record)
-        
-        self._cache.add(rst[0]["证券代码"])
         # 整理重复订单 {证券代码：[订单信息]}
-        for record in rst[0]:
-            stock_code = record[1]
-            order_id = record[9]
-            order_type = record[13]
-            order_price = round_up_decimal_2(float(record[7]))
-            order_share = int(float(record[8]))
+        for record in rst:
+            stock_code = record["证券代码"]
+            order_id = record["合同编号"]
+            order_type = record["买卖标志"]
+            order_price = round_up_decimal_2(float(record["委托价格"]))
+            order_share = int(float(record["委托数量"]))
             self.addOrder(stock_code,order_id,order_price,order_share,order_type)
 
         
@@ -193,10 +180,11 @@ class StockPool():
         assert type(share) is int and share > 0
         assert isValidStockCode(stock_code)
 
-        raising_price = self._cache.get(stock_code, "涨停价")
-        rst = self._tradeApi.Short(stock_code, raising_price, share)
-        if rst:
-            order_id = rst[0][0][0]
+        raising_price = c_query("涨停价", stock_code)
+        try:
+            rst = self._tradeApi.Short(stock_code, raising_price, share)
+        except TradeError as e:
+            return e.feedback
         return rst
 
     def lock(self, stock, share):
@@ -208,43 +196,18 @@ class StockPool():
         pass
 
 if __name__ == "__main__":
-    #print grabStocks('05a.xls')
     api = TradeApi.Instance()
     if not api.isLogon():
-        rst = api.Logon("125.39.80.105", 443, "184039030", "326326")
+        rst = api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
     sp = StockPool.Instance()
     
-    #xls = xlrd.open_workbook('05a.xls')
-    #table = xls.sheets()[0]
-    #stocks = [i.encode() for i in table.col_values(0)]
-    #shares = [int(i) for i in table.col_values(1)]
-    #sp.addStock(stocks, shares)
     sp.sync()
-    printd([sp.getStocks()])
-    print "======"
-    printd([sp.getStocks()['002294']])
+    ss = sp.getStocks()
+    print ss
+    for k in ss:
+        print k
+        print ss[k]["融券数量"]
+        print ss[k]["融券上限"]
+        print ss[k]["订单列表"]
 
-##    for i in range(1,3):
-##        sp.sync()
-##        printd([sp.getStock()['002294']])
-##        
-##        xx = i * 100
-##        pr = 41.73
-##        c,d,e = sp.acquire('002294', xx)
-##        print c
-##        print d
-##        print e
-##        if c:
-##            printd(api.CancelOrder(c))
-##            time.sleep(0.5)
-##            if e == 0:
-##                printd(api.Short('002294', pr, xx))
-##            else:
-##                printd(api.SendOrders([3,3],['002294','002294'],[pr,41.76], [xx, e]))
-##            for i in c:
-##                sp.removeOrder(i)
-##
-##            printd([sp.getStock()['002294']])
-##            time.sleep(1)
-##        else:
-##            print u"下单失败",xx,c,d,e
+    #print sp.acquire("600104",2200)
