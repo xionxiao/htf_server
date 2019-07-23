@@ -7,10 +7,10 @@ from command import *
 from common.error import TradeError
 from common.utils import dumpUTF8Json
 
-class BuyCmdCommand):
-    def __init__(self, api, stock, price, share, handler):
+class BuyCmd(Command):
+    def __init__(self, stock, price, share, handler):
         Command.__init__(self, handler)
-        self._api = api
+        self._api = TradeApi.Instance()
         self._stock = stock
         self._price = price
         self._share = share
@@ -19,18 +19,18 @@ class BuyCmdCommand):
     def execute(self):
         try:
             res = self._api.Buy(self._stock, self._price, self._share)
-            obj = {"result": res}
+            obj = {"result": res[0]}
             self._handler.write(dumpUTF8Json(obj))
         except TradeError as e:
             err_str = dumpUTF8Json({"error":str(e)})
             self._handler.write(err_str)
         finally:
-            self._handler.onComplete(self)
+            self.complete()
 
 class SellCmd(Command):
-    def __init__(self, api, stock, price, share, handler):
+    def __init__(self, stock, price, share, handler):
         Command.__init__(self, handler)
-        self._api = api
+        self._api = TradeApi.Instance()
         self._stock = stock
         self._price = price
         self._share = share
@@ -39,18 +39,18 @@ class SellCmd(Command):
     def execute(self):
         try:
             res = self._api.Sell(self._stock, self._price, self._share)
-            obj = {"result": res}
+            obj = {"result": res[0]}
             self._handler.write(dumpUTF8Json(obj))
         except TradeError as e:
             err_str = dumpUTF8Json({"error":str(e)})
             self._handler.write(err_str)
         finally:
-            self._handler.onComplete(self)
+            self.complete()
 
 class ShortCmd(Command):
-    def __init__(self, api, stock, price, share, handler):
+    def __init__(self, stock, price, share, handler):
         Command.__init__(self, handler)
-        self._api = api
+        self._api = TradeApi.Instance()
         self._stock = stock
         self._price = price
         self._share = share
@@ -58,14 +58,14 @@ class ShortCmd(Command):
 
     def execute(self):
         try:
-            res = self._api.Sell(self._stock, self._price, self._share)
-            obj = {"result": res}
+            res = self._api.Short(self._stock, self._price, self._share)
+            obj = {"result": res[0]}
             self._handler.write(dumpUTF8Json(obj))
         except TradeError as e:
             err_str = dumpUTF8Json({"error":str(e)})
             self._handler.write(err_str)
         finally:
-            self._handler.onComplete(self)
+            self.complete()
 
 if __name__ == "__main__":
     api = TradeApi.Instance()
@@ -74,7 +74,8 @@ if __name__ == "__main__":
     class ResponseReceiver(Receiver):
         def write(self, msg):
             print msg
+    
     r = ResponseReceiver()
-    buy = SellCommand(api, "600036", 18.0, 100, r)
+    buy = SellCmd("600036", 18.0, 100, r)
     buy.execute()
 

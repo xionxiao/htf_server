@@ -53,7 +53,6 @@ class QueryHandler(tornado.web.RequestHandler, Receiver):
             #self.finish()
 
     def onComplete(self, cmd):
-        Receiver.onComplete(self, cmd)
         self.finish()
 
 

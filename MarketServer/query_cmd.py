@@ -32,7 +32,7 @@ class QueryMinuteTimeDataCmd(Command):
             self._handler.write(err_str)
             _check_and_reconnect(e.feedback)
         finally:
-            self._handler.onComplete(self)
+            self.complete()
 
 class QueryQuote10Cmd(Command):
     def __init__(self, stocks, handler):
@@ -55,7 +55,7 @@ class QueryQuote10Cmd(Command):
             self._handler.write(err_str)
             _check_and_reconnect(e.feedback)
         finally:
-            self._handler.onComplete(self)
+            self.complete()
         
 
 class QueryQuote5Cmd(Command):
@@ -78,7 +78,7 @@ class QueryQuote5Cmd(Command):
             err_str = dumpUTF8Json({"error":str(e)})
             self._handler.write(err_str)
         finally:
-            self._handler.onComplete(self)
+            self.complete()
 
 class QueryTransactionCmd(Command):
     def __init__(self, stock, handler):
@@ -97,7 +97,7 @@ class QueryTransactionCmd(Command):
             ret_val = dumpUTF8Json({"error":str(e)})
             self._handler.write(ret_val)
         finally:
-            self._handler.onComplete(self)
+            self.complete()
 
 
 class QueryTransactionDetailCmd(Command):
@@ -117,4 +117,4 @@ class QueryTransactionDetailCmd(Command):
             ret_val = dumpUTF8Json({"error":str(e)})
             self._handler.write(ret_val)
         finally:
-            self._handler.onComplete(self)
+            self.complete()

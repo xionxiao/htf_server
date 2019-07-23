@@ -75,6 +75,7 @@ class Result(Feedback):
         Result.attr -> 包含的属性，即表头
         Result[n] -> 返回第n行，结果为dict
         Result[n]["Key"] -> 返回具体内容
+        Result["Key"] -> 如果为单行结果，返回Result[0]["Key"]
         Result.raw -> 原始返回字符串
         Result.attr -> 返回keys,等价于Result[0].keys()
         Result.items -> 返回数据的列表，数据为dict

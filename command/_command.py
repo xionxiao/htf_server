@@ -10,6 +10,9 @@ class Command(object):
         self._receiver = receiver 
 
     def execute(self):
+        self.complete()
+
+    def complete(self):
         self._receiver.onComplete(self)
 
 class Invoker(object):
