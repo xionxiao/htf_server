@@ -1,18 +1,11 @@
-var host = "http://" + window.location.host;
+var trade_host = "http://" + window.location.host;
 
-function ExcuteBuyStock() {
+function ExcuteBuyStock(id) {
 	console.log("Buy");
-	console.log($('#form-buy').serialize());
-	params = $('#form-buy');
-	console.log(params.val());
-	$.post(host + "/buy",$('#form-buy').serialize(), function(data){
-		console.log(data)
-		$("#result-panel .panel-body").prepend(data +  "<br>");
-		RefreshStockPool()
-	})
+	console.log(market_host);
 }
 
-function ExcuteSellStock() {
+function ExcuteSellStock(id) {
 	console.log("Sell");
 	params = $('#form-sell').serialize();
 	console.log(params);
@@ -42,16 +35,18 @@ function ExcuteCancelOrder() {
 
 function RefreshStockPool() {
 	console.log("Refresh Stock Pool");
-	$.get(host + "/query",{"catalogues":"stockpool"}, function(data) {
+	$.get(trade_host + "/query",{"catalogues":"stockpool"}, function(data) {
 		obj = eval("("+data+")");
+		console.log(obj)
 		$("#stock-pool .panel-body table tbody").empty();
 		item_str = "";
 		var color = "gray";
+		obj =  obj["stockpool"]
 		for ( i in obj) {
-			item_str += "<tr id="+i+'" style="color:' + color +';"' + ">";
+			item_str += "<tr id="+obj[i]+'" style="color:' + color +';"' + ">";
 			item_str += "<td>"+i+"</td>";
-			item_str += "<td>"+obj[i]["证券名称"]+"</td>";
-			item_str += "<td>"+obj[i]["涨停价"]+"</td>";
+			//item_str += "<td>"+obj[i]["证券名称"]+"</td>";
+			//item_str += "<td>"+obj[i]["涨停价"]+"</td>";
 			item_str += "<td>"+obj[i]["融券数量"]+"</td>";
 			item_str += "</tr>";
 		}
@@ -114,124 +109,3 @@ function ClearResultPanel() {
 	console.log("Clear Result Panel");
 	$("#result-panel .panel-body").empty();
 }
-
-function KeyShortcuts(evt) {
-	if (evt.altKey) {
-		console.log(evt.keyCode)
-		switch (evt.keyCode)
-		{
-		case 49: // Alt+1
-			var item = document.getElementById("buy_stock");
-			item.focus()
-			break;
-		case 50:  // Alt+2
-			var item = document.getElementById("sell_stock");
-			item.focus()
-			item.vaule=""
-			break;
-		case 51:  // Alt+3
-			var item = document.getElementById("cancel_order");
-			item.focus()
-			break;
-		}
-		return
-	}
-	switch (evt.keyCode)
-	{
-	case  38: // UP
-		PressKeyUp();
-		evt.preventDefault();
-		break;
-	case 40: // DOWN
-		PressKeyDown();
-		evt.preventDefault();
-		break
-	case 27: // ESC
-		PressEsc();
-		evt.preventDefault();
-		break;
-	}
-	/*
-	if ($("#sell_price").is(":focus"))
-	{
-		evt.preventDefault()
-		var val = parseFloat($("#sell_price").val());
-		if (isNaN(val))
-			val = 0.00;
-		switch (evt.keyCode)
-		{
-		case 38: // UP
-			val += 0.01;
-			$("#sell_price").val(val.toFixed(2));
-			evt.preventDefault();
-			break
-		case 40: // DOWN
-			val -= 0.01;
-			if (val < 0)
-			{
-				val = 0.00;
-			}
-			$("#sell_price").val(val.toFixed(2));
-			evt.preventDefault();
-			break
-		}
-	}
-	*/
-}
-
-function PressKeyUp() {
-	var focus = $(":focus");
-	if ( focus[0] && (focus[0].id == "sell_price" || focus[0].id == "buy_price")) {
-		var value = parseFloat(focus.val());
-		if (isNaN(value))
-			value = 0.00;
-		value += 0.01;
-		focus.val(value.toFixed(2));
-	}
-	if ( focus[0] && (focus[0].id == "sell_share" || focus[0].id == "buy_share")) {
-		var value = parseFloat(focus.val());
-		if (isNaN(value))
-			value = 0;
-		value += 100;
-		focus.val(value);
-	}
-}
-
-function PressKeyDown() {
-	var focus = $(":focus");
-	if ( focus[0] && (focus[0].id == "sell_price" || focus[0].id == "buy_price")) {
-		var value = parseFloat(focus.val());
-		value -= 0.01;
-		if (isNaN(value) || value < 0)
-			value = 0.00
-		focus.val(value.toFixed(2));
-	}
-	if ( focus[0] && (focus[0].id == "sell_share" || focus[0].id == "buy_share")) {
-		var value = parseFloat(focus.val());
-		value -= 100;
-		if (isNaN(value) || value <= 0)
-			value = 100
-		focus.val(value);
-	}
-
-}
-
-function PressEsc() {
-	var focus = $(":focus");
-	var ids = ["buy_stock", "buy_price", "buy_share", "sell_stock", "sell_price", "sell_share", "cancel_order"];
-	console.log(focus[0].id);
-	if (focus[0] && ids.indexOf(focus[0].id) > 0) {
-		console.log("clear");
-		focus.val("");
-	}
-}
-
-function Refresh() {
-	RefreshStockPool();
-	RefreshOrderList();
-}
-
-$(document).ready(function() {
-	Refresh()
-	setInterval("Refresh()", 5000);
-})

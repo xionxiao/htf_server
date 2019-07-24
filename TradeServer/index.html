@@ -6,8 +6,10 @@
         <link href="static/css/bootstrap.min.css" rel="stylesheet" /> 
         <!-- 包括所有已编译的插件 --> 
         <script src="static/js/jquery.min.js"></script>
-        <script src="static/js/bootstrap.min.js"></script> 
-        <script src="static/js/fetch.js"></script> 
+        <script src="static/js/bootstrap.min.js"></script>
+		<script src="static/js/keybindings.js"></script> 
+		<script src="static/js/fetch.js"></script>
+        <script src="static/js/trade.js"></script> 
         <style type="text/css">
 			.container-fluid {
 				margin-top:20px;
@@ -53,11 +55,11 @@
 			}
         </style>
     </head> 
-    <body onkeyup="KeyShortcuts(event)"> 
+    <body> 
         <div class="container-fluid"> 
             <div class="row"> 
 				<!-- 左边交易窗口 -->
-                <div class="col-xs-2"> 
+                <div class="col-xs-2" id=left> 
                     <div class="panel panel-danger" id="left-quote">
                         <div class="panel-heading">
 							<h3 class="panel-title"><span id="name">招商银行</span><span class="pull-right" id="code">600036</span></h3>
@@ -129,7 +131,7 @@
 						</table>
                     </div>
 					<!-- Buy Panel -->
-					<div class="panel panel-danger">
+					<div class="panel panel-danger"  id="left-buy">
                         <div class="panel-heading">
 							<h3 class="panel-title">买入<span class="pull-right">ALT+2</span></h3>
 						</div> 
