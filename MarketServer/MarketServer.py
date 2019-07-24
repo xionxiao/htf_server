@@ -24,6 +24,7 @@ class QueryHandler(tornado.web.RequestHandler, Receiver):
     _invoker = Invoker()
     @tornado.web.asynchronous
     def get(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
         try:
             catalogues = self.get_argument('catalogues')
             if catalogues == u"quote10":
