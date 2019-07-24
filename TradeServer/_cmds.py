@@ -3,6 +3,7 @@
 import sys
 sys.path.append("..")
 from trade import TradeApi
+from trade.stockpool import StockPool
 from command import *
 from common.error import TradeError
 from common.utils import dumpUTF8Json
@@ -67,6 +68,19 @@ class ShortCmd(Command):
         finally:
             self.complete()
 
+class GetStockPoolCmd(Command):
+    def __init__(self, handler):
+        Command.__init__(self, handler)
+        self._handler = handler
+
+    def execute(self):
+        sp = StockPool.Instance()
+        sp.sync()
+        ss = sp.getStocks()
+        obj = {"stockpool":ss}
+        self._handler.write(dumpUTF8Json(obj))
+        self.complete()
+
 if __name__ == "__main__":
     api = TradeApi.Instance()
     if not api.isLogon():
@@ -76,6 +90,8 @@ if __name__ == "__main__":
             print msg
     
     r = ResponseReceiver()
-    buy = SellCmd("600036", 18.0, 100, r)
-    buy.execute()
+    invoker = Invoker()
+    #buy = SellCmd("600036", 18.0, 100, r)
+    s = GetStockPoolCmd(r)
+    invoker.call(s)
 
