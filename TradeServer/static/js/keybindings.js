@@ -1,33 +1,35 @@
-(function(){
-	// 全局快捷键
-	function KeyShortcuts(evt) {
-		// 组合键
-		if (evt.altKey) {
-			switch (evt.keyCode)
-			{
-			case 49: // Alt+1
-				var item = $("#left-sell-price");
-				item.val($("#left-quote-table tr:eq(10) td:eq(1)").text());
-				item.focus()
-				break;
-			case 50:  // Alt+2
-				var item = $("#left-buy-price");
-				item.val($("#left-quote-table tr:eq(9) td:eq(1)").text());
-				item.focus()
-				break;
-			case 51:  // Alt+3
-				var item = $("#right-sell-price");
-				item.val($("#right-quote-table tr:eq(10) td:eq(1)").text());
-				item.focus()
-				break;
-			case 52:  // Alt+4
-				var item = $("#right-buy-price");
-				item.val($("#right-quote-table tr:eq(9) td:eq(1)").text());
-				item.focus()
-				break;
-			}
+// 全局快捷键
+function KeyShortcuts(evt) {
+	// 组合键
+	if (evt.altKey) {
+		switch (evt.keyCode)
+		{
+		case 49: // Alt+1
+			var item = $("#left-sell-price");
+			item.val($("#left-quote-table tr:eq(10) td:eq(1)").text());
+			item.focus()
+			break;
+		case 50:  // Alt+2
+			var item = $("#left-buy-price");
+			item.val($("#left-quote-table tr:eq(9) td:eq(1)").text());
+			item.focus()
+			break;
+		case 51:  // Alt+3
+			var item = $("#right-sell-price");
+			item.val($("#right-quote-table tr:eq(10) td:eq(1)").text());
+			item.focus()
+			break;
+		case 52:  // Alt+4
+			var item = $("#right-buy-price");
+			item.val($("#right-quote-table tr:eq(9) td:eq(1)").text());
+			item.focus()
+			break;
 		}
 	}
+}
+
+(function(){
+	
 
 	function AmountUp(evt) {
 		var value = parseInt($(this).val());
@@ -81,24 +83,40 @@
 
 	$(document).ready(function() {
 		// 全局热键
-		$("body").onKeyup = KeyShortcuts
+		$("body").onkeyUp = KeyShortcuts
 
 		// 绑定输入框消息
 		BindInputBoxMessage();
 
 		// 交易
 		$('#left-buy-price').bind('OnEnter', function(evt) {
-			ExcuteBuyStock();
+			ExcuteBuyStock("#left");
 		});
 		$('#left-buy-shares').bind('OnEnter', function(evt) {
-			ExcuteBuyStock();
+			ExcuteBuyStock("#left");
 		});
+		/*
 		$('#right-buy-price').bind('OnEnter', function(evt) {
-			ExcuteBuyStock();
+			ExcuteBuyStock("#right");
 		});
 		$('#right-buy-shares').bind('OnEnter', function(evt) {
-			ExcuteBuyStock();
+			ExcuteBuyStock("#right");
 		});
+		*/
+		$('#left-sell-price').bind('OnEnter', function(evt) {
+			ExcuteSellStock("#left");
+		});
+		$('#left-sell-shares').bind('OnEnter', function(evt) {
+			ExcuteSellStock("#left");
+		});
+		/*
+		$('#right-buy-price').bind('OnEnter', function(evt) {
+			ExcuteBuyStock("#right");
+		});
+		$('#right-buy-shares').bind('OnEnter', function(evt) {
+			ExcuteBuyStock("#right");
+		});
+		*/
 
 		// 行情
 		$('#left-input').bind('OnEnter', function(evt){

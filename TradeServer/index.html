@@ -55,14 +55,14 @@
 			}
         </style>
     </head> 
-    <body> 
+    <body onkeyup="KeyShortcuts(event)"> 
         <div class="container-fluid"> 
             <div class="row"> 
 				<!-- 左边交易窗口 -->
                 <div class="col-xs-2" id=left> 
                     <div class="panel panel-danger" id="left-quote">
                         <div class="panel-heading">
-							<h3 class="panel-title"><span id="name">招商银行</span><span class="pull-right" id="code">600036</span></h3>
+							<h3 class="panel-title"><span id="left-stock-name">招商银行</span><span class="pull-right" id="left-stock-code">600036</span></h3>
 						</div>
 						<input id="left-input" class="form-control input-sm" type="text" placeholder="输入股票代码" />
 						<table class="table table-hover table-condensed" id="left-quote-table"> 
@@ -155,8 +155,8 @@
 				</div> <!-- col-2 -->
 
 				<!-- 中间信息窗口 -->
-				<div class="col-xs-4" id="col-3" id="return-info">
-					<div class="panel panel-default">
+				<div class="col-xs-4" id="col-3">
+					<div class="panel panel-default"  id="return-info">
 						<div class="panel-heading">
 							<h3 class="panel-title">返回信息</h3>
 						</div>                          
@@ -190,7 +190,7 @@
 				<div class="col-xs-2"> 
                     <div class="panel panel-danger" id="right-quote">
                         <div class="panel-heading">
-							<h3 class="panel-title"><span id="name">招商银行</span><span class="pull-right" id="code">600036</span></h3>
+							<h3 class="panel-title"><span id="right-stock-name">招商银行</span><span class="pull-right" id="right-stock-code">600036</span></h3>
 						</div>  
 						<input id="right-input" class="form-control input-sm" type="text" placeholder="输入股票代码" />
 						<table class="table table-hover table-condensed" id="right-quote-table"> 

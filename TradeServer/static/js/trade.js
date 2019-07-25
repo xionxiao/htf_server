@@ -2,24 +2,46 @@ var trade_host = "http://" + window.location.host;
 
 function ExcuteBuyStock(id) {
 	console.log("Buy");
-	console.log(market_host);
+	price = parseFloat($(id+"-buy-price").val());
+	shares = parseFloat($(id+"-buy-shares").val());
+	stock = $(id+"-stock-code").text();
+	console.log(stock)
+	if (price && shares) {
+		params = {"stock":stock, "price":price, "share":shares};
+		$.post(trade_host + "/buy",params, function(data){
+			console.log(data);
+			obj = eval("("+data+")");
+			console.log(obj);
+			if (obj.error) {
+				text = obj.error;
+			}
+			if (obj.result) {
+				text = obj.result["合同编号"];
+			}
+			$("#return-info .panel-body").prepend(text +  "<br>");
+		});
+	}
 }
 
 function ExcuteSellStock(id) {
 	console.log("Sell");
-	params = $('#form-sell').serialize();
-	console.log(params);
-	price = $('#form-sell #sell_price').val();
-	console.log(price);
-	if (price) {
-		$.post(host + "/sell",params, function(data){
-			$("#result-panel .panel-body").prepend(data +  "<br>");
-			RefreshStockPool();
-		});
-	} else {
-		$.post(host + "instant_sell",params, function(data){
-			$("#result-panel .panel-body").prepend(data +  "<br>");
-			RefreshStockPool();
+	price = parseFloat($(id+"-sell-price").val());
+	shares = parseFloat($(id+"-sell-shares").val());
+	stock = $(id+"-stock-code").text();
+	console.log(stock)
+	if (price && shares) {
+		params = {"stock":stock, "price":price, "share":shares};
+		$.post(trade_host + "/sell",params, function(data){
+			console.log(data);
+			obj = eval("("+data+")");
+			console.log(obj)
+			if (obj.error) {
+				text = obj.error;
+			}
+			if (obj.result) {
+				text = obj.result["合同编号"];
+			}
+			$("#return-info .panel-body").prepend(text +  "<br>");
 		});
 	}
 }
