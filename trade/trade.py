@@ -230,23 +230,26 @@ class TradeApi():
             raise BatchTradeError(categories, stocks, prices, quantities, priceTypes, res.getResults())
         return res.getResults()
     
-    def CancelOrder(self, orderId):
+    def CancelOrder(self, exchangeId, orderId):
         assert self.isLogon()
         assert type(orderId) in [list, str]
+        assert type(exchangeId) in [list, str]
         if type(orderId) is list:
             count = len(orderId)
+            assert len(exchangeId) == count
             # Fix Bug when only one command in banch
             if count == 1:
-                return self.CancelOrder(orderId[0])
+                return self.CancelOrder(exchangeId[0], orderId[0])
             res = ResultBuffer(count)
             _orderId = c_array(orderId, c_char_p)
+            _exchangeId = c_array(exchangeId, c_char_p)
             self._dll.CancelOrders(self._clientId, _orderId, count, res.Result, res.ErrInfo)
             if not res:
                 raise BatchCancelError(res[0], order_id=orderId)
             return res.getResults()
         elif type(orderId) is str:
             res = ResultBuffer()
-            self._dll.CancelOrder(self._clientId, orderId, res.Result, res.ErrInfo)
+            self._dll.CancelOrder(self._clientId, exchangeId, orderId, res.Result, res.ErrInfo)
             if not res:
                 raise CancelError(res.getResults(), order_id=orderId)
             return res[0]
@@ -335,43 +338,45 @@ if __name__ == "__main__":
     try:
         if not api.isLogon():
             api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
-        rst = api.QueryData(5)
-        print(rst)
-        rst = api.Query("资金")
-        print(rst)
-        print(rst.attr[4] == "冻结资金")
-        print(u"======== 股份")
-        rst = api.Query("股份")
-        print(rst)
-        print(u"======== 当日委托")
-        print(api.Query("当日委托"))
-        print(u"======== 当日成交")
-        print(api.Query("当日成交"))
-        print(u"======== 可撤单")
-        rst = api.Query("可撤单")
-        print(rst)
-        print(u"======== 股东代码")
-        print(api.Query("股东代码"))
-        print(u"======== 融资余额")
-        print(api.Query("融资余额"))
-        #print(u"======== 融券余额")
-        #print(api.Query("融券余额")) # 系统暂不支持该功能
-        print(u"======== 可融证券")
-        print(api.Query("可融证券"))
-
-        print(u"======== 历史委托")
-        rst = api.QueryHistoryData(0, "20150429", "20150504")
-        print(rst)
-        rst = api.Query("历史委托", "20150708", "20150709")
-        print(len(rst))
-        print(u"======== 历史成交")
-        print(api.Query("历史成交", "20150429", "20150501"))
-        print(u"======== 交割单")
-        print(api.Query("交割单", startDate="20150429", endDate="20150501"))
-
-        print(u"======== 行情")
-        rst = api.Query("行情", "000002")
-        print(rst)
+        rst = api.CancelOrder('15')
+        print rst
+##        rst = api.QueryData(5)
+##        print(rst)
+##        rst = api.Query("资金")
+##        print(rst)
+##        print(rst.attr[4] == "冻结资金")
+##        print(u"======== 股份")
+##        rst = api.Query("股份")
+##        print(rst)
+##        print(u"======== 当日委托")
+##        print(api.Query("当日委托"))
+##        print(u"======== 当日成交")
+##        print(api.Query("当日成交"))
+##        print(u"======== 可撤单")
+##        rst = api.Query("可撤单")
+##        print(rst)
+##        print(u"======== 股东代码")
+##        print(api.Query("股东代码"))
+##        print(u"======== 融资余额")
+##        print(api.Query("融资余额"))
+##        #print(u"======== 融券余额")
+##        #print(api.Query("融券余额")) # 系统暂不支持该功能
+##        print(u"======== 可融证券")
+##        print(api.Query("可融证券"))
+##
+##        print(u"======== 历史委托")
+##        rst = api.QueryHistoryData(0, "20150429", "20150504")
+##        print(rst)
+##        rst = api.Query("历史委托", "20150708", "20150709")
+##        print(len(rst))
+##        print(u"======== 历史成交")
+##        print(api.Query("历史成交", "20150429", "20150501"))
+##        print(u"======== 交割单")
+##        print(api.Query("交割单", startDate="20150429", endDate="20150501"))
+##
+##        print(u"======== 行情")
+##        rst = api.Query("行情", "000002")
+##        print(rst)
 
         #print api.Repay("1000")
         #rst = api.CancelOrder(["1799","1798"])
