@@ -5,6 +5,7 @@ sys.path.append("..")
 from command import *
 from common.error import *
 from common.utils import dumpUTF8Json
+from common.cache import Cache
 from market import MarketApi
 
 def _check_and_reconnect(feedback):
@@ -45,8 +46,9 @@ class QueryQuote10Cmd(Command):
             lv2 = MarketApi.Instance()
             rst = lv2.GetQuotes10(self._stocks)
             obj = {"quote10":[]}
-            # r = RedisCache()
+            r = Cache()
             for i in rst:
+                i["Ãû³Æ"] = r.get(i["´úÂë"])
                 obj["quote10"].append(i)
             json_str = dumpUTF8Json(obj)
             self._handler.write(json_str)
