@@ -78,15 +78,11 @@ class ShortCmd(Command):
         try:
             self._sp.sync()
             i,c,s = self._sp.acquire(self._stock, self._share)
-            print i,c,s
             marketId = str(getMarketID(self._stock))
             res = self._api.CancelOrder(marketId, i)
-            print res
             if s > 0:
                 res = self._sp.fill(self._stock, s)
-                print res
             res = self._api.Short(self._stock, self._price, self._share)
-            print res
             obj = {"result": res[0]}
             self._handler.write(dumpUTF8Json(obj))
         except TradeError as e:
