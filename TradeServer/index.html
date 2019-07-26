@@ -86,12 +86,39 @@
 							<tr> <td class="red" >买八</td> <td></td> <td></td> </tr>
 							<tr> <td class="red" >买九</td> <td></td> <td></td> </tr> 
 							<tr> <td class="red" >买十</td> <td></td> <td></td> </tr>
-						</table>                       
+						</table>
+						<table class="table table-hover table-condensed">
+							<tr class="table-line"> 
+								<td>现价</td> <td class="blue">18.55</td> 
+								<td class="green">涨幅</td> <td class="green">-1.2%</td> 
+							</tr> 
+							<tr> 
+								<td>昨收价</td> <td class="blue">18.58</td> 
+								<td class="red">涨停价</td> <td class="red">20.15</td> 
+							</tr>
+						</table>
+                    </div>
+
+					<!-- Buy Panel -->
+					<div class="panel panel-danger"  id="left-buy">
+                        <div class="panel-heading">
+							<h3 class="panel-title">买入<span class="pull-right"></span></h3>
+						</div> 
+						<table class="table table-hover table-condensed"> 
+							<tr> 
+								<td>价格</td> 
+								<td><input type="text" class="input-sm form-control" id="left-buy-price"></td> 
+							</tr>
+							<tr>
+								<td>股数</td> 
+								<td><input type="text" class="input-sm form-control" id="left-buy-shares"></td> 
+							</tr>
+						</table> 
                     </div>
 				</div> <!-- col-1 -->
 
 				<div class="col-xs-2"> 
-                    <div class="panel panel-info" id="left-transaction">
+                    <div class="panel panel-default" id="left-transaction">
                         <div class="panel-heading">
 							<h3 class="panel-title">逐笔成交</h3>
 						</div> 
@@ -111,13 +138,33 @@
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
 						</table> 
                     </div>
 					
+					<!-- Short Panel -->
+					<div class="panel panel-primary" id="left-short">
+                        <div class="panel-heading">
+							<h3 class="panel-title">融券卖出<span class="pull-right">额度 6000</span></h3>
+						</div> 
+						<table class="table table-hover table-condensed"> 
+							<tr> 
+								<td>价格</td> 
+								<td><input type="text" class="input-sm form-control" id="left-short-price"></td> 
+							</tr>
+							<tr>
+								<td>股数</td> 
+								<td><input type="text" class="input-sm form-control" id="left-short-shares"></td>
+							</tr>
+						</table>
+                    </div>
+
 					<!-- Sell Panel -->
 					<div class="panel panel-success" id="left-sell">
                         <div class="panel-heading">
-							<h3 class="panel-title">卖出<span class="pull-right">ALT+1</span></h3>
+							<h3 class="panel-title">卖出<span class="pull-right">额度 1000</span></h3>
 						</div>  
 						<table class="table table-hover table-condensed"> 
 							<tr> 
@@ -130,28 +177,7 @@
 							</tr>
 						</table>
                     </div>
-					<!-- Buy Panel -->
-					<div class="panel panel-danger"  id="left-buy">
-                        <div class="panel-heading">
-							<h3 class="panel-title">买入<span class="pull-right">ALT+2</span></h3>
-						</div> 
-							<table class="table table-hover table-condensed"> 
-								<tr> 
-									<td>价格</td> 
-									<td><input type="text" class="input-sm form-control" id="left-buy-price"></td> 
-								</tr>
-								<tr>
-									<td>股数</td> 
-									<td><input type="text" class="input-sm form-control" id="left-buy-shares"></td> 
-								</tr>
-							</table> 
-                    </div>
-					<!-- indicator -->
-					<div class="panel panel-default">
-                        <div class="panel-heading">
-							<h3 class="panel-title">可用股数 <span class="pull-right" id="left-available-shares">6000</span></h3>
-						</div>  
-                    </div>
+
 				</div> <!-- col-2 -->
 
 				<!-- 中间信息窗口 -->
@@ -219,7 +245,7 @@
 				</div> <!-- col-4 -->
 
 				<div class="col-xs-2"> 
-                    <div class="panel panel-info" id="right-transaction">
+                    <div class="panel panel-default" id="right-transaction">
                         <div class="panel-heading">
 							<h3 class="panel-title">逐笔成交</h3>
 						</div> 

@@ -5,7 +5,7 @@ function KeyShortcuts(evt) {
 		switch (evt.keyCode)
 		{
 		case 49: // Alt+1
-			var item = $("#left-sell-price");
+			var item = $("#left-short-price");
 			item.val($("#left-quote-table tr:eq(10) td:eq(1)").text());
 			item.focus()
 			break;
@@ -15,8 +15,8 @@ function KeyShortcuts(evt) {
 			item.focus()
 			break;
 		case 51:  // Alt+3
-			var item = $("#right-sell-price");
-			item.val($("#right-quote-table tr:eq(10) td:eq(1)").text());
+			var item = $("#left-sell-price");
+			item.val($("#left-quote-table tr:eq(10) td:eq(1)").text());
 			item.focus()
 			break;
 		case 52:  // Alt+4
