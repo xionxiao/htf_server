@@ -243,7 +243,7 @@ class TradeApi():
             res = ResultBuffer(count)
             _orderId = c_array(orderId, c_char_p)
             _exchangeId = c_array(exchangeId, c_char_p)
-            self._dll.CancelOrders(self._clientId, _orderId, count, res.Result, res.ErrInfo)
+            self._dll.CancelOrders(self._clientId, _exchangeId, _orderId, count, res.Result, res.ErrInfo)
             if not res:
                 raise BatchCancelError(res[0], order_id=orderId)
             return res.getResults()
@@ -338,7 +338,7 @@ if __name__ == "__main__":
     try:
         if not api.isLogon():
             api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
-        rst = api.CancelOrder('15')
+        rst = api.CancelOrder(['1','1'],['4533','4536'])
         print rst
 ##        rst = api.QueryData(5)
 ##        print(rst)
