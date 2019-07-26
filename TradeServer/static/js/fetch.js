@@ -22,7 +22,7 @@ function RefreshQuote10() {
 	//console.log("Refresh Quote", g_stock_1, g_stock_2);
 	$.get(market_host + "/query",{"catalogues":"quote10", "stocks":g_stock_1+','+g_stock_2}, function(data) {
 		var obj = eval("("+data+")");
-		//console.log(obj);
+		console.log(obj);
 		if (obj['error'] !== undefined) {
 			return;
 		}
@@ -47,8 +47,8 @@ function RefreshTransactionDetail() {
 }
 
 function fill_quote_table(id, quote) {
-	$(id).find("#name").text(quote["名称"]);
-	$(id).find("#code").text(quote["代码"]);
+	$(id).find("#left-stock-name").text(quote["名称"]);
+	$(id).find("#left-stock-code").text(quote["代码"]);
 	var table = $(id).find("table").eq(0);
 	var rows = table.find('tr');
 	var color = "blue";

@@ -117,9 +117,16 @@ function KeyShortcuts(evt) {
 			ExcuteBuyStock("#right");
 		});
 		*/
+		$('#left-short-price').bind('OnEnter', function(evt) {
+			ExcuteShortStock("#left");
+		});
+		$('#left-short-shares').bind('OnEnter', function(evt) {
+			ExcuteShortStock("#left");
+		})
 
 		// 行情
 		$('#left-input').bind('OnEnter', function(evt){
+			g_stock_1 = $('#left-input').val();
 			Refresh();
 		});
 

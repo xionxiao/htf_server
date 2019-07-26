@@ -46,6 +46,29 @@ function ExcuteSellStock(id) {
 	}
 }
 
+function ExcuteShortStock(id) {
+	console.log("Short");
+	price = parseFloat($(id+"-short-price").val());
+	shares = parseFloat($(id+"-short-shares").val());
+	stock = $(id+"-stock-code").text();
+	console.log(stock)
+	if (price && shares) {
+		params = {"stock":stock, "price":price, "share":shares};
+		$.post(trade_host + "/short",params, function(data){
+			console.log(data);
+			obj = eval("("+data+")");
+			console.log(obj)
+			if (obj.error) {
+				text = obj.error;
+			}
+			if (obj.result) {
+				text = obj.result["合同编号"];
+			}
+			$("#return-info .panel-body").prepend(text +  "<br>");
+		});
+	}
+}
+
 function ExcuteCancelOrder() {
 	console.log("Cancel");
 	console.log($('#form-cancel').serialize());

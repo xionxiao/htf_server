@@ -46,8 +46,9 @@ def c_query(u_str, *args, **kwargs):
         if hp:
             return hp
         else:
-            rst = _query_quote(stock)
+            rst = _query_quote(stock)            
             hp = round_up_decimal_2(float(rst["昨收价"])*1.1)
+            #hp = round_up_decimal_2(float(rst["参考市值价格"])*1.1)
             return hp
     
 def _query_quote(stock):
@@ -75,8 +76,8 @@ if __name__ == "__main__":
     api = TradeApi.Instance()
     if not api.isLogon():
         api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
-    print(c_query("涨停价","600036"))
-    r1 = _query_quote("600036")
+    print(c_query("涨停价","000009"))
+    r1 = _query_quote("000009")
     #r2 = _query_quote("600036")
     #print(r1["昨收价"] == r2["昨收价"])
     
