@@ -6,7 +6,7 @@ from common.utils import *
 from query import c_query
 import time
 
-class StockPoolAcquireError(ErrorException):
+class StockPoolAcquireError(TradeError):
     pass
 
 @Singleton
@@ -29,7 +29,7 @@ class StockPool():
         assert type(share) is int and share > 0
         assert share % 100 == 0
         if not self._stock_pool.has_key(stock):
-            raise StockPoolAcquireError("Don't have stock " + stock)
+            print u"股票池中没有对应股票"
             return [],[],0
 
         order_dict = self._stock_pool[stock]["订单列表"]
@@ -119,6 +119,7 @@ class StockPool():
         pool = self._stock_pool
 
         harden_price = c_query("涨停价", stock_code)
+        #print stock_code, harden_price, order_price, order_type
         if order_type == "融券卖出" and order_price == harden_price:
             if not pool.has_key(stock_code):
                 pool[stock_code] = {"融券上限":order_share,

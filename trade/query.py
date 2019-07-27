@@ -44,7 +44,7 @@ def c_query(u_str, *args, **kwargs):
             stock = kwargs['stock']
         hp = _cache.get("五档行情:"+stock+":涨停价")
         if hp:
-            return hp
+            return round_up_decimal_2(float(hp))
         else:
             rst = _query_quote(stock)            
             hp = round_up_decimal_2(float(rst["昨收价"])*1.1)
@@ -65,7 +65,8 @@ def _query_quote(stock):
             now = datetime.datetime.now()
             nextday = datetime.datetime(now.year,now.month,now.day)+datetime.timedelta(days=1)
             expire_seconds = (nextday - now).seconds
-            _cache.set("五档行情:"+rst["证券代码"]+":昨收价", rst["昨收价"], expire_seconds)
+            # TODO: 更新时间与服务器刷新时间不一致
+            _cache.set("五档行情:"+rst["证券代码"]+":昨收价", rst["昨收价"], 60)
             harden_price = round_up_decimal_2(float(rst["昨收价"])*1.1)
             _cache.set("五档行情:"+rst["证券代码"]+":涨停价", str(harden_price), expire_seconds)
             return rst
@@ -76,9 +77,11 @@ if __name__ == "__main__":
     api = TradeApi.Instance()
     if not api.isLogon():
         api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
-    print(c_query("涨停价","000009"))
-    r1 = _query_quote("000009")
-    #r2 = _query_quote("600036")
-    #print(r1["昨收价"] == r2["昨收价"])
+    print(c_query("涨停价","000768"))
+    r1 = _query_quote("000768")
+    r2 = _query_quote("600036")
+    print(r1["昨收价"] == r2["昨收价"])
+    print(r1["昨收价"])
+    print(c_query("涨停价","000768"))
     
     
