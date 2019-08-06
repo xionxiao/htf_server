@@ -1,5 +1,8 @@
 # -*- coding: gbk -*-
 
+from threading import Thread
+from Queue import Queue
+
 class Receiver(object):
     """ Command callback object """
     def onComplete(self, cmd):
@@ -22,6 +25,23 @@ class Invoker(object):
     def call(self,cmd):
         print("pre execute " + str(cmd))
         cmd.execute()
+
+class ThreadInvoker(Invoker, Thread):
+    def __init__(self, *args, **kwargs):
+        Thread.__init__(self, *args, **kwargs)
+        self.workQueue = Queue()
+        self.resultQueue = Queue()
+        self.setDaemon(True)
+        self.start()
+
+    def call(self, cmd):
+        self.workQueue.put(cmd)
+        return self.resultQueue.get()
+
+    def run(self):
+        while True:
+            cmd = self.workQueue.get()
+            self.resultQueue.put(cmd.execute())
 
 if __name__ == "__main__":
     # TODO: Unit Test
