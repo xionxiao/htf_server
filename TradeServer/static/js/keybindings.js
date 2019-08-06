@@ -140,6 +140,9 @@ function KeyShortcuts(evt) {
 		
 		$("#left-buy-price").bind('OnKeyUp', PriceUp);
 		$("#left-buy-price").bind('OnKeyDown', PriceDown);
+
+		$("#left-short-price").bind('OnKeyUp', PriceUp);
+		$("#left-short-price").bind('OnKeyDown', PriceDown);
 		
 		$("#right-sell-price").bind('OnKeyUp', PriceUp);
 		$("#right-sell-price").bind('OnKeyDown', PriceDown);
@@ -147,18 +150,27 @@ function KeyShortcuts(evt) {
 		$("#right-buy-price").bind('OnKeyUp', PriceUp);
 		$("#right-buy-price").bind('OnKeyDown', PriceDown);
 
+		$("#right-short-price").bind('OnKeyUp', PriceUp);
+		$("#right-short-price").bind('OnKeyDown', PriceDown);
+
 		// 调整股数
 		$("#left-sell-shares").bind('OnKeyUp', AmountUp);
 		$("#left-sell-shares").bind('OnKeyDown', AmountDown);
 		
 		$("#left-buy-shares").bind('OnKeyUp', AmountUp);
 		$("#left-buy-shares").bind('OnKeyDown', AmountDown);
+
+		$("#left-short-shares").bind('OnKeyUp', AmountUp);
+		$("#left-short-shares").bind('OnKeyDown', AmountDown);
 		
 		$("#right-sell-shares").bind('OnKeyUp', AmountUp);
 		$("#right-sell-shares").bind('OnKeyDown', AmountDown);
 		
 		$("#right-buy-shares").bind('OnKeyUp', AmountUp);
 		$("#right-buy-shares").bind('OnKeyDown', AmountDown);
+
+		$("#right-short-shares").bind('OnKeyUp', AmountUp);
+		$("#right-short-shares").bind('OnKeyDown', AmountDown);
 
 		fill_transaction_table("#left-transaction");
 		fill_transaction_table("#right-transaction");
