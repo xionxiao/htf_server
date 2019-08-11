@@ -44,9 +44,6 @@ class ResultBuffer(object):
 
     def __getitem__(self, index):
         """ 返回Result对象 """
-        if not isinstance(index, int):
-            raise TypeError
-        assert index >= 0
         result_list = self.getResults()
         return result_list[index]
 
@@ -78,7 +75,7 @@ class Result(Feedback):
         Result["Key"] -> 如果为单行结果，返回Result[0]["Key"]
         Result.raw -> 原始返回字符串
         Result.attr -> 返回keys,等价于Result[0].keys()
-        Result.items -> 返回数据的列表，数据为dict
+        Result.items -> 返回数据的列表，列表的元素为dict
         Result.length -> len(Result) 返回有多少条数据（不包括头）
     """
     def __init__(self, result_string):
@@ -111,6 +108,9 @@ class Result(Feedback):
         else:
             return False
 
+    def getUTF8Result(self):
+        return Result(self.raw.decode('gbk').encode('utf8'))
+
 class Error(Feedback):
     def __init__(self, error_string):
         Feedback.__init__(self, error_string)
@@ -122,13 +122,15 @@ class Error(Feedback):
         return self.raw
     
 if __name__ == "__main__":
-    from TradeApi import *
+    import sys
+    sys.path.append("..")
+    from trade import TradeApi
     api = TradeApi.Instance()
     if not api.isLogon():
-        api.Logon("59.173.7.38", 7708, "184039030", "326326")
+        api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
     try:
-        time.sleep(10)
-        rst = api.SendOrders([0,0], ["000655","600036"], [20.22,12.5], [100,200])
+        time.sleep(1)
+        rst = api.Query("股份")
         print type(rst)
         printd(rst)
         print type(rst[0])
