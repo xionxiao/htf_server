@@ -28,7 +28,7 @@ function RefreshQuote10() {
 		}
 		fill_quote_table("#left-quote", obj["quote10"][0]);
 		fill_quote_table("#right-quote", obj["quote10"][1]);
-		RefreshQuote10()
+		RefreshQuote10();
 	})
 }
 
@@ -42,7 +42,7 @@ function RefreshTransactionDetail() {
 			return;
 		}
 		fill_transaction_table("#left-transaction", obj["transaction_detail"]);
-		RefreshTransactionDetail()
+		RefreshTransactionDetail();
 	})
 }
 
@@ -64,6 +64,15 @@ function fill_quote_table(id, quote) {
 		td.eq(1).text(quote[pr[i]].slice(0,-4)).attr("align","right").css('color','blue');
 		td.eq(2).text(quote[qu[i]]).attr("align","right").css('color','black');
 	}
+	table = $(id).find("table").eq(1);
+	row = table.find('tr').eq(0);
+	td = row.find('td');
+	td.eq(1).text(quote["现价"].slice(0,-4));
+	td.eq(3).text(quote["现量"]);
+	row = table.find('tr').eq(1);
+	td = row.find('td');
+	td.eq(1).text(quote["昨收"].slice(0,-4));
+	td.eq(3).text(quote["开盘"].slice(0,-4));
 }
 
 function fill_transaction_table(id, data) {

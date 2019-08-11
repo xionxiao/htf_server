@@ -21,7 +21,8 @@ class IndexHandler(tornado.web.RequestHandler):
         self.render("html\\index.html")
 
 class QueryHandler(tornado.web.RequestHandler, Receiver):
-    _invoker = Invoker()
+    _quote_invoker = Invoker()
+    _invoker = ThreadInvoker()
     @tornado.web.asynchronous
     def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
@@ -31,7 +32,7 @@ class QueryHandler(tornado.web.RequestHandler, Receiver):
                 stocks = self.get_argument('stocks').encode()
                 stocks = stocks.split(',')
                 cmd = QueryQuote10Cmd(stocks, self)
-                self._invoker.call(cmd)
+                self._quote_invoker.call(cmd)
             if catalogues == u"quote5":
                 stocks = self.get_argument('stocks').encode()
                 stocks = stocks.split(',')

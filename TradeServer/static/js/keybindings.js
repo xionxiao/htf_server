@@ -29,7 +29,6 @@ function KeyShortcuts(evt) {
 }
 
 (function(){
-	
 
 	function AmountUp(evt) {
 		var value = parseInt($(this).val());
@@ -177,7 +176,10 @@ function KeyShortcuts(evt) {
 
 		RefreshTransactionDetail();
 		RefreshQuote10();
+		//RefreshStockPool();
+		RefreshOrderList();
+		RefreshPosition();
 		//Refresh()
-		//setInterval("Refresh()", 5000);
+		setInterval("RefreshPosition();RefreshOrderList();", 2000);
 	});
 })();

@@ -16,7 +16,8 @@ class Command(object):
         self.complete()
 
     def complete(self):
-        self._receiver.onComplete(self)
+        if self._receiver:
+            self._receiver.onComplete(self)
 
 class Invoker(object):
     def __init__(self):

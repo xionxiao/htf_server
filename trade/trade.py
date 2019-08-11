@@ -17,7 +17,7 @@ class TradeApi():
         self._shareholder = {"沪市":None, "深市":None} # 股东代码
         # When load fails this may throw WindowsError exception
         path = os.path.split(os.path.realpath(__file__))[0]
-        self._dll = windll.LoadLibrary(path + "\\trade_yinhe.dll")
+        self._dll = windll.LoadLibrary(path + "\\trade.dll")
         self.Open()
 
     def __del__(self):
@@ -338,23 +338,23 @@ if __name__ == "__main__":
     try:
         if not api.isLogon():
             api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
-        rst = api.CancelOrder(['1','1'],['4533','4536'])
-        print rst
+##        rst = api.CancelOrder(['1','1'],['4533','4536'])
+##        print rst
 ##        rst = api.QueryData(5)
 ##        print(rst)
-##        rst = api.Query("资金")
-##        print(rst)
+        rst = api.Query("资金")
+        print(rst)
 ##        print(rst.attr[4] == "冻结资金")
-##        print(u"======== 股份")
-##        rst = api.Query("股份")
-##        print(rst)
+        print(u"======== 股份")
+        rst = api.Query("股份")
+        print(rst)
 ##        print(u"======== 当日委托")
 ##        print(api.Query("当日委托"))
 ##        print(u"======== 当日成交")
 ##        print(api.Query("当日成交"))
-##        print(u"======== 可撤单")
-##        rst = api.Query("可撤单")
-##        print(rst)
+        print(u"======== 可撤单")
+        rst = api.Query("可撤单")
+        print(rst)
 ##        print(u"======== 股东代码")
 ##        print(api.Query("股东代码"))
 ##        print(u"======== 融资余额")

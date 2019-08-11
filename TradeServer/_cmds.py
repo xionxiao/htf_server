@@ -5,7 +5,7 @@ sys.path.append("..")
 from trade import TradeApi
 from trade.stockpool import StockPool
 from command import *
-from common.error import TradeError
+from common.error import TradeError, QueryError
 from common.utils import dumpUTF8Json,getMarketID
 
 class GetStockPoolCmd(Command):
@@ -20,6 +20,40 @@ class GetStockPoolCmd(Command):
         obj = {"stockpool":ss}
         self._handler.write(dumpUTF8Json(obj))
         self.complete()
+
+class GetPositionCmd(Command):
+    def __init__(self, handler):
+        Command.__init__(self, handler)
+        self._api = TradeApi.Instance()
+        self._handler = handler
+
+    def execute(self):
+        try:
+            rst = self._api.Query("股份")
+            obj = {"position":rst.items}
+            self._handler.write(dumpUTF8Json(obj))
+        except Exception as e:
+            err_str = dumpUTF8Json({"error":str(e)})
+            self._handler.write(err_str)
+        finally:
+            self.complete()
+            
+class GetOrderListCmd(Command):
+    def __init__(self, handler):
+        Command.__init__(self, handler)
+        self._api = TradeApi.Instance()
+        self._handler = handler
+
+    def execute(self):
+        try:
+            rst = self._api.Query("可撤单")
+            obj = {"orderlist":rst.items}
+            self._handler.write(dumpUTF8Json(obj))
+        except Exception as e:
+            err_str = dumpUTF8Json({"error":str(e)})
+            self._handler.write(err_str)
+        finally:
+            self.complete()
 
 class BuyCmd(Command):
     def __init__(self, stock, price, share, handler):

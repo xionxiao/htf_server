@@ -20,14 +20,13 @@ var host = "http://" + window.location.host;
 
 function RefreshQuote10() {
 	//console.log("Refresh Quote", g_stock_1, g_stock_2);
-	$.get(host + "/query",{"catalogues":"quote10", "stocks":g_stock_1+','+g_stock_2}, function(data) {
+	$.get(host + "/query",{"catalogues":"quote10", "stocks":g_stock_1}, function(data) {
 		var obj = eval("("+data+")");
 		console.log(obj);
 		if (obj['error'] !== undefined) {
 			return;
 		}
 		fill_quote_table("#left-quote", obj["quote10"][0]);
-		fill_quote_table("#right-quote", obj["quote10"][1]);
 	})
 }
 

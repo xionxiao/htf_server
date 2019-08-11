@@ -74,7 +74,6 @@ function ExcuteCancelOrder() {
 	console.log($('#form-cancel').serialize());
 	$.post(host + "/cancel",$('#form-cancel').serialize(), function(data){
 		$("#result-panel .panel-body").prepend(data +  "<br>");
-		RefreshStockPool();
 	})
 }
 
@@ -96,6 +95,7 @@ function RefreshStockPool() {
 			item_str += "</tr>";
 		}
 		$("#stock-pool .panel-body table tbody").prepend(item_str);
+		RefreshStockPool();
 	})
 }
 
@@ -116,37 +116,65 @@ function CompareFactory(propertyName) {
 function compareDate(t1, t2) {
 	now = new Date();
 	today = now.toDateString() + " ";
-	c1 = Date.parse(today + t1["成交时间"]);
-	c2 = Date.parse(today + t2["成交时间"]);
+	c1 = Date.parse(today + t1["委托时间"]);
+	c2 = Date.parse(today + t2["委托时间"]);
 	return c2 - c1
 }
 
 function RefreshOrderList() {
 	console.log("Refresh Order List")
-	$.get(host + "/query",{"catalogues":"orderlist"}, function(data) {
+	$.get(trade_host + "/query",{"catalogues":"orderlist"}, function(data) {
 		obj = eval("("+data+")");
+		//console.log(obj);
+		obj = obj.orderlist;
 		obj_array = []
 		for (i in obj) {
 			obj_array.push(obj[i]);
 		}
 		obj = obj_array.sort(compareDate);
-		$("#order-list .panel-body table tbody").empty();
-		item_str = ""
+		$("#order-list table tbody").empty();
+		item_str = "<tr> <th>时间</th> <th>单号</th> <th>名称</th> <th>代码</th> <th>价格</th> <th>数量</th> <th>买卖</th> </tr>"
 		for ( i in obj) {
 			var color = 'blue'
-			if (obj[i]["买卖标志"] == "买入") {
+			if (obj[i]["买卖标志"] == "买入担保品") {
 					var color = 'red'
 			} 
 			item_str += "<tr id="+i+'" style="color:' + color +';"' + ">";
-			item_str += "<td>"+obj[i]["证券代码"]+"</td>";
+			item_str += "<td>"+obj[i]["委托时间"]+"</td>";
+			item_str += "<td>"+obj[i]["合同编号"]+"</td>";
 			item_str += "<td>"+obj[i]["证券名称"]+"</td>";
+			item_str += "<td>"+obj[i]["证券代码"]+"</td>";
+			item_str += "<td>"+obj[i]["委托价格"]+"</td>";
+			item_str += "<td>"+obj[i]["委托数量"]+"</td>";
 			item_str += "<td>"+obj[i]["买卖标志"]+"</td>";
-			item_str += "<td>"+obj[i]["成交价格"]+"</td>";
-			item_str += "<td>"+obj[i]["成交数量"]+"</td>";
-			item_str += "<td>"+obj[i]["成交时间"]+"</td>";
 			item_str += "</tr>";
 		}
-		$("#order-list .panel-body table tbody").append(item_str);
+		$("#order-list table tbody").append(item_str);
+		//RefreshOrderList();
+	})
+}
+
+function RefreshPosition() {
+	console.log("Refresh Stock Position")
+	$.get(trade_host + "/query",{"catalogues":"position"}, function(data) {
+		obj = eval("("+data+")");
+		//console.log(obj.position)
+		obj = obj.position
+		$("#stock-position table tbody").empty();
+		item_str = "<tr> <th>名称</th> <th>代码</th> <th>可卖</th> <th>持仓均价</th> <th>持仓数量</th> <th>参考盈亏</th></tr>"
+		for ( i in obj) {
+			var color = 'blue'
+			item_str += "<tr id="+i+'" style="color:' + color +';"' + ">";
+			item_str += "<td>"+obj[i]["证券名称"]+"</td>";
+			item_str += "<td>"+obj[i]["证券代码"]+"</td>";
+			item_str += "<td>"+obj[i]["可卖数量"]+"</td>";
+			item_str += "<td>"+obj[i]["盈亏成本价"]+"</td>";
+			item_str += "<td>"+obj[i]["证券数量"]+"</td>";
+			item_str += "<td>"+obj[i]["浮动盈亏"]+"</td>";
+			item_str += "</tr>";
+		}
+		$("#stock-position table tbody").append(item_str);
+		//RefreshOrderList();
 	})
 }
 
