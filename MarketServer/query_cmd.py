@@ -91,7 +91,7 @@ class QueryTransactionCmd(Command):
     def execute(self):
         try:
             lv2 = MarketApi.Instance()
-            rst = lv2.GetTransactionData(self._stock, 0, 20)
+            rst = lv2.GetTransactionData(self._stock, 0, 30)
             data = {"transaction": [i for i in rst]}
             ret_val = dumpUTF8Json(data)
             self._handler.write(ret_val)
@@ -111,7 +111,7 @@ class QueryTransactionDetailCmd(Command):
     def execute(self):
         try:
             lv2 = MarketApi.Instance()
-            rst = lv2.GetDetailTransactionData(self._stock, 0, 20)
+            rst = lv2.GetDetailTransactionData(self._stock, 0, 30)
             data = {"transaction_detail": [i for i in rst]}
             ret_val = dumpUTF8Json(data)
             self._handler.write(ret_val)

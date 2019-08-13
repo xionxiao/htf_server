@@ -45,6 +45,9 @@
 			.blue {
 				color:blue;
 			}
+			th{
+				text-align: center;
+			}
 			.table-line {
 				border-top: 2px solid gray;
 			}
@@ -56,7 +59,7 @@
     <body onkeyup="KeyShortcuts(event)"> 
         <div class="container"> 
             <div class="row"> 
-				<!-- 左边交易窗口 -->
+				<!-- 十档行情 -->
                 <div class="col-xs-2"> 
                     <div class="panel panel-danger" id="left-quote">
                         <div class="panel-heading">
@@ -86,15 +89,16 @@
 							<tr> <td class="red" >买十</td> <td></td> <td></td> </tr>
 						</table>                       
                     </div>
-				</div> <!-- col-1 -->
+				</div> <!-- 十档行情 -->
 
+				<!-- 逐笔成交 -->
 				<div class="col-xs-2"> 
-                    <div class="panel panel-info" id="left-transaction">
+                    <div class="panel panel-info" id="transaction-detail">
                         <div class="panel-heading">
 							<h3 class="panel-title">逐笔成交</h3>
 						</div> 
 						<table class="table table-hover table-condensed"> 
-							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <th>价格</th> <th>成交</th> <th>买卖</th> <th>时间</th> </tr> 
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
@@ -103,6 +107,12 @@
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
@@ -110,13 +120,40 @@
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr>
 						</table> 
-                    </div>
-					
-				</div> <!-- col-xs-2 -->
+                    </div>		
+				</div> <!-- 逐笔成交 -->
 
-				<!-- 中间信息窗口 -->
-				<div class="col-xs-4" id="col-3" id="return-info">
-				</div> <!-- col-xs-4 -->
+				<!-- 分时成交明细 -->
+				<div class="col-xs-2">
+					<div class="panel panel-default" id="transaction">
+                        <div class="panel-heading">
+							<h3 class="panel-title">分时成交明细</h3>
+						</div> 
+						<table class="table table-hover table-condensed"> 
+							<tr> <th>时间</th> <th>价格</th> <th>现量</th> <th></th> <th>笔数</th> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> 
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>
+						</table> 
+                    </div>		
+				</div> <!-- 分时成交明细 -->
 
 				<!-- 右边交易窗口 -->
 				<div class="col-xs-2"> 

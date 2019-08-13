@@ -39,7 +39,20 @@ function RefreshTransactionDetail() {
 			console.log(obj['error']);
 			return;
 		}
-		fill_transaction_table("#left-transaction", obj["transaction_detail"]);
+		fill_transaction_detail_table("#transaction-detail", obj["transaction_detail"]);
+	})
+}
+
+function RefreshTransaction() {
+	//console.log("Refresh Transaction");
+	$.get(host + "/query",{"catalogues":"transaction", "stock":g_stock_1}, function(data) {
+		var obj = eval("("+data+")");
+		console.log(obj);
+		if (obj['error'] !== undefined) {
+			console.log(obj['error']);
+			return;
+		}
+		fill_transaction_table("#transaction", obj["transaction"]);
 	})
 }
 
@@ -66,7 +79,35 @@ function fill_quote_table(id, quote) {
 function fill_transaction_table(id, data) {
 	var table = $(id).find("table").eq(0);
 	var rows = table.find('tr');
-	for (var i=0; i<20; i++) {
+	for (var i=1; i<30; i++) {
+		var tr = rows.eq(i);
+		var td = tr.find('td');
+		if (!data[i]) {
+			td.eq(3).text("__:__:__");
+			td.eq(0).text("_____");
+			td.eq(1).text("____");
+			td.eq(2).text("_");
+		} else {
+			if (data[i]["买卖"] == '1') {
+				tr.css('color','darkgreen');
+				data[i]["买卖"] = 'S';
+			} else {
+				tr.css('color','red')
+				data[i]["买卖"] = 'B'
+			}
+			td.eq(0).text(data[i]["时间"]).css('color','gray');
+			td.eq(1).text(data[i]["价格"].slice(0,-4));
+			td.eq(2).text(data[i]["现量"].split('.')[0]);
+			td.eq(3).text(data[i]["买卖"]);
+			td.eq(4).text(data[i]["笔数"]).css('color','gray');
+		}
+	}
+}
+
+function fill_transaction_detail_table(id, data) {
+	var table = $(id).find("table").eq(0);
+	var rows = table.find('tr');
+	for (var i=1; i<30; i++) {
 		var tr = rows.eq(i);
 		var td = tr.find('td');
 		if (!data[i]) {
@@ -79,7 +120,7 @@ function fill_transaction_table(id, data) {
 				tr.css('color','darkgreen')
 			else
 				tr.css('color','red')
-			td.eq(3).text(data[i]["成交时间"]).css('color','gray');
+			td.eq(3).text(data[i]["成交时间"]).css('color','gray')
 			td.eq(0).text(data[i]["价格"].slice(0,-4));
 			td.eq(1).text(data[i]["成交量"].split('.')[0]);
 			td.eq(2).text(data[i]["性质"]);
@@ -88,8 +129,9 @@ function fill_transaction_table(id, data) {
 }
 
 function Refresh() {
-	RefreshQuote10()
-	RefreshTransactionDetail()
+	RefreshQuote10();
+	RefreshTransactionDetail();
+	RefreshTransaction();
 }
 
 function KeyShortcuts(evt) {
