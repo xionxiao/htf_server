@@ -57,8 +57,6 @@ class ResultBuffer(object):
 
 class Feedback(object):
     def __init__(self, result_string):
-        if not isinstance(result_string, str):
-            raise TypeError
         self.raw = result_string
 
     def __nonzero__(self):
@@ -108,7 +106,7 @@ class Result(Feedback):
         else:
             return False
 
-    def getUTF8Result(self):
+    def toUTF8Result(self):
         return Result(self.raw.decode('gbk').encode('utf8'))
 
 class Error(Feedback):
@@ -131,11 +129,10 @@ if __name__ == "__main__":
     try:
         time.sleep(1)
         rst = api.Query("股份")
-        print type(rst)
-        printd(rst)
-        print type(rst[0])
-        printd(rst[0])
-        printd(type(rst.getResults()))
+        print(type(rst))
+        print(rst)
+        print(type(rst[0]))
+        print(rst[0]["证券名称"])
     except Error as e:
         print type(e),e
     finally:
