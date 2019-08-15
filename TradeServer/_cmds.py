@@ -5,8 +5,10 @@ sys.path.append("..")
 from trade import TradeApi
 from trade.stockpool import StockPool
 from command import *
+from common.resultbuffer import Result
 from common.error import TradeError, QueryError
 from common.utils import dumpUTF8Json,getMarketID
+from common.cache import Cache
 
 class GetStockPoolCmd(Command):
     def __init__(self, handler):
@@ -26,10 +28,16 @@ class GetPositionCmd(Command):
         Command.__init__(self, handler)
         self._api = TradeApi.Instance()
         self._handler = handler
+        self._cache = Cache()
 
     def execute(self):
         try:
-            rst = self._api.Query("股份")
+            cache_string = self._cache.get("股份")
+            if cache_string:
+                rst = Result(cache_string)
+            else:
+                rst = self._api.Query("股份")
+                self._cache.set("股份", rst.raw, 5)
             obj = {"position":rst.items}
             self._handler.write(dumpUTF8Json(obj))
         except Exception as e:
@@ -43,10 +51,19 @@ class GetOrderListCmd(Command):
         Command.__init__(self, handler)
         self._api = TradeApi.Instance()
         self._handler = handler
+        self._cache = Cache()
 
     def execute(self):
         try:
-            rst = self._api.Query("可撤单")
+            cache_string = self._cache.get("可撤单")
+            if cache_string:
+                rst = Result(cache_string)
+            else:
+                rst = self._api.Query("可撤单")
+                # expire time 2 seconds
+                # TODO:
+                # Should read in setting
+                self._cache.set("可撤单", rst.raw, 5)
             obj = {"orderlist":rst.items}
             self._handler.write(dumpUTF8Json(obj))
         except Exception as e:
