@@ -82,15 +82,23 @@ class BuyCmd(Command):
         self._handler = handler
 
     def execute(self):
+        obj = {"request":
+               {"cmd":"buy",
+                "stock":self._stock,
+                "price":self._price,
+                "share":self._share
+                }
+               }
         try:
             res = self._api.Buy(self._stock, self._price, self._share)
             # TODO: 更丰富的返回内容: {"command": {comd: buy, stock:6000036, price:18.5, share:100}
             #                        "result": ...,
             #                        "error":
-            obj = {"result": res[0]}
+            obj["result"] = res[0]
             self._handler.write(dumpUTF8Json(obj))
         except TradeError as e:
-            err_str = dumpUTF8Json({"error":str(e)})
+            obj['error'] = str(e)
+            err_str = dumpUTF8Json(obj)
             self._handler.write(err_str)
         finally:
             self.complete()
@@ -105,12 +113,20 @@ class SellCmd(Command):
         self._handler = handler
 
     def execute(self):
+        obj = {"request":
+               {"cmd":"sell",
+                "stock":self._stock,
+                "price":self._price,
+                "share":self._share
+                }
+               }
         try:
             res = self._api.Sell(self._stock, self._price, self._share)
-            obj = {"result": res[0]}
+            obj['result'] = res[0]
             self._handler.write(dumpUTF8Json(obj))
         except TradeError as e:
-            err_str = dumpUTF8Json({"error":str(e)})
+            obj['error'] = str(e)
+            err_str = dumpUTF8Json(obj)
             self._handler.write(err_str)
         finally:
             self.complete()
@@ -126,6 +142,13 @@ class ShortCmd(Command):
         self._handler = handler
 
     def execute(self):
+        obj = {"request":
+               {"cmd":"short",
+                "stock":self._stock,
+                "price":self._price,
+                "share":self._share
+                }
+               }
         try:
             self._sp.sync()
             i,c,s = self._sp.acquire(self._stock, self._share)
@@ -133,16 +156,17 @@ class ShortCmd(Command):
                 marketId = str(getMarketID(self._stock))
                 res = self._api.CancelOrder(marketId, i)
             else:
-                obj = {"error": "acquire error: stock="+self._stock+" share="+str(self._share)}
+                obj['error'] = "acquire error: stock="+self._stock+" share="+str(self._share)
                 self._handler.write(dumpUTF8Json(obj))
                 return
             if s > 0:
                 res = self._sp.fill(self._stock, s)
             res = self._api.Short(self._stock, self._price, self._share)
-            obj = {"result": res[0]}
+            obj["result"] = res[0]
             self._handler.write(dumpUTF8Json(obj))
         except TradeError as e:
-            err_str = dumpUTF8Json({"error":str(e)})
+            obj['error'] = str(e)
+            err_str = dumpUTF8Json(obj)
             self._handler.write(err_str)
         finally:
             self.complete()
@@ -152,16 +176,24 @@ class CancelCmd(Command):
         Command.__init__(self, handler)
         self._api = TradeApi.Instance()
         self._marketId = str(getMarketId(stock))
+        self._stock = stock
         self._orderId = orderId
         self._handler = handler
 
     def execute(self):
+        obj = {"request":
+               {"cmd":"cancel",
+                "orderId":self._orderId,
+                "stock":self._stock,
+                }
+               }
         try:
             res = self._api.CancelOrder(self._marketId, self._orderId)
-            obj = {"result": res[0]}
+            obj["result"] = res[0]
             self._handler.write(dumpUTF8Json(obj))
         except TradeError as e:
-            err_str = dumpUTF8Json({"error":str(e)})
+            obj['error'] = str(e)
+            err_str = dumpUTF8Json(obj)
             self._handler.write(err_str)
         finally:
             self.complete()
