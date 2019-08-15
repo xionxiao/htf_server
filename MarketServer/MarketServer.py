@@ -4,7 +4,7 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
-import sys,os,json
+import sys,os,json,ConfigParser
 sys.path.append("..")
 
 from command import *
@@ -65,8 +65,14 @@ class MarketServer(tornado.web.Application):
         self._lv2_api.Connect("119.97.185.4", 7709)
 
 if __name__ == "__main__":
+    settings = ConfigParser.ConfigParser()
+    settings.read("settings.ini")
+
+    market_server_ip = settings.get("market", "server")
+    market_server_port = settings.get("market", "port")
+    
     api = MarketApi.Instance()
-    api.Connect("119.97.185.4",7709)
+    api.Connect(market_server_ip, int(market_server_port))
     
     tornado.options.parse_command_line()
     settings = {
