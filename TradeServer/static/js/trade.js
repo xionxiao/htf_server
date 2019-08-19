@@ -125,7 +125,7 @@ function RefreshOrderList() {
 	console.log("Refresh Order List")
 	$.get(trade_host + "/query",{"catalogues":"orderlist"}, function(data) {
 		obj = eval("("+data+")");
-		//console.log(obj);
+		//console.log(JSON.stringify(obj));
 		obj = obj.orderlist;
 		obj_array = []
 		for (i in obj) {
@@ -159,6 +159,7 @@ function RefreshPosition() {
 	$.get(trade_host + "/query",{"catalogues":"position"}, function(data) {
 		obj = eval("("+data+")");
 		//console.log(obj.position)
+		//console.log(JSON.stringify(obj));
 		obj = obj.position
 		$("#stock-position table tbody").empty();
 		item_str = "<tr> <th>名称</th> <th>代码</th> <th>可卖</th> <th>持仓均价</th> <th>持仓数量</th> <th>参考盈亏</th></tr>"

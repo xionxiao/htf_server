@@ -28,9 +28,6 @@
 			#col-3 .panel{
 				min-height: 205px;
 			}
-			#col-3 #order-list {
-				height: 300px;
-			}
             .glyphicon:hover {
                 color:#5bc0de;
                 cursor:hand;
@@ -202,11 +199,13 @@
 					<div class="panel panel-default" id="stock-position">
 						<div class="panel-heading">
 							<h3 class="panel-title">持仓</h3>
-						</div> 						
-						<table class="table table-hover"> 
+						</div>
+						
+						<table class="table table-hover" style="table-layout:fixed;height:100px;"> 
 							<tr> <th>名称</th> <th>代码</th> <th>可卖</th> <th>持仓均价</th> <th>持仓数量</th> <th>参考盈亏</th></tr>
-							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> <td></td> </tr>  
-						</table> 
+							<div style="overflow-y: auto;">
+							</div>
+						</table>
                     </div>
 
 				</div> <!-- col-3 col-4 -->

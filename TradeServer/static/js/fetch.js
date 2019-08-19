@@ -22,7 +22,7 @@ function RefreshQuote10() {
 	//console.log("Refresh Quote", g_stock_1, g_stock_2);
 	$.get(market_host + "/query",{"catalogues":"quote10", "stocks":g_stock_1+','+g_stock_2}, function(data) {
 		var obj = eval("("+data+")");
-		console.log(obj);
+		//console.log(obj);
 		if (obj['error'] !== undefined) {
 			return;
 		}
