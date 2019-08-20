@@ -3,6 +3,7 @@
 from ctypes import *
 from decimal import *
 from resultbuffer import *
+from _stockcode_hashmap import StockCodeHashmap
 import re,json
 
 __all__ = ["Singleton", "isValidStockCode", "isValidIpAddress", "isValidDate",
@@ -75,6 +76,14 @@ def getMarketID(stock, byName=False):
         if byName:
             return "深市"
         return 0
+
+def getStockCode(name):
+    pass
+
+def getStockName(stock):
+    if len(stock) == 6:
+        stock += ".SH" if getMarketID(stock) else ".SZ"
+    return StockCodeHashmap[stock.upper()]
 
 def round_up_decimal_2(float_number):
     """ 修复python round()四舍六入问题,保留两位小数 """

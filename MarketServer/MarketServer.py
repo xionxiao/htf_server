@@ -26,6 +26,7 @@ class QueryHandler(tornado.web.RequestHandler, Receiver):
     @tornado.web.asynchronous
     def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
+        # TODO: 不用线程异常栈不同，应该由Command自行处理异常
         try:
             catalogues = self.get_argument('catalogues')
             if catalogues == u"quote10":
@@ -50,9 +51,8 @@ class QueryHandler(tornado.web.RequestHandler, Receiver):
                 stock = self.get_argument('stock').encode()
                 cmd = QueryMinuteTimeDataCmd(stock, self)
                 self._invoker.call(cmd)
-        finally:
-            pass
-            #self.finish()
+        except:
+            self.finish()
 
     def onComplete(self, cmd):
         self.finish()
