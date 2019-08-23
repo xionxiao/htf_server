@@ -94,7 +94,6 @@ class StockPool():
 
     def addStock(self, stock_code, upper_limit):
         """在股票池中增加单只股票"""
-        # 参数检查
         if type(stock_code) is not list:
             stock_code = [stock_code]
         if type(upper_limit) is not list:

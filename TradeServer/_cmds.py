@@ -63,8 +63,34 @@ class GetOrderListCmd(Command):
                 # expire time 2 seconds
                 # TODO:
                 # Should read in setting
-                self._cache.set("可撤单", rst.raw, 5)
+                self._cache.set("可撤单", rst.raw, 2)
             obj = {"orderlist":rst.items}
+            self._handler.write(dumpUTF8Json(obj))
+        except Exception as e:
+            err_str = dumpUTF8Json({"error":str(e)})
+            self._handler.write(err_str)
+        finally:
+            self.complete()
+
+class GetDealsCmd(Command):
+    def __init__(self, handler):
+        Command.__init__(self, handler)
+        self._api = TradeApi.Instance()
+        self._handler = handler
+        self._cache = Cache()
+
+    def execute(self):
+        try:
+            cache_string = self._cache.get("当日成交")
+            if cache_string:
+                rst = Result(cache_string)
+            else:
+                rst = self._api.Query("当日成交")
+                # expire time 2 seconds
+                # TODO:
+                # Should read in setting
+                self._cache.set("当日成交", rst.raw, 2)
+            obj = {"deals":rst.items}
             self._handler.write(dumpUTF8Json(obj))
         except Exception as e:
             err_str = dumpUTF8Json({"error":str(e)})
@@ -131,6 +157,34 @@ class SellCmd(Command):
         finally:
             self.complete()
 
+class DirectShortCmd(Command):
+    def __init__(self, stock, price, share, handler):
+        Command.__init__(self, handler)
+        self._api = TradeApi.Instance()
+        self._stock = stock
+        self._price = price
+        self._share = share
+        self._handler = handler
+
+    def execute(self):
+        obj = {"request":
+               {"cmd":"direct_short",
+                "stock":self._stock,
+                "price":self._price,
+                "share":self._share
+                }
+               }
+        try:
+            res = self._api.Short(self._stock, self._price, self._share)
+            obj['result'] = res[0]
+            self._handler.write(dumpUTF8Json(obj))
+        except TradeError as e:
+            obj['error'] = str(e)
+            err_str = dumpUTF8Json(obj)
+            self._handler.write(err_str)
+        finally:
+            self.complete()
+
 class ShortCmd(Command):
     def __init__(self, stock, price, share, handler):
         Command.__init__(self, handler)
@@ -176,7 +230,7 @@ class CancelCmd(Command):
     def __init__(self, stock, orderId, handler):
         Command.__init__(self, handler)
         self._api = TradeApi.Instance()
-        self._marketId = str(getMarketId(stock))
+        self._marketId = str(getMarketID(stock))
         self._stock = stock
         self._orderId = orderId
         self._handler = handler

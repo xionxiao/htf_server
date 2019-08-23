@@ -48,6 +48,7 @@ def c_query(u_str, *args, **kwargs):
         else:
             rst = _query_quote(stock)            
             hp = round_up_decimal_2(float(rst["昨收价"])*1.1)
+            # TODO: 周六日，及非开盘时段价格问题
             #hp = round_up_decimal_2(float(rst["参考市值价格"])*1.1)
             return hp
     
