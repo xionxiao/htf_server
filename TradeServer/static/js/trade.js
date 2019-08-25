@@ -53,7 +53,7 @@ function ExcuteShortStock(id) {
 	stock = $(id+"-stock-code").text();
 	console.log(stock)
 	if (price && shares) {
-		params = {"stock":stock, "price":price, "share":shares};
+		params = {"type":"frompool", "stock":stock, "price":price, "share":shares};
 		$.post(trade_host + "/short",params, function(data){
 			console.log(data);
 			obj = eval("("+data+")");
