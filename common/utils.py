@@ -100,7 +100,8 @@ class StockCode(object):
     def getMarketId(self, byName=False):
         if byName:
             return "沪市" if self.market_id is 1 else "深市"
-        return self.market_id
+        else:
+            return self.market_id
     
 
 def isValidStockCode(stock):
@@ -120,9 +121,10 @@ def isValidDate(date):
     re_str = r'^\d{4}(0\d{1}|1[0-2])([0-2]\d{1}|3[0,1])$'
     return bool(re.match(re_str, date))
 
+
 def getMarketID(stock, byName=False):
     u""" 判断股票市场： 返回 1-上海  0-深圳  错误代码将弹出异常"""
-    if stock[0] in ('1','6'):
+    if stock[0] in ('5','6'):
         if byName:
             return "沪市"
         return 1

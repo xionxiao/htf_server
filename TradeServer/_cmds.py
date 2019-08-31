@@ -63,7 +63,7 @@ class GetOrderListCmd(Command):
                 # expire time 2 seconds
                 # TODO:
                 # Should read in setting
-                self._cache.set("可撤单", rst.raw, 2)
+                self._cache.set("可撤单", rst.raw, 3)
             obj = {"orderlist":rst.items}
             self._handler.write(dumpUTF8Json(obj))
         except Exception as e:
@@ -89,7 +89,7 @@ class GetDealsCmd(Command):
                 # expire time 2 seconds
                 # TODO:
                 # Should read in setting
-                self._cache.set("当日成交", rst.raw, 2)
+                self._cache.set("当日成交", rst.raw, 3)
             obj = {"deals":rst.items}
             self._handler.write(dumpUTF8Json(obj))
         except Exception as e:

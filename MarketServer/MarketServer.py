@@ -52,7 +52,7 @@ class QueryHandler(tornado.web.RequestHandler, Receiver):
                 cmd = QueryMinuteTimeDataCmd(stock, self)
                 self._invoker.call(cmd)
         except Exception as e:
-            self.write(dumpUTF8Json({'error':str(e)))
+            self.write(dumpUTF8Json({'error':str(e)}))
             self.finish()
 
     def onComplete(self, cmd):
