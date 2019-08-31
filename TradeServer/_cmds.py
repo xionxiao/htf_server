@@ -208,12 +208,14 @@ class ShortCmd(Command):
             i,c,s = self._sp.acquire(self._stock, self._share)
             if i:
                 marketId = str(getMarketID(self._stock))
+                if type(i) is list:
+                    marketId = [marketId] * len(i)
                 res = self._api.CancelOrder(marketId, i)
             else:
                 obj['error'] = "acquire error: stock="+self._stock+" share="+str(self._share)
                 self._handler.write(dumpUTF8Json(obj))
                 return
-            time.sleep(0.1)
+            time.sleep(0.3)
             if s > 0:
                 res = self._sp.fill(self._stock, s)
             res = self._api.Short(self._stock, self._price, self._share)
