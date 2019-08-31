@@ -51,7 +51,8 @@ class QueryHandler(tornado.web.RequestHandler, Receiver):
                 stock = self.get_argument('stock').encode()
                 cmd = QueryMinuteTimeDataCmd(stock, self)
                 self._invoker.call(cmd)
-        except:
+        except Exception as e:
+            self.write(dumpUTF8Json({'error':str(e)))
             self.finish()
 
     def onComplete(self, cmd):
@@ -62,7 +63,6 @@ class MarketServer(tornado.web.Application):
     def __init__(self, *args, **kwargs):
         tornado.web.Application.__init__(self, *args, **kwargs)
         self._lv2_api = MarketApi.Instance()
-        self._lv2_api.Connect("119.97.185.4", 7709)
 
 if __name__ == "__main__":
     settings = ConfigParser.ConfigParser()

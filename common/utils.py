@@ -6,7 +6,7 @@ from resultbuffer import *
 from _stockcode_hashmap import StockCodeHashmap
 import re,json
 
-__all__ = ["Singleton", "isValidStockCode", "isValidIpAddress", "isValidDate",
+__all__ = ["Singleton", "StockCode", "isValidStockCode", "isValidIpAddress", "isValidDate",
            "getMarketID","round_up_decimal_2","dumpUTF8Json", "c_array"]
 
 class Singleton:
@@ -48,16 +48,71 @@ class Singleton:
     def __instancecheck__(self, inst):
         return isinstance(inst, self._decorated)
 
+class StockCode(object):
+    """ fields:
+            stock_code: 000001,600036,000625
+            market_id: 1-上海，0-深圳
+    """
+    
+    __FIX_UPPER_STR = ("SH","SS","SZ")
+    def __init__(self, code):
+        """
+        code format: [prefix][code].[suffix]
+            preifx: "sh","SH","sz","SZ","ss","SS"
+            code: six diggit begen with [0,1,2,3,5,6,7,8,9]
+            suffix: "sh","SH","sz","SZ","ss","SS"
+            "SS","SH": 沪市
+            "SZ": 深市
+        e.g. "600036", "sh600036", "600036.sh"
+        """
+        spstr = code.split('.')
+        if len(spstr) > 2 or len(spstr[0]) not in (6,8):
+            raise ValueError,"Invalidate stock code " + code
+        if len(spstr[0]) == 8 and len(spstr) == 2:
+            # prevent "sh600036.sh"
+            raise ValueError,"Invalidate stock code " + code
+
+        if len(spstr[0]) == 6:
+            self.stock_code = spstr[0]
+            if not self.isValidStockCode(self.stock_code):
+                raise ValueError,"Invalidate stock code " + code
+            if len(spstr) == 2: # '600036.sh'
+                suffix = spstr[1].upper()
+                if not suffix in self.__FIX_UPPER_STR:
+                    raise ValueError,"Invalidate stock code " + code
+                self.market_id = 0 if suffix is 'SZ' else 1
+            else: # '600036'
+                self.market_id = getMarketID(self.stock_code)
+
+        if len(spstr[0]) == 8:
+            if len(spstr) == 2: # invalid "sh600036.sh"
+                raise ValueError,"Invalidate stock code " + code
+            
+            self.stock_code = spstr[0][2:]
+            if not self.isValidStockCode(self.stock_code):
+                raise ValueError,"Invalidate stock code " + code
+            
+            prefix = spstr[0][0:2].upper()
+            if not prefix in self.__FIX_UPPER_STR:
+                raise ValueError,"Invalidate stock code " + code
+            self.market_id = 0 if prefix is "SZ" else 1
+
+    def getMarketId(self, byName=False):
+        if byName:
+            return "沪市" if self.market_id is 1 else "深市"
+        return self.market_id
+    
+
 def isValidStockCode(stock):
-    if not type(stock) is str:
-        return False
-    return bool(re.match("[036][0-9]{5}$", stock))
+    return bool(re.match("[01235678][0-9]{5}$", stock))
+
 
 def isValidIpAddress(ip):
     if not type(ip) is str:
         return False
     re_str = r'^((\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])\.){3}(\d{1,2}|1\d{2}|2[0-4]\d|25[0-5])$'
     return bool(re.match(re_str, ip))
+
 
 def isValidDate(date):
     if type(date) is not str:
@@ -67,18 +122,19 @@ def isValidDate(date):
 
 def getMarketID(stock, byName=False):
     u""" 判断股票市场： 返回 1-上海  0-深圳  错误代码将弹出异常"""
-    assert isValidStockCode(stock)
-    if stock[0] == '6':
+    if stock[0] in ('1','6'):
         if byName:
             return "沪市"
         return 1
-    else: # 0,3 创业板为深圳
+    else: # 0,2,3,5,6,7,8,9 创业板为深圳
         if byName:
             return "深市"
         return 0
 
+
 def getStockCode(name):
     pass
+
 
 def getStockName(stock):
     if len(stock) == 6:
@@ -156,5 +212,11 @@ if __name__ == "__main__":
     c11 = Class1.Instance()
     c22 = Class2.Instance()
 
-    printd(c1)
+    print(c1)
+
+    codes = ['600036','sh600036','000625.sz','ss600036','000001.ss','000001']
+    for i in codes:
+        sc = StockCode(i)
+        print sc.stock_code
+        print sc.getMarketId()
         

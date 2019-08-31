@@ -350,8 +350,8 @@ if __name__ == "__main__":
         #print(rst)
         #print(u"======== 当日委托")
         #print(api.Query("当日委托"))
-        print(u"======== 当日成交")
-        print(api.Query("当日成交"))
+        #print(u"======== 当日成交")
+        #print(api.Query("当日成交"))
 ##        print(u"======== 可撤单")
 ##        rst = api.Query("可撤单")
 ##        print(rst)
@@ -385,7 +385,7 @@ if __name__ == "__main__":
         #rst = api.SendOrder(3, "000655", 0.22, 100)
         #print rst
         #print api.SendOrders([3,3,3], ["000655", "000625","600005"], [0.22, 0.11, 0.4], [100,100,200])
-        #print api.Buy("000690", 18.8, 100)
+        print api.Buy("159901", 3.3, 100)
         #print api.Sell("000690", 10.10, 100)
         #print api.Short("600005", 6.4, 100)
     except ErrorException as e:
