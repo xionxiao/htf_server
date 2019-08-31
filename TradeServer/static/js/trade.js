@@ -95,7 +95,7 @@ function RefreshStockPool() {
 			item_str += "</tr>";
 		}
 		$("#stock-pool .panel-body table tbody").prepend(item_str);
-		RefreshStockPool();
+		setTimeout(RefreshStockPool,3000);
 	})
 }
 
@@ -150,7 +150,7 @@ function RefreshOrderList() {
 			item_str += "</tr>";
 		}
 		$("#order-list table tbody").append(item_str);
-		//RefreshOrderList();
+		setTimeout(RefreshOrderList,3000);
 	})
 }
 
@@ -175,7 +175,7 @@ function RefreshPosition() {
 			item_str += "</tr>";
 		}
 		$("#stock-position table tbody").append(item_str);
-		//RefreshOrderList();
+		setTimeout(RefreshOrderList,3000);
 	})
 }
 

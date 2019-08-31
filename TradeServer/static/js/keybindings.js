@@ -180,6 +180,5 @@ function KeyShortcuts(evt) {
 		RefreshOrderList();
 		RefreshPosition();
 		//Refresh()
-		setInterval("RefreshPosition();RefreshOrderList();", 2000);
 	});
 })();
