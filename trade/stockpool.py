@@ -4,7 +4,8 @@ from trade import TradeApi
 from common.error import *
 from common.utils import *
 from query import c_query
-import time
+import time,decimal
+decimal.getcontext.rounding = decimal.ROUND_05UP
 
 class StockPoolAcquireError(TradeError):
     pass
@@ -170,7 +171,8 @@ class StockPool():
             stock_code = record["证券代码"]
             order_id = record["合同编号"]
             order_type = record["买卖标志"]
-            order_price = round_up_decimal_2(float(record["委托价格"]))
+            ndigits = len(record["委托价格"].split('.')[1])
+            order_price = round(float(record["委托价格"]), ndigits)
             order_share = int(float(record["委托数量"]))
             self.addOrder(stock_code,order_id,order_price,order_share,order_type)
 

@@ -7,7 +7,7 @@ from _stockcode_hashmap import StockCodeHashmap
 import re,json
 
 __all__ = ["Singleton", "StockCode", "isValidStockCode", "isValidIpAddress", "isValidDate",
-           "getMarketID","round_up_decimal_2","dumpUTF8Json", "c_array"]
+           "getMarketID","dumpUTF8Json", "c_array"]
 
 class Singleton:
     """
@@ -74,7 +74,7 @@ class StockCode(object):
 
         if len(spstr[0]) == 6:
             self.stock_code = spstr[0]
-            if not self.isValidStockCode(self.stock_code):
+            if not isValidStockCode(self.stock_code):
                 raise ValueError,"Invalidate stock code " + code
             if len(spstr) == 2: # '600036.sh'
                 suffix = spstr[1].upper()
@@ -89,7 +89,7 @@ class StockCode(object):
                 raise ValueError,"Invalidate stock code " + code
             
             self.stock_code = spstr[0][2:]
-            if not self.isValidStockCode(self.stock_code):
+            if not isValidStockCode(self.stock_code):
                 raise ValueError,"Invalidate stock code " + code
             
             prefix = spstr[0][0:2].upper()
@@ -143,10 +143,6 @@ def getStockName(stock):
         stock += ".SH" if getMarketID(stock) else ".SZ"
     return StockCodeHashmap[stock.upper()]
 
-def round_up_decimal_2(float_number):
-    """ 修复python round()四舍六入问题,保留两位小数 """
-    getcontext().rounding = ROUND_HALF_UP 
-    return float('{:.2f}'.format(Decimal(str(float_number))))
 
 def c_array(src_list, TYPE):
     assert type(src_list) is list
@@ -156,8 +152,10 @@ def c_array(src_list, TYPE):
     for i in range(count): rst[i] = TYPE(src_list[i])
     return rst
 
+
 def dumpUTF8Json(obj):
     return json.dumps(obj, encoding="gbk").decode('utf8')
+
 
 def printd(obj):
     """Debug print"""
@@ -189,8 +187,6 @@ def __print_Result(r):
 
 
 if __name__ == "__main__":
-##    x = round_up_decimal_2(44.665)
-##    print x
 ##    test_stock_code = ['300001','600036','000625','100001','6001036','6x0001']
 ##    for i in test_stock_code:
 ##        print i,isValidStockCode(i)

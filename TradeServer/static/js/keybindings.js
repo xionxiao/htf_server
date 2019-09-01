@@ -126,11 +126,9 @@ function KeyShortcuts(evt) {
 		// 行情
 		$('#left-input').bind('OnEnter', function(evt){
 			g_stock_1 = $('#left-input').val();
-			Refresh();
 		});
 
 		$('#right-input').bind('OnEnter', function(evt) {
-			Refresh();
 		});
 
 		// 调整价格
@@ -174,8 +172,8 @@ function KeyShortcuts(evt) {
 		fill_transaction_table("#left-transaction");
 		fill_transaction_table("#right-transaction");
 
-		RefreshTransactionDetail();
 		RefreshQuote10();
+		RefreshTransactionDetail();
 		//RefreshStockPool();
 		RefreshOrderList();
 		RefreshPosition();

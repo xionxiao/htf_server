@@ -122,7 +122,7 @@ function compareDate(t1, t2) {
 }
 
 function RefreshOrderList() {
-	console.log("Refresh Order List")
+	//console.log("Refresh Order List")
 	$.get(trade_host + "/query",{"catalogues":"orderlist"}, function(data) {
 		obj = eval("("+data+")");
 		//console.log(JSON.stringify(obj));
@@ -155,7 +155,7 @@ function RefreshOrderList() {
 }
 
 function RefreshPosition() {
-	console.log("Refresh Stock Position")
+	//console.log("Refresh Stock Position")
 	$.get(trade_host + "/query",{"catalogues":"position"}, function(data) {
 		obj = eval("("+data+")");
 		//console.log(obj.position)
