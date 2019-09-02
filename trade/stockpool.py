@@ -29,7 +29,7 @@ class StockPool():
         assert type(share) is int and share > 0
         assert share % 100 == 0
         if not self._stock_pool.has_key(stock):
-            print u"股票池中没有对应股票"
+            raise AcquireError("股票池中没有对应股票")
             return [],[],0
 
         order_dict = self._stock_pool[stock]["订单列表"]
@@ -43,7 +43,7 @@ class StockPool():
         out_value_list = []
         if sum(values) < share:
             # raise exception
-            print u"证券数量不足"
+            raise AcquireError("股票池中股票数量不足")
             return [],[],0
         for i in range(len(sorted_dict)):
             if not greater_pos:
@@ -208,4 +208,4 @@ if __name__ == "__main__":
     for k in ss:
         print k,ss[k]["融券数量"],ss[k]["融券上限"],ss[k]["订单列表"]
 
-    #print sp.acquire("600104",2200)
+    print sp.acquire("601318",100)

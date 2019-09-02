@@ -183,26 +183,21 @@ class ShortCmd(Command):
         try:
             self._sp.sync()
             i,c,s = self._sp.acquire(self._stock, self._share)
-            if i:
-                marketId = str(getMarketID(self._stock))
-                if type(i) is list:
-                    marketId = [marketId] * len(i)
-                res = self._api.CancelOrder(marketId, i)
-            else:
-                obj['error'] = "acquire error: stock="+self._stock+" share="+str(self._share)
-                self._handler.write(dumpUTF8Json(obj))
-                return
+            marketId = str(getMarketID(self._stock))
+            if type(i) is list:
+                marketId = [marketId] * len(i)
+            res = self._api.CancelOrder(marketId, i)
             time.sleep(0.3)
             if s > 0:
                 res = self._sp.fill(self._stock, s)
             res = self._api.Short(self._stock, self._price, self._share)
             obj["result"] = res[0]
-            self._handler.write(dumpUTF8Json(obj))
         except TradeError as e:
             obj['error'] = str(e)
-            err_str = dumpUTF8Json(obj)
-            self._handler.write(err_str)
+        except AcquireError as e:
+            obj['error'] = str(e)
         finally:
+            self._handler.write(dumpUTF8Json(obj))
             self.complete()
 
 class CancelCmd(Command):

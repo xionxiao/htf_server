@@ -1,7 +1,7 @@
 # -*- coding: gbk -*-
 import datetime
 
-__all__ = ["ErrorException", "LogonError", "QueryError", "BatchQueryError", "TradeError", "BatchTradeError", "CancelError", "BatchCancelError", "RepayError"]
+__all__ = ["ErrorException", "LogonError", "QueryError", "BatchQueryError", "AcquireError", "TradeError", "BatchTradeError", "CancelError", "BatchCancelError", "RepayError"]
 
 class ErrorException(Exception):
     def __init__(self, feedback, **kwargs):
@@ -38,6 +38,9 @@ class QueryError(ErrorException):
 class BatchQueryError(QueryError):
     u""" 批量查询错误 """
     # TODO: 批量查询额外数据处理
+    pass
+
+class AcquireError(ErrorException):
     pass
 
 class TradeError(ErrorException):
