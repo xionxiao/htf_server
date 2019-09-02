@@ -4,8 +4,7 @@ from trade import TradeApi
 from common.error import *
 from common.utils import *
 from query import c_query
-import time,decimal
-decimal.getcontext.rounding = decimal.ROUND_05UP
+import time
 
 class StockPoolAcquireError(TradeError):
     pass
@@ -162,7 +161,7 @@ class StockPool():
         """ 与服务器同步股票池 """
         self._stock_pool = {}
         try:
-            rst = self._tradeApi.Query("可撤单")
+            rst = c_query("可撤单")
         except QueryError as e:
             return
 
@@ -207,9 +206,6 @@ if __name__ == "__main__":
     ss = sp.getStocks()
     print ss
     for k in ss:
-        print k
-        print ss[k]["融券数量"]
-        print ss[k]["融券上限"]
-        print ss[k]["订单列表"]
+        print k,ss[k]["融券数量"],ss[k]["融券上限"],ss[k]["订单列表"]
 
     #print sp.acquire("600104",2200)

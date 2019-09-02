@@ -1,12 +1,10 @@
 # -*- coding: gbk -*-
 
-from ctypes import *
-from decimal import *
 from resultbuffer import *
 from _stockcode_hashmap import StockCodeHashmap
-import re,json
+import re,json,decimal
 
-__all__ = ["Singleton", "StockCode", "isValidStockCode", "isValidIpAddress", "isValidDate",
+__all__ = ["Singleton", "StockCode", "round_up_decimal", "isValidStockCode", "isValidIpAddress", "isValidDate",
            "getMarketID","dumpUTF8Json", "c_array"]
 
 class Singleton:
@@ -157,6 +155,15 @@ def dumpUTF8Json(obj):
     return json.dumps(obj, encoding="gbk").decode('utf8')
 
 
+def round_up_decimal(number, ndigits=2):
+    """ 修复python round()四舍六入问题,默认保留两位小数
+        number 可为数字或字符串
+    """
+    decimal.getcontext().rounding = decimal.ROUND_HALF_UP
+    format_str = '{:.' + str(ndigits) + 'f}'
+    return float(format_str.format(decimal.Decimal(str(number))))
+
+
 def printd(obj):
     """Debug print"""
     if type(obj) is ResultBuffer:
@@ -187,9 +194,17 @@ def __print_Result(r):
 
 
 if __name__ == "__main__":
+    print round_up_decimal(6.555)
+    print round_up_decimal(6.554)
+    print round_up_decimal('6.9955', 2)
+    print round_up_decimal('6.9954', 3)
 ##    test_stock_code = ['300001','600036','000625','100001','6001036','6x0001']
 ##    for i in test_stock_code:
 ##        print i,isValidStockCode(i)
+
+    from ctypes import *
+    x = [1,2,3]
+    p = c_array(x, c_int)
 
     test_ip_addr = ['10.255.1.255:80', '192.168.1.100', '300.180.260.1','127.0.0.256',10.250]
     for i in test_ip_addr:

@@ -4,6 +4,7 @@ import sys,time
 sys.path.append("..")
 from trade import TradeApi
 from trade.stockpool import StockPool
+from trade.query import c_query
 from command import *
 from common.resultbuffer import Result
 from common.error import TradeError, QueryError
@@ -28,16 +29,10 @@ class GetPositionCmd(Command):
         Command.__init__(self, handler)
         self._api = TradeApi.Instance()
         self._handler = handler
-        self._cache = Cache()
 
     def execute(self):
         try:
-            cache_string = self._cache.get("股份")
-            if cache_string:
-                rst = Result(cache_string)
-            else:
-                rst = self._api.Query("股份")
-                self._cache.set("股份", rst.raw, 5)
+            rst = c_query("股份")
             obj = {"position":rst.items}
             self._handler.write(dumpUTF8Json(obj))
         except Exception as e:
@@ -51,19 +46,10 @@ class GetOrderListCmd(Command):
         Command.__init__(self, handler)
         self._api = TradeApi.Instance()
         self._handler = handler
-        self._cache = Cache()
 
     def execute(self):
         try:
-            cache_string = self._cache.get("可撤单")
-            if cache_string:
-                rst = Result(cache_string)
-            else:
-                rst = self._api.Query("可撤单")
-                # expire time 2 seconds
-                # TODO:
-                # Should read in setting
-                self._cache.set("可撤单", rst.raw, 3)
+            rst = c_query("可撤单")
             obj = {"orderlist":rst.items}
             self._handler.write(dumpUTF8Json(obj))
         except Exception as e:
@@ -77,19 +63,10 @@ class GetDealsCmd(Command):
         Command.__init__(self, handler)
         self._api = TradeApi.Instance()
         self._handler = handler
-        self._cache = Cache()
 
     def execute(self):
         try:
-            cache_string = self._cache.get("当日成交")
-            if cache_string:
-                rst = Result(cache_string)
-            else:
-                rst = self._api.Query("当日成交")
-                # expire time 2 seconds
-                # TODO:
-                # Should read in setting
-                self._cache.set("当日成交", rst.raw, 3)
+            rst = c_query("当日成交")
             obj = {"deals":rst.items}
             self._handler.write(dumpUTF8Json(obj))
         except Exception as e:

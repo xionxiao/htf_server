@@ -6,7 +6,7 @@ sys.path.append("..")
 from common.error import *
 from common.utils import *
 from common.resultbuffer import *
-import datetime, time, numbers
+import numbers
 
 @Singleton
 class TradeApi():
@@ -352,9 +352,14 @@ if __name__ == "__main__":
         #print(api.Query("当日委托"))
         #print(u"======== 当日成交")
         #print(api.Query("当日成交"))
-##        print(u"======== 可撤单")
-##        rst = api.Query("可撤单")
-##        print(rst)
+        n = 0
+        from datetime import datetime
+        while True:
+            print datetime.now()
+            n = n + 1
+            print(u"======== 可撤单 " + str(n))
+            rst = api.Query("可撤单")
+            print(rst)
 ##        print(u"======== 股东代码")
 ##        print(api.Query("股东代码"))
 ##        print(u"======== 融资余额")
@@ -385,11 +390,12 @@ if __name__ == "__main__":
         #rst = api.SendOrder(3, "000655", 0.22, 100)
         #print rst
         #print api.SendOrders([3,3,3], ["000655", "000625","600005"], [0.22, 0.11, 0.4], [100,100,200])
-        print api.Buy("159901", 3.3, 100)
+        #print api.Buy("159901", 3.3, 100)
         #print api.Sell("000690", 10.10, 100)
         #print api.Short("600005", 6.4, 100)
     except ErrorException as e:
         print "!!!!!!!!!!!!!!!!!!!!!"
+        print datetime.now()
         print e.feedback
     finally:
         print "Log off"
