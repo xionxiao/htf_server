@@ -30,7 +30,7 @@ class QueryMinuteTimeDataCmd(Command):
                 obj["minute"].append(i)
             json_str = dumpUTF8Json(obj)
             self._handler.write(json_str)
-        except QuerryError as e:
+        except QueryError as e:
             err_str = dumpUTF8Json({"error":str(e)})
             self._handler.write(err_str)
             _check_and_reconnect(e.feedback)
