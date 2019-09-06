@@ -5,9 +5,11 @@
         <meta charset="utf-8" /> 
         <link href="static/css/bootstrap.min.css" rel="stylesheet" /> 
         <!-- 包括所有已编译的插件 --> 
-        <script src="static/js/zepto.min.js"></script>
+        <script src="static/js/jquery.min.js"></script>
         <script src="static/js/bootstrap.min.js"></script> 
-        <script src="static/js/fetch.js"></script> 
+        <script src="static/js/highstock.js"></script>
+	    <script src="static/js/mchart.js"></script>
+	    <script src="static/js/fetch.js"></script> 
         <style type="text/css">
 			.container {
 				margin-top:20px;
@@ -54,6 +56,9 @@
 			#left-transaction table {
 				font-size: 6px;
 			}
+			#minute-panel {
+                border: 0px solid white;
+            }
         </style>
     </head> 
     <body onkeyup="KeyShortcuts(event)"> 
@@ -91,9 +96,22 @@
                     </div>
 				</div> <!-- 十档行情 -->
 
+				<!-- 分时图 -->
+                <div class="col-xs-6">
+                    <div class="panel panel-info" id="minute-panel">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">分时图</h3>
+                        </div>  
+                        <div id="minute-chart" style="height:200px">
+                        </div>
+                        <div id="minute-chart-volume" style="height:125px">
+                        </div>
+                    </div>
+                </div> <!-- 分时图 -->
+
 				<!-- 逐笔成交 -->
 				<div class="col-xs-2"> 
-                    <div class="panel panel-info" id="transaction-detail">
+                    <div class="panel panel-success" id="transaction-detail">
                         <div class="panel-heading">
 							<h3 class="panel-title">逐笔成交</h3>
 						</div> 
@@ -154,10 +172,6 @@
 						</table> 
                     </div>		
 				</div> <!-- 分时成交明细 -->
-
-				<!-- 右边交易窗口 -->
-				<div class="col-xs-2"> 
-				</div> <!-- col-xs-2 -->
 
             </div> <!-- row -->
         </div> <!-- container -->

@@ -60,6 +60,30 @@ function RefreshTransaction() {
 	})
 }
 
+function RefreshMinuteChart() {
+	console.log("Refresh Minute Chart")
+	$.get(host + "/query",{"catalogues":"minute", "stock":g_stock_1}, function(data) {
+		var data = eval("("+data+")");
+		console.log(data);
+		var mPrice = [],
+		mVolume = [],
+		last_price = 0;
+
+		for (var i = 0; i < data.minute.length; i++) {
+			var price = parseFloat(data.minute[i]["现价"]);
+			var vol = parseInt(data.minute[i]["成交量"]);
+
+			mPrice.push(price);
+			color = price > last_price ? 'red' : 'green'
+			last_price = price;
+
+			mVolume.push([vol, color]);
+		};
+		drawMinuteChart(mPrice, mVolume);
+		//setTimeout(RefreshMinuteChart(), 60*1000);
+	});
+}
+
 function fill_quote_table(id, quote) {
 	$(id).find("#name").text(quote["名称"]);
 	$(id).find("#code").text(quote["代码"]);
@@ -254,6 +278,7 @@ $(document).ready(function() {
 
 	$('#left-input').bind('OnEnter', function(evt){
 		g_stock_1 = $('#left-input').val();
+		RefreshMinuteChart();
 	});
 
 	$('#right-input').bind('OnEnter', function(evt) {
@@ -264,8 +289,9 @@ $(document).ready(function() {
 })
 
 function Refresh() {
-	RefreshQuote10();
-	RefreshTransactionDetail();
-	RefreshTransaction();
+	//RefreshQuote10();
+	//RefreshTransactionDetail();
+	//RefreshTransaction();
+	RefreshMinuteChart();
 	//setInterval("Refresh()", 5000);
 }
