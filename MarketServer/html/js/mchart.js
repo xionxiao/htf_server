@@ -37,7 +37,8 @@ $(function(){
 
 }());
 
-function drawMinuteChart(mPrice, mVolume) {
+function drawMinuteChart(mPrice, mVolume, mAxis) {
+    console.log(mAxis);
 	$('#minute-chart').highcharts({
 		tooltip: {
             valueDecimals: 2,
@@ -62,6 +63,8 @@ function drawMinuteChart(mPrice, mVolume) {
         	lineWidth: 1,
         	minPadding: 0,
         	maxPadding: 0,
+			min: 0,
+			max: 240,
             startOnTick: true,
             endOnTick: true,
         	gridLineWidth: 1,
@@ -85,12 +88,12 @@ function drawMinuteChart(mPrice, mVolume) {
         yAxis : [{
         	lineWidth: 1,
         	tickAmount: 9,
-            tickPixelInterval: 25,
-            tickPositions: [16.42,16.56,16.70,16.84,16.98,17.12,17.26,17.4,],
+            //tickPixelInterval: 25,
+			tickPositions: mAxis,
             plotLines: [{
                 width: 1,
                 color: "#E0E0E0",
-                value: 16.84,
+                value: mAxis[4],
             }],
         	gridLineDashStyle: "dash",
         	labels : {
@@ -146,6 +149,8 @@ function drawMinuteChart(mPrice, mVolume) {
         	maxPadding: 0,
         	startOnTick: true,
         	endOnTick: true,
+			min:0,
+			max:240,
         	gridLineWidth: 1,
         	gridLineDashStyle: "dash",
         	minorGridLineWidth: 1,

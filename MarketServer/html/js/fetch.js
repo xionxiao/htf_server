@@ -20,20 +20,20 @@ var host = "http://" + window.location.host;
 }());
 
 function RefreshQuote10() {
-	//console.log("Refresh Quote", g_stock_1, g_stock_2);
 	$.get(host + "/query",{"catalogues":"quote10", "stocks":g_stock_1}, function(data) {
 		var obj = eval("("+data+")");
 		console.log(obj);
 		if (obj['error'] !== undefined) {
 			return;
 		}
+		mClose = obj['quote10'][0]['昨收'];
+		mOpen = obj['quote10'][0]['开盘'];
 		fill_quote_table("#left-quote", obj["quote10"][0]);
-		setTimeout(RefreshQuote10(), 0000);
+		setTimeout(RefreshQuote10, 5000);
 	})
 }
 
 function RefreshTransactionDetail() {
-	//console.log("Refresh Transaction");
 	$.get(host + "/query",{"catalogues":"transaction_detail", "stock":g_stock_1}, function(data) {
 		var obj = eval("("+data+")");
 		console.log(obj);
@@ -42,12 +42,11 @@ function RefreshTransactionDetail() {
 			return;
 		}
 		fill_transaction_detail_table("#transaction-detail", obj["transaction_detail"]);
-		setTimeout(RefreshTransactionDetail(), 0000);
+		setTimeout(RefreshTransactionDetail, 5000);
 	})
 }
 
 function RefreshTransaction() {
-	//console.log("Refresh Transaction");
 	$.get(host + "/query",{"catalogues":"transaction", "stock":g_stock_1}, function(data) {
 		var obj = eval("("+data+")");
 		console.log(obj);
@@ -56,7 +55,7 @@ function RefreshTransaction() {
 			return;
 		}
 		fill_transaction_table("#transaction", obj["transaction"]);
-		setTimeout(RefreshTransaction(), 0000);
+		setTimeout(RefreshTransaction, 5000);
 	})
 }
 
@@ -79,8 +78,31 @@ function RefreshMinuteChart() {
 
 			mVolume.push([vol, color]);
 		};
-		drawMinuteChart(mPrice, mVolume);
-		//setTimeout(RefreshMinuteChart(), 60*1000);
+		var close = parseFloat(mClose),
+			open = parseFloat(mOpen);
+		var min = Math.min.apply(null, mPrice),
+			max = Math.max.apply(null, mPrice);
+		console.log(min);
+		console.log(max);
+		a = Math.max((max - close),(close - min));
+		console.log(a);
+		b = a / close;
+		console.log(b);
+		console.log(Math.round(b*100)/100);
+		axis = [(close*(1-b)).toFixed(2), 
+				(close*(1-b/4*3)).toFixed(2), 
+				(close*(1-b/4*2)).toFixed(2),
+				(close*(1-b/4*1)).toFixed(2), 
+				close.toFixed(2), 
+				(close*(1+b/4*1)).toFixed(2), 
+				(close*(1+b/4*2)).toFixed(2), 
+				(close*(1+b/4*3)).toFixed(2), 
+				(close*(1+b)).toFixed(2)];
+		console.log(axis);
+		console.log(open);
+		mPrice.unshift(open);
+		drawMinuteChart(mPrice, mVolume, axis);
+		setTimeout(RefreshMinuteChart, 60*1000);
 	});
 }
 
@@ -278,7 +300,6 @@ $(document).ready(function() {
 
 	$('#left-input').bind('OnEnter', function(evt){
 		g_stock_1 = $('#left-input').val();
-		RefreshMinuteChart();
 	});
 
 	$('#right-input').bind('OnEnter', function(evt) {
@@ -289,9 +310,9 @@ $(document).ready(function() {
 })
 
 function Refresh() {
-	//RefreshQuote10();
-	//RefreshTransactionDetail();
-	//RefreshTransaction();
+	RefreshQuote10();
+	RefreshTransactionDetail();
+	RefreshTransaction();
 	RefreshMinuteChart();
 	//setInterval("Refresh()", 5000);
 }
