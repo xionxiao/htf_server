@@ -14,11 +14,10 @@ from query_cmd import *
 from market import MarketApi
 
 from tornado.options import define, options
-define("port", default=80, help="run on the given port", type=int)
 
 class IndexHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("html\\index.html")
+        self.render("static\\index.html")
 
 class QueryHandler(tornado.web.RequestHandler, Receiver):
     _quote_invoker = Invoker()
@@ -70,13 +69,18 @@ if __name__ == "__main__":
 
     market_server_ip = settings.get("market", "server")
     market_server_port = settings.get("market", "port")
+    try:
+        port = settings.get("server", "port")
+    except ConfigParser.NoOptionError:
+        port = 80
+    define("port", default=port, help="run on the given port", type=int)
     
     api = MarketApi.Instance()
     api.Connect(market_server_ip, int(market_server_port))
     
     tornado.options.parse_command_line()
     settings = {
-    "static_path": os.path.join(os.path.dirname(__file__), "html").decode('gbk'),
+    "static_path": os.path.join(os.path.dirname(__file__), "static").decode('gbk'),
     "debug": True
     }
     router = [(r"/", IndexHandler),
