@@ -188,6 +188,31 @@ class StockPool():
             return e.feedback
         return rst
 
+    def short_frompool(self, stock_code, price, share):
+        self.sync()
+        i,c,s = self.acquire(stock_code, share)
+        marketId = str(getMarketID(stock_code))
+        if type(i) is list:
+            marketId = [marketId] * len(i)
+        rst = self._tradeApi.CancelOrder(marketId, i)
+
+        if s > 0:
+            raising_price = c_query("涨停价", stock_code)
+            ## TODO: 20 应该配置成参数
+            for x in range(20):
+                try:
+                    rst = self._tradeApi.SendOrders([3]*2, [stock_code]*2, [raising_price,price], [s,share])
+                except BatchTradeError as e:
+                    continue
+                return rst
+        else:
+            for x in range(20):
+                try:
+                    rst = self._tradeApi.Short(stock_code, price, share)
+                except TradeError as e:
+                    continue
+                return rst
+    
     def lock(self, stock, share):
         """ 买单锁定股票 """
         pass
@@ -208,4 +233,4 @@ if __name__ == "__main__":
     for k in ss:
         print k,ss[k]["融券数量"],ss[k]["融券上限"],ss[k]["订单列表"]
 
-    print sp.acquire("601318",100)
+    #print sp.acquire("601318",100)
