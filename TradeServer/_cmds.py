@@ -94,9 +94,6 @@ class BuyCmd(Command):
                }
         try:
             res = self._api.Buy(self._stock, self._price, self._share)
-            # TODO: 更丰富的返回内容: {"command": {comd: buy, stock:6000036, price:18.5, share:100}
-            #                        "result": ...,
-            #                        "error":
             obj["result"] = res[0]
             self._handler.write(dumpUTF8Json(obj))
         except TradeError as e:
@@ -182,16 +179,6 @@ class ShortCmd(Command):
                }
         try:
             res = self._sp.short_frompool(self._stock, self._price, self._share)
-##            self._sp.sync()
-##            i,c,s = self._sp.acquire(self._stock, self._share)
-##            marketId = str(getMarketID(self._stock))
-##            if type(i) is list:
-##                marketId = [marketId] * len(i)
-##            res = self._api.CancelOrder(marketId, i)
-##            time.sleep(0.3)
-##            if s > 0:
-##                res = self._sp.fill(self._stock, s)
-##            res = self._api.Short(self._stock, self._price, self._share)
             obj["result"] = res[0]
         except CancelError as e:
             obj['error'] = str(e)
