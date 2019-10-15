@@ -45,3 +45,5 @@ R.py
 # Log file
 log.txt
 *.log
+
+.*
