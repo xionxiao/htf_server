@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 import datetime
 
 __all__ = ["ErrorException", "LogonError", "QueryError", "BatchQueryError", "AcquireError", "TradeError", "BatchTradeError", "CancelError", "BatchCancelError", "RepayError"]
@@ -13,7 +13,7 @@ class ErrorException(Exception):
         return str(self.timestamp) + '\n' + str(self.feedback)
 
 class LogonError(ErrorException):
-    u""" µÇÂ¼´íÎó """
+    u""" ç™»å½•é”™è¯¯ """
     def __init__(self, ip, port, feedback, **kwargs):
         ErrorException.__init__(self, feedback, **kwargs)
         self.ip = ip
@@ -23,8 +23,8 @@ class LogonError(ErrorException):
         return str(self.feedback)
 
 class QueryError(ErrorException):
-    u""" ²éÑ¯´íÎó """
-    # TODO: query_typeÍ³Ò»¶¨Òå
+    u""" æŸ¥è¯¢é”™è¯¯ """
+    # TODO: query_typeç»Ÿä¸€å®šä¹‰
     def __init__(self, query_type, feedback, **kwargs):
         ErrorException.__init__(self, feedback, **kwargs)
         self.query_type = query_type
@@ -36,15 +36,15 @@ class QueryError(ErrorException):
         return ret_val
 
 class BatchQueryError(QueryError):
-    u""" ÅúÁ¿²éÑ¯´íÎó """
-    # TODO: ÅúÁ¿²éÑ¯¶îÍâÊı¾İ´¦Àí
+    u""" æ‰¹é‡æŸ¥è¯¢é”™è¯¯ """
+    # TODO: æ‰¹é‡æŸ¥è¯¢é¢å¤–æ•°æ®å¤„ç†
     pass
 
 class AcquireError(ErrorException):
     pass
 
 class TradeError(ErrorException):
-    u""" ½»Ò×´íÎó """
+    u""" äº¤æ˜“é”™è¯¯ """
     def __init__(self, order_type, stock, price, shares, price_type, feedback, **kwargs):
         ErrorException.__init__(self, feedback, **kwargs)
         self.param = {}
@@ -55,8 +55,8 @@ class TradeError(ErrorException):
         self.param["price_type"] = price_type
 
 class BatchTradeError(TradeError):
-    u""" ÅúÁ¿½»Ò×´íÎó """
-    # TODO: ÅúÁ¿µ¥´íÎó¶îÍâÊı¾İ´¦Àí
+    u""" æ‰¹é‡äº¤æ˜“é”™è¯¯ """
+    # TODO: æ‰¹é‡å•é”™è¯¯é¢å¤–æ•°æ®å¤„ç†
     pass
 
 class CancelError(ErrorException):
@@ -69,5 +69,5 @@ class RepayError(ErrorException):
     pass
 
 if __name__ == "__main__":
-    q = QueryError("ĞĞÇé", "hello", hello="world")
+    q = QueryError("è¡Œæƒ…", "hello", hello="world")
     print q

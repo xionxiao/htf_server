@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 
 import redis,sys
 sys.path.append("..")
@@ -22,8 +22,8 @@ class RedisCache(object):
             rst = lv2.GetSecurityList(market,start)
             start += len(rst)
             for i in rst:
-                key = i["代码"] + '.SZ'
-                value = i["名称"]
+                key = i["浠ｇ爜"] + '.SZ'
+                value = i["鍚嶇О"]
                 self._db.set(key,value)
                 obj[key] = value
             if len(rst) < 1000:
@@ -37,8 +37,8 @@ class RedisCache(object):
             rst = lv2.GetSecurityList(market,start)
             start += len(rst)
             for i in rst:
-                key = i["代码"] + '.SH'
-                value = i["名称"]
+                key = i["浠ｇ爜"] + '.SH'
+                value = i["鍚嶇О"]
                 self._db.set(key,value)
                 obj[key] = value
             if len(rst) < 1000:

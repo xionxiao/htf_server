@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 
 from trade import TradeApi
 import sys,datetime
@@ -9,38 +9,38 @@ from common.resultbuffer import Result
 
 _cache = Cache()
 
-# ²éÑ¯ÀàĞÍ
-QUERY_TYPE = ("×Ê½ğ",  # 0
-              "¹É·İ",  # 1 
-              "µ±ÈÕÎ¯ÍĞ",  # 2
-              "µ±ÈÕ³É½»",  # 3
-              "¿É³·µ¥",  # 4
-              "¹É¶«´úÂë",  # 5
-              "ÈÚ×ÊÓà¶î",  # 6
-              "ÈÚÈ¯Óà¶î",  # 7
-              "¿ÉÈÚÖ¤È¯"   # 8
+# æŸ¥è¯¢ç±»å‹
+QUERY_TYPE = ("èµ„é‡‘",  # 0
+              "è‚¡ä»½",  # 1 
+              "å½“æ—¥å§”æ‰˜",  # 2
+              "å½“æ—¥æˆäº¤",  # 3
+              "å¯æ’¤å•",  # 4
+              "è‚¡ä¸œä»£ç ",  # 5
+              "èèµ„ä½™é¢",  # 6
+              "èåˆ¸ä½™é¢",  # 7
+              "å¯èè¯åˆ¸"   # 8
               )
 
-# ÀúÊ·Î¯ÍĞÀàĞÍ
-HISTORY_QUERY_TYPE = ("ÀúÊ·Î¯ÍĞ", # 0
-                      "ÀúÊ·³É½»", # 1
-                      "½»¸îµ¥", # 2
+# å†å²å§”æ‰˜ç±»å‹
+HISTORY_QUERY_TYPE = ("å†å²å§”æ‰˜", # 0
+                      "å†å²æˆäº¤", # 1
+                      "äº¤å‰²å•", # 2
                       )
-# ÑÓÊ±£¬µ¥Î»s
-_query_timeout = (1, #"×Ê½ğ"      ·şÎñÆ÷ÎŞÏŞÖÆ
-                  1, #"¹É·İ"      ·şÎñÆ÷ÎŞÏŞÖÆ
-                  2, #"µ±ÈÕÎ¯ÍĞ"    ·şÎñÆ÷ÏŞÖÆ30´Î
-                  2, #"µ±ÈÕ³É½»"    ·şÎñÆ÷ÏŞÖÆ30´Î
-                  2, #"¿É³·µ¥"     ·şÎñÆ÷ÏŞÖÆ30´Î
-                  1, #"¹É¶«´úÂë"    ·şÎñÆ÷ÎŞÏŞÖÆ
-                  1, #"ÈÚ×ÊÓà¶î"    ·şÎñÆ÷ÎŞÏŞÖÆ
-                  1, #"ÈÚÈ¯Óà¶î"    ²»Ö§³Ö
-                  1, #"¿ÉÈÚÖ¤È¯"    ·şÎñÆ÷ÎŞÏŞÖÆ
+# å»¶æ—¶ï¼Œå•ä½s
+_query_timeout = (1, #"èµ„é‡‘"      æœåŠ¡å™¨æ— é™åˆ¶
+                  1, #"è‚¡ä»½"      æœåŠ¡å™¨æ— é™åˆ¶
+                  2, #"å½“æ—¥å§”æ‰˜"    æœåŠ¡å™¨é™åˆ¶30æ¬¡
+                  2, #"å½“æ—¥æˆäº¤"    æœåŠ¡å™¨é™åˆ¶30æ¬¡
+                  2, #"å¯æ’¤å•"     æœåŠ¡å™¨é™åˆ¶30æ¬¡
+                  1, #"è‚¡ä¸œä»£ç "    æœåŠ¡å™¨æ— é™åˆ¶
+                  1, #"èèµ„ä½™é¢"    æœåŠ¡å™¨æ— é™åˆ¶
+                  1, #"èåˆ¸ä½™é¢"    ä¸æ”¯æŒ
+                  1, #"å¯èè¯åˆ¸"    æœåŠ¡å™¨æ— é™åˆ¶
                   )
 
-_his_query_timeout = (30, #"ÀúÊ·Î¯ÍĞ"    ·şÎñÏŞÖÆ2´Î
-                      6, #"ÀúÊ·³É½»"    ·şÎñÏŞÖÆ10´Î
-                      1, #"½»¸îµ¥"     ·şÎñÆ÷ÎŞÏŞÖÆ
+_his_query_timeout = (30, #"å†å²å§”æ‰˜"    æœåŠ¡é™åˆ¶2æ¬¡
+                      6, #"å†å²æˆäº¤"    æœåŠ¡é™åˆ¶10æ¬¡
+                      1, #"äº¤å‰²å•"     æœåŠ¡å™¨æ— é™åˆ¶
                       )
 
 def c_query(u_str, *args, **kwargs):
@@ -64,7 +64,7 @@ def c_query(u_str, *args, **kwargs):
             index = HISTORY_QUERY_TYPE.index(u_str)
             _cache.set(u_str, str(rst), _his_query_timeout[index])
         return rst
-    if u_str in ["ĞĞÇé","ÎåµµĞĞÇé","±¨¼Û"]:
+    if u_str in ["è¡Œæƒ…","äº”æ¡£è¡Œæƒ…","æŠ¥ä»·"]:
         if len(args) == 1:
             assert isValidStockCode(args[0])
             stock = args[0]
@@ -73,7 +73,7 @@ def c_query(u_str, *args, **kwargs):
         else:
             raise ValueError, "missing stock code"
         return _query_quote(stock)
-    if u_str == "ÕÇÍ£¼Û":
+    if u_str == "æ¶¨åœä»·":
         if len(args) == 1:
             assert isValidStockCode(args[0])
             stock = args[0]
@@ -81,49 +81,49 @@ def c_query(u_str, *args, **kwargs):
             stock = kwargs['stock']
         else:
             raise ValueError, "missing stock code"
-        hp = _cache.get("ÎåµµĞĞÇé:"+stock+":ÕÇÍ£¼Û")
+        hp = _cache.get("äº”æ¡£è¡Œæƒ…:"+stock+":æ¶¨åœä»·")
         if hp:
             ndigits = len(hp.split('.')[1])
             return round_up_decimal(float(hp), ndigits)
         else:
             rst = _query_quote(stock)            
-            ndigits = len(rst["×òÊÕ¼Û"].split('.')[1])
-            hp = round_up_decimal(float(rst["×òÊÕ¼Û"])*1.1, ndigits)
-            # TODO: ÖÜÁùÈÕ£¬¼°·Ç¿ªÅÌÊ±¶Î¼Û¸ñÎÊÌâ
+            ndigits = len(rst["æ˜¨æ”¶ä»·"].split('.')[1])
+            hp = round_up_decimal(float(rst["æ˜¨æ”¶ä»·"])*1.1, ndigits)
+            # TODO: å‘¨å…­æ—¥ï¼ŒåŠéå¼€ç›˜æ—¶æ®µä»·æ ¼é—®é¢˜
             return hp
     
 def _query_quote(stock):
     assert isValidStockCode(stock)
-    cc = _cache.get("ÎåµµĞĞÇé:"+stock)
+    cc = _cache.get("äº”æ¡£è¡Œæƒ…:"+stock)
     if cc:
         rst = Result(cc)
     else:
         api = TradeApi.Instance()
         rst = api.GetQuote(stock)
-        _cache.set("ÎåµµĞĞÇé:"+rst["Ö¤È¯´úÂë"], str(rst), 1)
+        _cache.set("äº”æ¡£è¡Œæƒ…:"+rst["è¯åˆ¸ä»£ç "], str(rst), 1)
         now = datetime.datetime.now()
         nextday = datetime.datetime(now.year,now.month,now.day)+datetime.timedelta(days=1)
         expire_seconds = (nextday - now).seconds
-        # TODO: ¸üĞÂÊ±¼äÓë·şÎñÆ÷Ë¢ĞÂÊ±¼ä²»Ò»ÖÂ
-        _cache.set("ÎåµµĞĞÇé:"+rst["Ö¤È¯´úÂë"]+":×òÊÕ¼Û", rst["×òÊÕ¼Û"], 60)
-        ndigits = len(rst["×òÊÕ¼Û"].split('.')[1])
-        harden_price = round_up_decimal(float(rst["×òÊÕ¼Û"])*1.1, ndigits)
-        _cache.set("ÎåµµĞĞÇé:"+rst["Ö¤È¯´úÂë"]+":ÕÇÍ£¼Û", str(harden_price), expire_seconds)
+        # TODO: æ›´æ–°æ—¶é—´ä¸æœåŠ¡å™¨åˆ·æ–°æ—¶é—´ä¸ä¸€è‡´
+        _cache.set("äº”æ¡£è¡Œæƒ…:"+rst["è¯åˆ¸ä»£ç "]+":æ˜¨æ”¶ä»·", rst["æ˜¨æ”¶ä»·"], 60)
+        ndigits = len(rst["æ˜¨æ”¶ä»·"].split('.')[1])
+        harden_price = round_up_decimal(float(rst["æ˜¨æ”¶ä»·"])*1.1, ndigits)
+        _cache.set("äº”æ¡£è¡Œæƒ…:"+rst["è¯åˆ¸ä»£ç "]+":æ¶¨åœä»·", str(harden_price), expire_seconds)
     return rst
 
 if __name__ == "__main__":
     api = TradeApi.Instance()
     if not api.isLogon():
         api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
-    print(c_query("ÕÇÍ£¼Û","510300"))
+    print(c_query("æ¶¨åœä»·","510300"))
     r1 = _query_quote("510300")
     r2 = _query_quote("600150")
-    print(r1["×òÊÕ¼Û"] == r2["×òÊÕ¼Û"])
-    print(r2["×òÊÕ¼Û"])
-    print(c_query("ÕÇÍ£¼Û","600150"))
+    print(r1["æ˜¨æ”¶ä»·"] == r2["æ˜¨æ”¶ä»·"])
+    print(r2["æ˜¨æ”¶ä»·"])
+    print(c_query("æ¶¨åœä»·","600150"))
     n = 0
     while True:
         n += 1
-        print(c_query("ÀúÊ·Î¯ÍĞ", '20150901','20150902'), n)
+        print(c_query("å†å²å§”æ‰˜", '20150901','20150902'), n)
     
     

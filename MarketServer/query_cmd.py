@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 
 import sys,os,json
 sys.path.append("..")
@@ -11,7 +11,7 @@ from market import MarketApi
 def _check_and_reconnect(feedback):
     # TODO:
     # Check in ThreadInvoker
-    if feedback.raw == "·¢ËÍÊı¾İÊ§°Ü, ÇëÖØĞÂÁ¬½Ó·şÎñÆ÷":
+    if feedback.raw == "å‘é€æ•°æ®å¤±è´¥, è¯·é‡æ–°è¿æ¥æœåŠ¡å™¨":
         lv2 = MarketApi.Instance()
         lv2.Connect("119.97.185.4",7709)
 
@@ -51,7 +51,7 @@ class QueryQuote10Cmd(Command):
             obj = {"quote10":[]}
             r = Cache()
             for i in rst:
-                i["Ãû³Æ"] = getStockName(i["´úÂë"])
+                i["åç§°"] = getStockName(i["ä»£ç "])
                 obj["quote10"].append(i)
             json_str = dumpUTF8Json(obj)
             self._handler.write(json_str)
@@ -76,7 +76,7 @@ class QueryQuote5Cmd(Command):
             rst = lv2.GetQuotes5(self._stocks)
             json_obj = {"quote5":[]}
             for i in rst:
-                i["Ãû³Æ"] = getStockName(i["´úÂë"])
+                i["åç§°"] = getStockName(i["ä»£ç "])
                 json_obj["quote5"].append(i)
             json_str = dumpUTF8Json(json_obj)
             self._handler.write(json_str)

@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 
 from ctypes import *
 from utils import *
@@ -31,9 +31,9 @@ class ResultBuffer(object):
         if not self._ResultList:
             if self.Count == 1:
                 if self.ErrInfo.value != "":
-                    self._ResultList = [ Error(self.ErrInfo.value) ]
+                    self._ResultList = [ Error(self.ErrInfo.value.decode("GBK").encode("UTF8")) ]
                 else:
-                    self._ResultList = [ Result(self.Result.value) ]
+                    self._ResultList = [ Result(self.Result.value.decode("GBK").encode("UTF8")) ]
             else:
                 for i in range(self.Count):
                     if self.ErrInfo[i] == "":
@@ -43,7 +43,7 @@ class ResultBuffer(object):
         return self._ResultList
 
     def __getitem__(self, index):
-        """ ·µ»ØResult¶ÔÏó """
+        """ è¿”å›Resultå¯¹è±¡ """
         result_list = self.getResults()
         return result_list[index]
 
@@ -66,15 +66,15 @@ class Feedback(object):
         return self.raw
 
 class Result(Feedback):
-    u""" ½âÎö·µ»Ø½á¹ûµÄ¶şÎ¬±í¸ñ
-        Result.attr -> °üº¬µÄÊôĞÔ£¬¼´±íÍ·
-        Result[n] -> ·µ»ØµÚnĞĞ£¬½á¹ûÎªdict
-        Result[n]["Key"] -> ·µ»Ø¾ßÌåÄÚÈİ
-        Result["Key"] -> Èç¹ûÎªµ¥ĞĞ½á¹û£¬·µ»ØResult[0]["Key"]
-        Result.raw -> Ô­Ê¼·µ»Ø×Ö·û´®
-        Result.attr -> ·µ»Økeys,µÈ¼ÛÓÚResult[0].keys()
-        Result.items -> ·µ»ØÊı¾İµÄÁĞ±í£¬ÁĞ±íµÄÔªËØÎªdict
-        Result.length -> len(Result) ·µ»ØÓĞ¶àÉÙÌõÊı¾İ£¨²»°üÀ¨Í·£©
+    u""" è§£æè¿”å›ç»“æœçš„äºŒç»´è¡¨æ ¼
+        Result.attr -> åŒ…å«çš„å±æ€§ï¼Œå³è¡¨å¤´
+        Result[n] -> è¿”å›ç¬¬nè¡Œï¼Œç»“æœä¸ºdict
+        Result[n]["Key"] -> è¿”å›å…·ä½“å†…å®¹
+        Result["Key"] -> å¦‚æœä¸ºå•è¡Œç»“æœï¼Œè¿”å›Result[0]["Key"]
+        Result.raw -> åŸå§‹è¿”å›å­—ç¬¦ä¸²
+        Result.attr -> è¿”å›keys,ç­‰ä»·äºResult[0].keys()
+        Result.items -> è¿”å›æ•°æ®çš„åˆ—è¡¨ï¼Œåˆ—è¡¨çš„å…ƒç´ ä¸ºdict
+        Result.length -> len(Result) è¿”å›æœ‰å¤šå°‘æ¡æ•°æ®ï¼ˆä¸åŒ…æ‹¬å¤´ï¼‰
     """
     def __init__(self, result_string):
         Feedback.__init__(self, result_string)
@@ -101,7 +101,7 @@ class Result(Feedback):
         return len(self.items)
 
     def __nonzero__(self):
-        if self.attr: # Ö»ÓĞÒ»ĞĞ£¬items=[], length=0
+        if self.attr: # åªæœ‰ä¸€è¡Œï¼Œitems=[], length=0
             return True
         else:
             return False
@@ -128,11 +128,11 @@ if __name__ == "__main__":
         api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
     try:
         time.sleep(1)
-        rst = api.Query("¹É·İ")
+        rst = api.Query("è‚¡ä»½")
         print(type(rst))
         print(rst)
         print(type(rst[0]))
-        print(rst[0]["Ö¤È¯Ãû³Æ"])
+        print(rst[0]["è¯åˆ¸åç§°"])
     except Error as e:
         print type(e),e
     finally:

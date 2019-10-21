@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 
 from trade import TradeApi
 from common.error import *
@@ -11,28 +11,28 @@ class StockPoolAcquireError(TradeError):
 
 @Singleton
 class StockPool():
-    """ ¹ÜÀí¿É½»Ò×µÄ¹ÉÆ± """    
+    """ ç®¡ç†å¯äº¤æ˜“çš„è‚¡ç¥¨ """    
     def __init__(self):
         self._tradeApi = TradeApi.Instance()
         # structure of pooled stocks
-        # { stock_code: Ö¤È¯´úÂëÎª¼üÖµ
+        # { stock_code: è¯åˆ¸ä»£ç ä¸ºé”®å€¼
         #   {
-        #       ÈÚÈ¯ÊıÁ¿: 500
-        #       ÈÚÈ¯ÉÏÏŞ: 1000
-        #       ¶©µ¥ÁĞ±í: {order_id:share, order_id:share}
+        #       èåˆ¸æ•°é‡: 500
+        #       èåˆ¸ä¸Šé™: 1000
+        #       è®¢å•åˆ—è¡¨: {order_id:share, order_id:share}
         #   }
         # }
         self._stock_pool = {}
         
     def acquire(self, stock, share):
-        """ »ñµÃÏàÓ¦ÊıÄ¿¹ÉÆ±, ·µ»Ø³·Ïû¶©µ¥ºÅ,³·Ïû¶©µ¥¹ÉÊı£¬²¹³äÏÂµ¥¹ÉÊı(ÕÇÍ£¼Û)"""
+        """ è·å¾—ç›¸åº”æ•°ç›®è‚¡ç¥¨, è¿”å›æ’¤æ¶ˆè®¢å•å·,æ’¤æ¶ˆè®¢å•è‚¡æ•°ï¼Œè¡¥å……ä¸‹å•è‚¡æ•°(æ¶¨åœä»·)"""
         assert type(share) is int and share > 0
         assert share % 100 == 0
         if not self._stock_pool.has_key(stock):
-            raise AcquireError("¹ÉÆ±³ØÖĞÃ»ÓĞ¶ÔÓ¦¹ÉÆ±")
+            raise AcquireError("è‚¡ç¥¨æ± ä¸­æ²¡æœ‰å¯¹åº”è‚¡ç¥¨")
             return [],[],0
 
-        order_dict = self._stock_pool[stock]["¶©µ¥ÁĞ±í"]
+        order_dict = self._stock_pool[stock]["è®¢å•åˆ—è¡¨"]
         sorted_dict = sorted(order_dict.items(), key=lambda d:d[1], reverse=True)
         
         keys = [ i[0] for i in sorted_dict ]
@@ -43,7 +43,7 @@ class StockPool():
         out_value_list = []
         if sum(values) < share:
             # raise exception
-            raise AcquireError("¹ÉÆ±³ØÖĞ¹ÉÆ±ÊıÁ¿²»×ã")
+            raise AcquireError("è‚¡ç¥¨æ± ä¸­è‚¡ç¥¨æ•°é‡ä¸è¶³")
             return [],[],0
         for i in range(len(sorted_dict)):
             if not greater_pos:
@@ -74,7 +74,7 @@ class StockPool():
                         out_value_list.append(values[i])
                         continue
 
-            # ÁĞ±íÖĞÔªËØÖµĞ¡ÓÚÄ¿±êÖµµÄÎ»ÖÃ
+            # åˆ—è¡¨ä¸­å…ƒç´ å€¼å°äºç›®æ ‡å€¼çš„ä½ç½®
             if share == values[i]:
                 out_key_list.append(keys[i])
                 out_value_list.append(values[i])
@@ -93,7 +93,7 @@ class StockPool():
                     return out_key_list,out_value_list,0
 
     def addStock(self, stock_code, upper_limit):
-        """ÔÚ¹ÉÆ±³ØÖĞÔö¼Óµ¥Ö»¹ÉÆ±"""
+        """åœ¨è‚¡ç¥¨æ± ä¸­å¢åŠ å•åªè‚¡ç¥¨"""
         if type(stock_code) is not list:
             stock_code = [stock_code]
         if type(upper_limit) is not list:
@@ -104,9 +104,9 @@ class StockPool():
             _upper_limit = upper_limit[i]
             assert type(_upper_limit) is int and _upper_limit >= 0
             stock = {
-                     "ÈÚÈ¯ÊıÁ¿": 0,
-                     "ÈÚÈ¯ÉÏÏŞ": _upper_limit,
-                     "¶©µ¥ÁĞ±í": {}
+                     "èåˆ¸æ•°é‡": 0,
+                     "èåˆ¸ä¸Šé™": _upper_limit,
+                     "è®¢å•åˆ—è¡¨": {}
                     }
             self._stock_pool[stock_code[i]] = stock
 
@@ -114,43 +114,43 @@ class StockPool():
         return self._stock_pool
 
     def addOrder(self, stock_code, order_id, order_price, order_share, order_type):
-        """ Ïò¶©µ¥ÁĞ±íÔö¼Ó¶©µ¥ """
+        """ å‘è®¢å•åˆ—è¡¨å¢åŠ è®¢å• """
         pool = self._stock_pool
 
-        harden_price = c_query("ÕÇÍ£¼Û", stock_code)
+        harden_price = c_query("æ¶¨åœä»·", stock_code)
         #print stock_code, harden_price, order_price, order_type
-        if order_type == "ÈÚÈ¯Âô³ö" and order_price == harden_price:
+        if order_type == "èåˆ¸å–å‡º" and order_price == harden_price:
             if not pool.has_key(stock_code):
-                pool[stock_code] = {"ÈÚÈ¯ÉÏÏŞ":order_share,
-                                    "ÈÚÈ¯ÊıÁ¿":order_share,
-                                    "¶©µ¥ÁĞ±í":{order_id:order_share}
+                pool[stock_code] = {"èåˆ¸ä¸Šé™":order_share,
+                                    "èåˆ¸æ•°é‡":order_share,
+                                    "è®¢å•åˆ—è¡¨":{order_id:order_share}
                                     }
                 return
-            # Ö¤È¯ÔÚ¹ÉÆ±³ØÖĞ
+            # è¯åˆ¸åœ¨è‚¡ç¥¨æ± ä¸­
             pool = pool[stock_code]
-            if not pool["¶©µ¥ÁĞ±í"].has_key(order_id):
-                pool["¶©µ¥ÁĞ±í"][order_id] = order_share
-                pool["ÈÚÈ¯ÊıÁ¿"] += order_share
-                if pool["ÈÚÈ¯ÊıÁ¿"] > pool["ÈÚÈ¯ÉÏÏŞ"]:
-                    pool["ÈÚÈ¯ÉÏÏŞ"] = pool["ÈÚÈ¯ÊıÁ¿"]
+            if not pool["è®¢å•åˆ—è¡¨"].has_key(order_id):
+                pool["è®¢å•åˆ—è¡¨"][order_id] = order_share
+                pool["èåˆ¸æ•°é‡"] += order_share
+                if pool["èåˆ¸æ•°é‡"] > pool["èåˆ¸ä¸Šé™"]:
+                    pool["èåˆ¸ä¸Šé™"] = pool["èåˆ¸æ•°é‡"]
 
     def removeOrder(self, order_id):
         for k,v in self._stock_pool.iteritems():
-            if v["¶©µ¥ÁĞ±í"].has_key(order_id):
-                v["¶©µ¥ÁĞ±í"].pop(order_id)
+            if v["è®¢å•åˆ—è¡¨"].has_key(order_id):
+                v["è®¢å•åˆ—è¡¨"].pop(order_id)
                 return True
         return False
     
     def setUpperLimit(self, stock_code, max_shares):
-        """ ÉèÖÃ¹ÉÆ±³ØÖĞÄ³Ö»¹ÉÆ±´æ´¢ÉÏÏŞ """
+        """ è®¾ç½®è‚¡ç¥¨æ± ä¸­æŸåªè‚¡ç¥¨å­˜å‚¨ä¸Šé™ """
         assert type(max_shares) is int and max_shares > 0
         if self._stock_pool.has_key(stock_code):
-            self._stock_pool[stock_code]["ÈÚÈ¯ÉÏÏŞ"] = max_shares
+            self._stock_pool[stock_code]["èåˆ¸ä¸Šé™"] = max_shares
 
     def getUpperLimit(self, stock_code):
-        """ »ñÈ¡¹ÉÆ±³ØÖĞÄ³Ö»¹ÉÆ±´æ´¢ÉÏÏŞ """
+        """ è·å–è‚¡ç¥¨æ± ä¸­æŸåªè‚¡ç¥¨å­˜å‚¨ä¸Šé™ """
         if self._stock_pool.has_key(stock_code):
-            return self._stock_pool[stock_code]["ÈÚÈ¯ÉÏÏŞ"]
+            return self._stock_pool[stock_code]["èåˆ¸ä¸Šé™"]
         else:
             return 0
 
@@ -158,30 +158,30 @@ class StockPool():
         pass
 
     def sync(self):
-        """ Óë·şÎñÆ÷Í¬²½¹ÉÆ±³Ø """
+        """ ä¸æœåŠ¡å™¨åŒæ­¥è‚¡ç¥¨æ±  """
         self._stock_pool = {}
         try:
-            rst = c_query("¿É³·µ¥")
+            rst = c_query("å¯æ’¤å•")
         except QueryError as e:
             return
 
-        # ÕûÀíÖØ¸´¶©µ¥ {Ö¤È¯´úÂë£º[¶©µ¥ĞÅÏ¢]}
+        # æ•´ç†é‡å¤è®¢å• {è¯åˆ¸ä»£ç ï¼š[è®¢å•ä¿¡æ¯]}
         for record in rst:
-            stock_code = record["Ö¤È¯´úÂë"]
-            order_id = record["ºÏÍ¬±àºÅ"]
-            order_type = record["ÂòÂô±êÖ¾"]
-            ndigits = len(record["Î¯ÍĞ¼Û¸ñ"].split('.')[1])
-            order_price = round(float(record["Î¯ÍĞ¼Û¸ñ"]), ndigits)
-            order_share = int(float(record["Î¯ÍĞÊıÁ¿"]))
+            stock_code = record["è¯åˆ¸ä»£ç "]
+            order_id = record["åˆåŒç¼–å·"]
+            order_type = record["ä¹°å–æ ‡å¿—"]
+            ndigits = len(record["å§”æ‰˜ä»·æ ¼"].split('.')[1])
+            order_price = round(float(record["å§”æ‰˜ä»·æ ¼"]), ndigits)
+            order_share = int(float(record["å§”æ‰˜æ•°é‡"]))
             self.addOrder(stock_code,order_id,order_price,order_share,order_type)
 
         
     def fill(self, stock_code, share):
-        """ ´Ó·şÎñÆ÷»ñÈ¡¹ÉÆ± """
+        """ ä»æœåŠ¡å™¨è·å–è‚¡ç¥¨ """
         assert type(share) is int and share > 0
         assert isValidStockCode(stock_code)
 
-        raising_price = c_query("ÕÇÍ£¼Û", stock_code)
+        raising_price = c_query("æ¶¨åœä»·", stock_code)
         try:
             rst = self._tradeApi.Short(stock_code, raising_price, share)
         except TradeError as e:
@@ -197,8 +197,8 @@ class StockPool():
         rst = self._tradeApi.CancelOrder(marketId, i)
 
         if s > 0:
-            raising_price = c_query("ÕÇÍ£¼Û", stock_code)
-            ## TODO: 20 Ó¦¸ÃÅäÖÃ³É²ÎÊı
+            raising_price = c_query("æ¶¨åœä»·", stock_code)
+            ## TODO: 20 åº”è¯¥é…ç½®æˆå‚æ•°
             for x in range(20):
                 try:
                     rst = self._tradeApi.SendOrders([3]*2, [stock_code]*2, [raising_price,price], [s,share])
@@ -214,11 +214,11 @@ class StockPool():
                 return rst
     
     def lock(self, stock, share):
-        """ Âòµ¥Ëø¶¨¹ÉÆ± """
+        """ ä¹°å•é”å®šè‚¡ç¥¨ """
         pass
 
     def unLock(self, stock, share):
-        """ ½âËø¹ÉÆ± """
+        """ è§£é”è‚¡ç¥¨ """
         pass
 
 if __name__ == "__main__":
@@ -231,6 +231,6 @@ if __name__ == "__main__":
     ss = sp.getStocks()
     print ss
     for k in ss:
-        print k,ss[k]["ÈÚÈ¯ÊıÁ¿"],ss[k]["ÈÚÈ¯ÉÏÏŞ"],ss[k]["¶©µ¥ÁĞ±í"]
+        print k,ss[k]["èåˆ¸æ•°é‡"],ss[k]["èåˆ¸ä¸Šé™"],ss[k]["è®¢å•åˆ—è¡¨"]
 
     #print sp.acquire("601318",100)

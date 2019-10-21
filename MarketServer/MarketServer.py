@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 
 import tornado.httpserver
 import tornado.ioloop
@@ -25,7 +25,7 @@ class QueryHandler(tornado.web.RequestHandler, Receiver):
     @tornado.web.asynchronous
     def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
-        # TODO: 不用线程异常栈不同，应该由Command自行处理异常
+        # TODO: 涓嶇敤绾跨▼寮傚父鏍堜笉鍚岋紝搴旇鐢盋ommand鑷澶勭悊寮傚父
         try:
             catalogues = self.get_argument('catalogues')
             if catalogues == u"quote10":

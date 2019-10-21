@@ -1,27 +1,28 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 
 from ctypes import *
 import sys
 sys.path.append("..")
-
 from common.error import *
 from common.utils import *
 from common.utils import c_array
 from common.resultbuffer import *
-import os,datetime,time
+import os
+
 
 @Singleton
 class MarketApi(Singleton):
+
     def __init__(self):
         self._ip = ""
         self._port = None
         self._isConnected = False
-        # Ê§°ÜÅ×³öWindowsErrorÒì³£
+        # å¤±è´¥æŠ›å‡ºWindowsErrorå¼‚å¸¸
         path = os.path.split(os.path.realpath(__file__))[0]
         self._dll = windll.LoadLibrary(path + '\\market.dll')
 
     def Connect(self, ip, port):
-        """ Á¬½Ó·şÎñÆ÷ """
+        """ è¿æ¥æœåŠ¡å™¨ """
         assert(isValidIpAddress(ip))
         assert(type(port) is int)
         self._ip = ip
@@ -34,13 +35,14 @@ class MarketApi(Singleton):
 
     def isConnected(self):
         return self._isConnected
-    
+
     def Disconnect(self):
         if self._isConnected:
             self._dll.TdxL2Hq_Disconnect()
+            self._isConnected = False
 
     def GetQuotes5(self, stocks):
-        u""" »ñµÃÎåµµĞĞÇé """
+        u""" è·å¾—äº”æ¡£è¡Œæƒ… """
         assert type(stocks) in [list, str]
         assert self.isConnected()
 
@@ -56,16 +58,17 @@ class MarketApi(Singleton):
         c_count.value = count
         c_count_ref = byref(c_count)
         rst = ResultBuffer()
-        self._dll.TdxL2Hq_GetSecurityQuotes(c_markets, c_stocks, c_count_ref, rst.Result, rst.ErrInfo)
+        self._dll.TdxL2Hq_GetSecurityQuotes(
+            c_markets, c_stocks, c_count_ref, rst.Result, rst.ErrInfo)
         if not rst:
-            raise QueryError("ÎåµµĞĞÇé",rst[0])
+            raise QueryError("äº”æ¡£è¡Œæƒ…", rst[0])
         return rst[0]
 
     def GetQuotes10(self, stocks):
-        u""" »ñµÃÊ®µµ±¨¼Û """
+        u""" è·å¾—åæ¡£æŠ¥ä»· """
         assert self.isConnected()
         assert type(stocks) in [list, str]
-        
+
         if type(stocks) is str:
             stocks = [stocks]
         count = len(stocks)
@@ -77,100 +80,107 @@ class MarketApi(Singleton):
         c_count = c_short(count)
         c_count_ref = byref(c_count)
         rst = ResultBuffer()
-        self._dll.TdxL2Hq_GetSecurityQuotes10(c_markets, c_stocks, c_count_ref, rst.Result, rst.ErrInfo)
+        self._dll.TdxL2Hq_GetSecurityQuotes10(
+            c_markets, c_stocks, c_count_ref, rst.Result, rst.ErrInfo)
         if not rst:
-            raise QueryError("Ê®µµĞĞÇé", rst[0])
+            raise QueryError("åæ¡£è¡Œæƒ…", rst[0])
         return rst[0]
 
     def GetMinuteTimeData(self, stock):
-        u""" »ñÈ¡·ÖÊ±Êı¾İ """
+        u""" è·å–åˆ†æ—¶æ•°æ® """
         assert self.isConnected()
         assert(isValidStockCode(stock))
 
         market = c_byte(getMarketID(stock))
         rst = ResultBuffer()
-        self._dll.TdxL2Hq_GetMinuteTimeData(market, stock, rst.Result, rst.ErrInfo)
+        self._dll.TdxL2Hq_GetMinuteTimeData(
+            market, stock, rst.Result, rst.ErrInfo)
         if not rst:
-            raise QueryError("·ÖÊ±Êı¾İ", rst[0])
+            raise QueryError("åˆ†æ—¶æ•°æ®", rst[0])
         return rst[0]
 
     def GetTransactionData(self, stock, start, count):
-        u""" »ñÈ¡Öğ±È³É½»Êı¾İ """
+        u""" è·å–é€æ¯”æˆäº¤æ•°æ® """
         assert self.isConnected()
         assert(isValidStockCode(stock))
         assert(type(start) is int and start >= 0)
-        
+
         market = c_byte(getMarketID(stock))
         count_ref = byref(c_short(count))
         rst = ResultBuffer()
-        self._dll.TdxL2Hq_GetTransactionData(market, stock, start, count_ref, rst.Result, rst.ErrInfo)
+        self._dll.TdxL2Hq_GetTransactionData(
+            market, stock, start, count_ref, rst.Result, rst.ErrInfo)
         if not rst:
-            raise QueryError("Öğ±È³É½»", rst[0])
+            raise QueryError("é€æ¯”æˆäº¤", rst[0])
         return rst[0]
 
     def GetDetailTransactionData(self, stock, start, count):
-        u""" »ñÈ¡Öğ±È³É½»Êı¾İ """
+        u""" è·å–é€æ¯”æˆäº¤æ•°æ® """
         assert self.isConnected()
         assert(isValidStockCode(stock))
         assert(type(start) is int and start >= 0)
-        
+
         market = c_byte(getMarketID(stock))
         count_ref = byref(c_short(count))
         rst = ResultBuffer()
-        self._dll.TdxL2Hq_GetDetailTransactionData(market, stock, start, count_ref, rst.Result, rst.ErrInfo)
+        self._dll.TdxL2Hq_GetDetailTransactionData(
+            market, stock, start, count_ref, rst.Result, rst.ErrInfo)
         if not rst:
-            raise QueryError("Öğ±È³É½»", rst[0])
+            raise QueryError("é€æ¯”æˆäº¤", rst[0])
         return rst[0]
 
     def GetSecurityCount(self, market):
-        u""" »ñµÃ¹ÉÆ±ÊıÁ¿ ·µ»Ø¹ÉÆ±ÊıÁ¿ """
+        u""" è·å¾—è‚¡ç¥¨æ•°é‡ è¿”å›è‚¡ç¥¨æ•°é‡ """
         assert self.isConnected()
         res = ResultBuffer()
         count = c_short()
         count_ref = byref(count)
         self._dll.TdxL2Hq_GetSecurityCount(market, count_ref, res.ErrInfo)
         if not res:
-            raise QueryError("¹ÉÆ±ÊıÁ¿", rst[0], market=market)
+            raise QueryError("è‚¡ç¥¨æ•°é‡", rst[0], market=market)
         return count.value
 
     def GetSecurityList(self, market, start):
-        u""" »ñµÃstart¿ªÊ¼1000Ö§¹ÉÆ±´úÂë """
+        u""" è·å¾—startå¼€å§‹1000æ”¯è‚¡ç¥¨ä»£ç  """
         assert self.isConnected()
         res = ResultBuffer()
-        _strat = c_short(start)
+        _start = c_short(start)
         _count = c_short()
         _count_ref = byref(_count)
-        self._dll.TdxL2Hq_GetSecurityList(market, start, _count_ref, res.Result, res.ErrInfo)
+        self._dll.TdxL2Hq_GetSecurityList(
+            market, _start, _count_ref, res.Result, res.ErrInfo)
         if not res:
-            raise QueryError("¹ÉÆ±´úÂë", res[0])
-        # TODO£º´¦Àí·µ»ØÊıÁ¿
+            raise QueryError("è‚¡ç¥¨ä»£ç ", res[0])
+        # TODOï¼šå¤„ç†è¿”å›æ•°é‡
         return res[0]
-        
+
     def __del__(self):
         self.Disconnect()
 
-def GetIndexBars(self):
-    pass
-    #TdxL2Hq_GetIndexBars()
+    def GetIndexBars(self):
+        pass
+        # TdxL2Hq_GetIndexBars()
 
 if __name__ == "__main__":
-    import os, msvcrt, signal
+    import msvcrt
+    import signal
+
     def OnExit(signum, frame):
-        print u"°´ÈÎÒâ¼üÍË³ö"
+        print u"æŒ‰ä»»æ„é”®é€€å‡º"
         msvcrt.getch()
         lv2.Disconnect()
         exit()
 
     signal.signal(signal.SIGINT, OnExit)
     lv2 = MarketApi.Instance()
-    lv2.Connect("119.97.185.4",7709)
+    lv2.Connect("119.97.185.4", 7709)
+
     try:
         rst = lv2.GetMinuteTimeData('600036')
-        print(str(rst.attr).decode("gbk"))
+        print(rst.attr)
         for i in rst.attr:
             print(i)
         print len(rst)
+        lv2.Disconnect()
     except ErrorException as e:
-        print
-
-    lv2.Disconnect()
+        print e

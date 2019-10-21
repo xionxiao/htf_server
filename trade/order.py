@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 
 from ctypes import *
 from Utils import *
@@ -7,24 +7,24 @@ import datetime
 import time
 
 class Order(object):
-    # È¯ÉÌ
+    # åˆ¸å•†
     _securiies_trader = None
-    # ¹É¶«´úÂë
+    # è‚¡ä¸œä»£ç 
     _stock_holder_code = None
-    # ¶©µ¥ÀàĞÍ£¨ÂòÂô±êÖ¾£©
+    # è®¢å•ç±»å‹ï¼ˆä¹°å–æ ‡å¿—ï¼‰
     _type = None
-    # ±¨¼Û·½Ê½
+    # æŠ¥ä»·æ–¹å¼
     _price_type = None
-    # ¹É¶«´úÂë
+    # è‚¡ä¸œä»£ç 
     _stockholder_code = None
-    # ¹ÉÆ±´úÂë
+    # è‚¡ç¥¨ä»£ç 
     _stock_code = None
-    # ¹ÉÊı
+    # è‚¡æ•°
     _shares = None
-    # ÏÂµ¥Ê±¼ä
+    # ä¸‹å•æ—¶é—´
     _place_time = None
-    # ¶©µ¥×´Ì¬
+    # è®¢å•çŠ¶æ€
     _order_status
-    # Î¯ÍĞ±àºÅ
-    # ³É½»±àºÅ
-    # ½»Ò×Ô±ID
+    # å§”æ‰˜ç¼–å·
+    # æˆäº¤ç¼–å·
+    # äº¤æ˜“å‘˜ID

@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 
 from resultbuffer import *
 from _stockcode_hashmap import StockCodeHashmap
@@ -49,7 +49,7 @@ class Singleton:
 class StockCode(object):
     """ fields:
             stock_code: 000001,600036,000625
-            market_id: 1-ÉÏº££¬0-ÉîÛÚ
+            market_id: 1-ä¸Šæµ·ï¼Œ0-æ·±åœ³
     """
     
     __FIX_UPPER_STR = ("SH","SS","SZ")
@@ -59,8 +59,8 @@ class StockCode(object):
             preifx: "sh","SH","sz","SZ","ss","SS"
             code: six diggit begen with [0,1,2,3,5,6,7,8,9]
             suffix: "sh","SH","sz","SZ","ss","SS"
-            "SS","SH": »¦ÊĞ
-            "SZ": ÉîÊĞ
+            "SS","SH": æ²ªå¸‚
+            "SZ": æ·±å¸‚
         e.g. "600036", "sh600036", "600036.sh"
         """
         spstr = code.split('.')
@@ -97,7 +97,7 @@ class StockCode(object):
 
     def getMarketId(self, byName=False):
         if byName:
-            return "»¦ÊĞ" if self.market_id is 1 else "ÉîÊĞ"
+            return "æ²ªå¸‚" if self.market_id is 1 else "æ·±å¸‚"
         else:
             return self.market_id
     
@@ -121,14 +121,14 @@ def isValidDate(date):
 
 
 def getMarketID(stock, byName=False):
-    u""" ÅĞ¶Ï¹ÉÆ±ÊĞ³¡£º ·µ»Ø 1-ÉÏº£  0-ÉîÛÚ  ´íÎó´úÂë½«µ¯³öÒì³£"""
+    u""" åˆ¤æ–­è‚¡ç¥¨å¸‚åœºï¼š è¿”å› 1-ä¸Šæµ·  0-æ·±åœ³  é”™è¯¯ä»£ç å°†å¼¹å‡ºå¼‚å¸¸"""
     if stock[0] in ('5','6'):
         if byName:
-            return "»¦ÊĞ"
+            return "æ²ªå¸‚"
         return 1
-    else: # 0,2,3,5,6,7,8,9 ´´Òµ°åÎªÉîÛÚ
+    else: # 0,2,3,5,6,7,8,9 åˆ›ä¸šæ¿ä¸ºæ·±åœ³
         if byName:
-            return "ÉîÊĞ"
+            return "æ·±å¸‚"
         return 0
 
 
@@ -156,8 +156,8 @@ def dumpUTF8Json(obj):
 
 
 def round_up_decimal(number, ndigits=2):
-    """ ĞŞ¸´python round()ËÄÉáÁùÈëÎÊÌâ,Ä¬ÈÏ±£ÁôÁ½Î»Ğ¡Êı
-        number ¿ÉÎªÊı×Ö»ò×Ö·û´®
+    """ ä¿®å¤python round()å››èˆå…­å…¥é—®é¢˜,é»˜è®¤ä¿ç•™ä¸¤ä½å°æ•°
+        number å¯ä¸ºæ•°å­—æˆ–å­—ç¬¦ä¸²
     """
     decimal.getcontext().rounding = decimal.ROUND_HALF_UP
     format_str = '{:.' + str(ndigits) + 'f}'

@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 
 from ctypes import *
 import sys,os
@@ -14,7 +14,7 @@ class TradeApi():
         self._clientId = -1
         self._ip = ""
         self._port = None
-        self._shareholder = {"»¦ÊĞ":None, "ÉîÊĞ":None} # ¹É¶«´úÂë
+        self._shareholder = {"æ²ªå¸‚":None, "æ·±å¸‚":None} # è‚¡ä¸œä»£ç 
         # When load fails this may throw WindowsError exception
         path = os.path.split(os.path.realpath(__file__))[0]
         self._dll = windll.LoadLibrary(path + "\\trade.dll")
@@ -32,7 +32,7 @@ class TradeApi():
         self._dll.CloseTdx()
     
     def Logon(self, ip, port, branch, account, password, tradeAccount="", TxPassword="", version="9.01"):
-        u""" µÇÂ¼·şÎñÆ÷ """
+        u""" ç™»å½•æœåŠ¡å™¨ """
         assert isValidIpAddress(ip)
         assert type(port) is int
         assert type(account) is str
@@ -49,14 +49,14 @@ class TradeApi():
         self._clientId = client
         self._ip = ip
         self._port = port
-        # »ñµÃ¹É¶«´úÂë
+        # è·å¾—è‚¡ä¸œä»£ç 
         rst = self.QueryData(5)
-        if rst[0]["¹É¶«´úÂë"][0] == "E":
-            self._shareholder["»¦ÊĞ"] = rst[0]["¹É¶«´úÂë"]
-            self._shareholder["ÉîÊĞ"] = rst[1]["¹É¶«´úÂë"]
-        elif rst[0]["¹É¶«´úÂë"][0] == "0":
-            self._shareholder["»¦ÊĞ"] = rst[1]["¹É¶«´úÂë"]
-            self._shareholder["ÉîÊĞ"] = rst[0]["¹É¶«´úÂë"]
+        if rst[0]["è‚¡ä¸œä»£ç "][0] in ("E", "A"):
+            self._shareholder["æ²ªå¸‚"] = rst[0]["è‚¡ä¸œä»£ç "]
+            self._shareholder["æ·±å¸‚"] = rst[1]["è‚¡ä¸œä»£ç "]
+        elif rst[0]["è‚¡ä¸œä»£ç "][0] == "0":
+            self._shareholder["æ²ªå¸‚"] = rst[1]["è‚¡ä¸œä»£ç "]
+            self._shareholder["æ·±å¸‚"] = rst[0]["è‚¡ä¸œä»£ç "]
         else:
             raise LogonError(ip, port, rst, extra="wrong shareholder")
     
@@ -66,13 +66,13 @@ class TradeApi():
             self._clientId = -1
 
     def isLogon(self):
-        u""" ¼ì²éÊÇ·ñÒÑµÇÂ¼ """
-        # Èç¹û clientId Ê§Ğ§£¬ÔÚµ÷ÓÃÆäËûAPIÊ±»áÅ×³öWindowsErrorÒì³££¬ Error -1073741816
+        u""" æ£€æŸ¥æ˜¯å¦å·²ç™»å½• """
+        # å¦‚æœ clientId å¤±æ•ˆï¼Œåœ¨è°ƒç”¨å…¶ä»–APIæ—¶ä¼šæŠ›å‡ºWindowsErrorå¼‚å¸¸ï¼Œ Error -1073741816
         return bool(self._clientId != -1)
     
     def QueryData(self, category):
-        u""" ²éÑ¯¸÷ÖÖ½»Ò×Êı¾İ
-             0×Ê½ğ  1¹É·İ   2µ±ÈÕÎ¯ÍĞ  3µ±ÈÕ³É½»    4¿É³·µ¥   5¹É¶«´úÂë  6ÈÚ×ÊÓà¶î   7ÈÚÈ¯Óà¶î  8¿ÉÈÚÖ¤È¯
+        u""" æŸ¥è¯¢å„ç§äº¤æ˜“æ•°æ®
+             0èµ„é‡‘  1è‚¡ä»½   2å½“æ—¥å§”æ‰˜  3å½“æ—¥æˆäº¤    4å¯æ’¤å•   5è‚¡ä¸œä»£ç   6èèµ„ä½™é¢   7èåˆ¸ä½™é¢  8å¯èè¯åˆ¸
         """
         
         assert self.isLogon()
@@ -86,9 +86,9 @@ class TradeApi():
         return res[0]
 
     def QueryDatas(self, categories):
-        u""" ²éÑ¯¸÷ÖÖ½»Ò×Êı¾İ:
+        u""" æŸ¥è¯¢å„ç§äº¤æ˜“æ•°æ®:
              categories is query type list.
-             0×Ê½ğ  1¹É·İ   2µ±ÈÕÎ¯ÍĞ  3µ±ÈÕ³É½»    4¿É³·µ¥   5¹É¶«´úÂë  6ÈÚ×ÊÓà¶î   7ÈÚÈ¯Óà¶î  8¿ÉÈÚÖ¤È¯
+             0èµ„é‡‘  1è‚¡ä»½   2å½“æ—¥å§”æ‰˜  3å½“æ—¥æˆäº¤    4å¯æ’¤å•   5è‚¡ä¸œä»£ç   6èèµ„ä½™é¢   7èåˆ¸ä½™é¢  8å¯èè¯åˆ¸
         """
         assert self.isLogon()
         assert type(categories) is list
@@ -105,9 +105,9 @@ class TradeApi():
         return res.getResults()
 
     def QueryHistoryData(self, histQueryType, startDate, endDate):
-        u""" ²éÑ¯ÀúÊ·½»Ò×Êı¾İ£º
-             0ÀúÊ·Î¯ÍĞ  1ÀúÊ·³É½»   2½»¸îµ¥
-             ÈÕÆÚ¸ñÊ½: 20140301
+        u""" æŸ¥è¯¢å†å²äº¤æ˜“æ•°æ®ï¼š
+             0å†å²å§”æ‰˜  1å†å²æˆäº¤   2äº¤å‰²å•
+             æ—¥æœŸæ ¼å¼: 20140301
         """
         assert self.isLogon()
         assert histQueryType in range(3) # 0-3
@@ -121,7 +121,7 @@ class TradeApi():
         return res[0]
 
     def GetQuote(self, stocks):
-        u""" ²éÑ¯ĞĞÇéÊı¾İ """
+        u""" æŸ¥è¯¢è¡Œæƒ…æ•°æ® """
         assert self.isLogon()
         assert type(stocks) in [str, list]
         
@@ -143,7 +143,7 @@ class TradeApi():
                 raise BatchQueryError("quote", res[0], stock=stocks) 
             return res[0]
 
-    # »ñÈ¡¹É¶«´úÂë
+    # è·å–è‚¡ä¸œä»£ç 
     def _getShareholderID(self, stock):
         market_id = getMarketID(stock, True)
         return self._shareholder[market_id]
@@ -151,24 +151,24 @@ class TradeApi():
     def SendOrder(self, category, stock, price, quantity, priceType=0, shareholder=''):
         u"""
         category:
-            # 0ÂòÈë
-            # 1Âô³ö
-            # 2ÈÚ×ÊÂòÈë
-            # 3ÈÚÈ¯Âô³ö
-            # 4ÂòÈ¯»¹È¯
-            # 5ÂôÈ¯»¹¿î
-            # 6ÏÖÈ¯»¹È¯
+            # 0ä¹°å…¥
+            # 1å–å‡º
+            # 2èèµ„ä¹°å…¥
+            # 3èåˆ¸å–å‡º
+            # 4ä¹°åˆ¸è¿˜åˆ¸
+            # 5å–åˆ¸è¿˜æ¬¾
+            # 6ç°åˆ¸è¿˜åˆ¸
         priceType:
-            # 0ÉÏº£ÏŞ¼ÛÎ¯ÍĞ ÉîÛÚÏŞ¼ÛÎ¯ÍĞ
-            # 1(ÊĞ¼ÛÎ¯ÍĞ)ÉîÛÚ¶Ô·½×îÓÅ¼Û¸ñ
-            # 2(ÊĞ¼ÛÎ¯ÍĞ)ÉîÛÚ±¾·½×îÓÅ¼Û¸ñ
-            # 3(ÊĞ¼ÛÎ¯ÍĞ)ÉîÛÚ¼´Ê±³É½»Ê£Óà³·Ïú
-            # 4(ÊĞ¼ÛÎ¯ÍĞ)ÉÏº£Îåµµ¼´³ÉÊ£³· ÉîÛÚÎåµµ¼´³ÉÊ£³·
-            # 5(ÊĞ¼ÛÎ¯ÍĞ)ÉîÛÚÈ«¶î³É½»»ò³·Ïú
-            # 6(ÊĞ¼ÛÎ¯ÍĞ)ÉÏº£Îåµµ¼´³É×ªÏŞ¼Û
+            # 0ä¸Šæµ·é™ä»·å§”æ‰˜ æ·±åœ³é™ä»·å§”æ‰˜
+            # 1(å¸‚ä»·å§”æ‰˜)æ·±åœ³å¯¹æ–¹æœ€ä¼˜ä»·æ ¼
+            # 2(å¸‚ä»·å§”æ‰˜)æ·±åœ³æœ¬æ–¹æœ€ä¼˜ä»·æ ¼
+            # 3(å¸‚ä»·å§”æ‰˜)æ·±åœ³å³æ—¶æˆäº¤å‰©ä½™æ’¤é”€
+            # 4(å¸‚ä»·å§”æ‰˜)ä¸Šæµ·äº”æ¡£å³æˆå‰©æ’¤ æ·±åœ³äº”æ¡£å³æˆå‰©æ’¤
+            # 5(å¸‚ä»·å§”æ‰˜)æ·±åœ³å…¨é¢æˆäº¤æˆ–æ’¤é”€
+            # 6(å¸‚ä»·å§”æ‰˜)ä¸Šæµ·äº”æ¡£å³æˆè½¬é™ä»·
          """
         
-        # ²ÎÊı¼ì²é
+        # å‚æ•°æ£€æŸ¥
         assert self.isLogon()
         assert type(category) is int and category in range(7) # 0-6
         assert type(priceType) is int and priceType in range(7) # 0-6
@@ -177,7 +177,7 @@ class TradeApi():
         assert type(quantity) is int and quantity > 0
         
         res = ResultBuffer()
-        # ´¦Àí¹É¶«´úÂë
+        # å¤„ç†è‚¡ä¸œä»£ç 
         shareholder = self._getShareholderID(stock)
         self._dll.SendOrder(self._clientId, category, priceType, shareholder, stock, c_float(price), quantity, res.Result, res.ErrInfo)
         if not res:
@@ -185,7 +185,7 @@ class TradeApi():
         return res[0]
 
     def SendOrders(self, categories, stocks, prices, quantities, priceTypes=[0], shareholder=['']):
-        u""" ÅúÁ¿ÏÂµ¥½Ó¿Ú """
+        u""" æ‰¹é‡ä¸‹å•æ¥å£ """
         assert self.isLogon()
         assert type(categories) is list
         assert type(stocks) is list
@@ -271,47 +271,47 @@ class TradeApi():
     def Short(self, zqdm, price, share):
         return self.SendOrder(3, zqdm, price, share)
 
-    # ²éÑ¯ÀàĞÍ
-    QUERY_TYPE = ("×Ê½ğ",  # 0
-                  "¹É·İ",  # 1 
-                  "µ±ÈÕÎ¯ÍĞ",  # 2
-                  "µ±ÈÕ³É½»",  # 3
-                  "¿É³·µ¥",  # 4
-                  "¹É¶«´úÂë",  # 5
-                  "ÈÚ×ÊÓà¶î",  # 6
-                  "ÈÚÈ¯Óà¶î",  # 7
-                  "¿ÉÈÚÖ¤È¯"   # 8
+    # æŸ¥è¯¢ç±»å‹
+    QUERY_TYPE = ("èµ„é‡‘",  # 0
+                  "è‚¡ä»½",  # 1 
+                  "å½“æ—¥å§”æ‰˜",  # 2
+                  "å½“æ—¥æˆäº¤",  # 3
+                  "å¯æ’¤å•",  # 4
+                  "è‚¡ä¸œä»£ç ",  # 5
+                  "èèµ„ä½™é¢",  # 6
+                  "èåˆ¸ä½™é¢",  # 7
+                  "å¯èè¯åˆ¸"   # 8
                   )
     
-    # ÀúÊ·Î¯ÍĞÀàĞÍ
-    HISTORY_QUERY_TYPE = ("ÀúÊ·Î¯ÍĞ", # 0
-                          "ÀúÊ·³É½»", # 1
-                          "½»¸îµ¥", # 2
+    # å†å²å§”æ‰˜ç±»å‹
+    HISTORY_QUERY_TYPE = ("å†å²å§”æ‰˜", # 0
+                          "å†å²æˆäº¤", # 1
+                          "äº¤å‰²å•", # 2
                           )
         
     def Query(self, u_str, *args, **kwargs):
-        u""" ½»Ò×ĞÅÏ¢£º
-                  "×Ê½ğ"       0
-                  "¹É·İ"       1
-                  "µ±ÈÕÎ¯ÍĞ"    2
-                  "µ±ÈÕ³É½»"    3
-                  "¿É³·µ¥"     4
-                  "¹É¶«´úÂë"    5
-                  "ÈÚ×ÊÓà¶î"    6
-                  "ÈÚÈ¯Óà¶î"    7
-                  "¿ÉÈÚÖ¤È¯"    8
+        u""" äº¤æ˜“ä¿¡æ¯ï¼š
+                  "èµ„é‡‘"       0
+                  "è‚¡ä»½"       1
+                  "å½“æ—¥å§”æ‰˜"    2
+                  "å½“æ—¥æˆäº¤"    3
+                  "å¯æ’¤å•"     4
+                  "è‚¡ä¸œä»£ç "    5
+                  "èèµ„ä½™é¢"    6
+                  "èåˆ¸ä½™é¢"    7
+                  "å¯èè¯åˆ¸"    8
 
-           ÀúÊ·Î¯ÍĞ£º ²ÎÊı -- startTime=20150512, endTime=20150513
-                  "ÀúÊ·Î¯ÍĞ"    11
-                  "ÀúÊ·³É½»"    12
-                  "½»¸îµ¥"      13
+           å†å²å§”æ‰˜ï¼š å‚æ•° -- startTime=20150512, endTime=20150513
+                  "å†å²å§”æ‰˜"    11
+                  "å†å²æˆäº¤"    12
+                  "äº¤å‰²å•"      13
 
-           ÎåµµĞĞÇé£º  ²ÎÊı -- stock="000002"
-                  "ĞĞÇé"     21
-                  "×òÊÕ¼Û"    22
-                  "½ñ¿ª¼Û"    23
-                  "µ±Ç°¼Û"    24
-                  "ÕÇÍ£¼Û"    25
+           äº”æ¡£è¡Œæƒ…ï¼š  å‚æ•° -- stock="000002"
+                  "è¡Œæƒ…"     21
+                  "æ˜¨æ”¶ä»·"    22
+                  "ä»Šå¼€ä»·"    23
+                  "å½“å‰ä»·"    24
+                  "æ¶¨åœä»·"    25
         """
         if u_str in self.QUERY_TYPE:
             x = self.QUERY_TYPE.index(u_str)
@@ -324,7 +324,7 @@ class TradeApi():
                 return self.QueryHistoryData(x, args[0], args[1])
             else:
                 return None
-        elif u_str == "ĞĞÇé":
+        elif u_str == "è¡Œæƒ…":
             if len(args) == 1:
                 return self.GetQuote(args[0])
             elif len(args) == 0 and kwargs['stock']:
@@ -337,50 +337,60 @@ if __name__ == "__main__":
     #sys.stdout=f
     try:
         if not api.isLogon():
-            api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
+            # é“¶æ²³è¯åˆ¸
+            api.Logon("219.143.214.201", 7708, 0, "221199993996", "456456", version="2.19")
+            # åæ³°è¯åˆ¸
+            #api.Logon("61.132.54.83", 7708, 0, "666622963937", "001639","", TxPassword="830916", version="6.52")
+            # æ‹›å•†è¯åˆ¸
+            #api.Logon("202.106.83.206", 443, 0, "77810652", "001639", version="2.41")
+            # å®æºè¯åˆ¸
+            #api.Logon("123.127.243.5", 7708, 8021, "100410015652", "830916", version="6.00")
+            
 ##        rst = api.CancelOrder(['1','1'],['4533','4536'])
 ##        print rst
 ##        rst = api.QueryData(5)
 ##        print(rst)
-        #rst = api.Query("×Ê½ğ")
+        #rst = api.Query("èµ„é‡‘")
         #print(rst)
-##        print(rst.attr[4] == "¶³½á×Ê½ğ")
-        #print(u"======== ¹É·İ")
-        #rst = api.Query("¹É·İ")
+##        print(rst.attr[4] == "å†»ç»“èµ„é‡‘")
+        #print(u"======== è‚¡ä»½")
+        #rst = api.Query("è‚¡ä»½")
         #print(rst)
-        #print(u"======== µ±ÈÕÎ¯ÍĞ")
-        #print(api.Query("µ±ÈÕÎ¯ÍĞ"))
-        #print(u"======== µ±ÈÕ³É½»")
-        #print(api.Query("µ±ÈÕ³É½»"))
+        #print(u"======== å½“æ—¥å§”æ‰˜")
+        #print(api.Query("å½“æ—¥å§”æ‰˜"))
+        #print(u"======== å½“æ—¥æˆäº¤")
+        #print(api.Query("å½“æ—¥æˆäº¤"))
         n = 0
         from datetime import datetime
+        import time
         while True:
             print datetime.now()
             n = n + 1
-            print(u"======== ¿É³·µ¥ " + str(n))
-            rst = api.Query("¿É³·µ¥")
-            print(rst)
-##        print(u"======== ¹É¶«´úÂë")
-##        print(api.Query("¹É¶«´úÂë"))
-##        print(u"======== ÈÚ×ÊÓà¶î")
-##        print(api.Query("ÈÚ×ÊÓà¶î"))
-##        #print(u"======== ÈÚÈ¯Óà¶î")
-##        #print(api.Query("ÈÚÈ¯Óà¶î")) # ÏµÍ³Ôİ²»Ö§³Ö¸Ã¹¦ÄÜ
-##        print(u"======== ¿ÉÈÚÖ¤È¯")
-##        print(api.Query("¿ÉÈÚÖ¤È¯"))
+            print(u"======== å¯æ’¤å• " + str(n))
+            time.sleep(10)
+            rst = api.Query("å¯æ’¤å•")
+            #print(rst)
+        #print(u"======== è‚¡ä¸œä»£ç ")
+        #print(api.Query("è‚¡ä¸œä»£ç "))
+        #print(u"======== èèµ„ä½™é¢")
+        #print(api.Query("èèµ„ä½™é¢"))
+        #print(u"======== èåˆ¸ä½™é¢")
+        #print(api.Query("èåˆ¸ä½™é¢")) # ç³»ç»Ÿæš‚ä¸æ”¯æŒè¯¥åŠŸèƒ½
+        #print(u"======== å¯èè¯åˆ¸")
+        #print(api.Query("å¯èè¯åˆ¸"))
 ##
-##        print(u"======== ÀúÊ·Î¯ÍĞ")
+##        print(u"======== å†å²å§”æ‰˜")
 ##        rst = api.QueryHistoryData(0, "20150429", "20150504")
 ##        print(rst)
-##        rst = api.Query("ÀúÊ·Î¯ÍĞ", "20150708", "20150709")
+##        rst = api.Query("å†å²å§”æ‰˜", "20150708", "20150709")
 ##        print(len(rst))
-##        print(u"======== ÀúÊ·³É½»")
-##        print(api.Query("ÀúÊ·³É½»", "20150429", "20150501"))
-##        print(u"======== ½»¸îµ¥")
-##        print(api.Query("½»¸îµ¥", startDate="20150429", endDate="20150501"))
+##        print(u"======== å†å²æˆäº¤")
+##        print(api.Query("å†å²æˆäº¤", "20150429", "20150501"))
+##        print(u"======== äº¤å‰²å•")
+##        print(api.Query("äº¤å‰²å•", startDate="20150429", endDate="20150501"))
 ##
-##        print(u"======== ĞĞÇé")
-##        rst = api.Query("ĞĞÇé", "000002")
+##        print(u"======== è¡Œæƒ…")
+##        rst = api.Query("è¡Œæƒ…", "000002")
 ##        print(rst)
 
         #print api.Repay("1000")
@@ -395,6 +405,7 @@ if __name__ == "__main__":
         #print api.Short("600005", 6.4, 100)
     except ErrorException as e:
         print "!!!!!!!!!!!!!!!!!!!!!"
+        from datetime import datetime
         print datetime.now()
         print e.feedback
     finally:

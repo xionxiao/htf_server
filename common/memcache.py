@@ -1,4 +1,4 @@
-# -*- coding: gbk -*-
+# -*- coding: utf8 -*-
 
 from couchbase.bucket import Bucket
 from couchbase.exceptions import CouchbaseError
@@ -7,7 +7,7 @@ def _toUTF8(ss):
     return ss.decode('gbk').encode('utf8')
 
 class Cache(object):
-    """ 缓存系统 """
+    """ 缂撳瓨绯荤粺 """
 
     def __init__(self, host='localhost', port=12000, debug=0):
         try:
@@ -38,7 +38,7 @@ class Cache(object):
 
 if __name__ == "__main__":
     c = Cache('192.168.1.112',8091)
-    c.set('你好','世界')
-    print c.get('你好')
+    c.set('浣犲ソ','涓栫晫')
+    print c.get('浣犲ソ')
     print c.get('000625')
     
