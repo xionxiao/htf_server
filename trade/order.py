@@ -6,6 +6,7 @@ from ResultBuffer import *
 import datetime
 import time
 
+
 class Order(object):
     # 券商
     _securiies_trader = None

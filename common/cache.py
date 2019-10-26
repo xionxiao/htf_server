@@ -2,8 +2,10 @@
 
 import redis
 
+
 class Cache(object):
-    """ »º´æÏµÍ³ """
+
+    u""" ç¼“å­˜ç³»ç»Ÿ """
 
     def __init__(self, host='localhost', port=6379, db=0):
         try:
@@ -29,4 +31,3 @@ class Cache(object):
 if __name__ == "__main__":
     c = Cache()
     print c.get("000625")
-    

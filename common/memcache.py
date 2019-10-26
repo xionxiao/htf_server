@@ -3,10 +3,13 @@
 from couchbase.bucket import Bucket
 from couchbase.exceptions import CouchbaseError
 
+
 def _toUTF8(ss):
     return ss.decode('gbk').encode('utf8')
 
+
 class Cache(object):
+
     """ 缓存系统 """
 
     def __init__(self, host='localhost', port=12000, debug=0):
@@ -37,8 +40,7 @@ class Cache(object):
 
 
 if __name__ == "__main__":
-    c = Cache('192.168.1.112',8091)
-    c.set('你好','世界')
+    c = Cache('192.168.1.112', 8091)
+    c.set('你好', '世界')
     print c.get('你好')
     print c.get('000625')
-    

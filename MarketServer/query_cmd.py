@@ -1,21 +1,26 @@
 # -*- coding: utf8 -*-
 
-import sys,os,json
+import sys
+import json
+import os
 sys.path.append("..")
 from command import *
 from common.error import *
-from common.utils import dumpUTF8Json,getStockName
+from common.utils import dumpUTF8Json, getStockName
 from common.cache import Cache
 from market import MarketApi
+
 
 def _check_and_reconnect(feedback):
     # TODO:
     # Check in ThreadInvoker
     if feedback.raw == "发送数据失败, 请重新连接服务器":
         lv2 = MarketApi.Instance()
-        lv2.Connect("119.97.185.4",7709)
+        lv2.Connect("119.97.185.4", 7709)
+
 
 class QueryMinuteTimeDataCmd(Command):
+
     def __init__(self, stock, handler):
         Command.__init__(self, handler)
         self._stock = stock
@@ -25,20 +30,22 @@ class QueryMinuteTimeDataCmd(Command):
         try:
             lv2 = MarketApi.Instance()
             rst = lv2.GetMinuteTimeData(self._stock)
-            obj = {"minute":[]}
+            obj = {"minute": []}
             for i in rst:
                 obj["minute"].append(i)
             json_str = dumpUTF8Json(obj)
             self._handler.write(json_str)
         except QueryError as e:
-            err_str = dumpUTF8Json({"error":str(e)})
+            err_str = dumpUTF8Json({"error": str(e)})
             self._handler.write(err_str)
             _check_and_reconnect(e.feedback)
             self.complete()
         else:
             self.complete()
 
+
 class QueryQuote10Cmd(Command):
+
     def __init__(self, stocks, handler):
         Command.__init__(self, handler)
         self._stocks = stocks
@@ -48,23 +55,23 @@ class QueryQuote10Cmd(Command):
         try:
             lv2 = MarketApi.Instance()
             rst = lv2.GetQuotes10(self._stocks)
-            obj = {"quote10":[]}
-            r = Cache()
+            obj = {"quote10": []}
             for i in rst:
                 i["名称"] = getStockName(i["代码"])
                 obj["quote10"].append(i)
             json_str = dumpUTF8Json(obj)
             self._handler.write(json_str)
         except QueryError as e:
-            err_str = dumpUTF8Json({"error":str(e)})
+            err_str = dumpUTF8Json({"error": str(e)})
             self._handler.write(err_str)
             _check_and_reconnect(e.feedback)
             self.complete()
         else:
             self.complete()
-        
+
 
 class QueryQuote5Cmd(Command):
+
     def __init__(self, stocks, handler):
         Command.__init__(self, handler)
         self._stocks = stocks
@@ -74,20 +81,22 @@ class QueryQuote5Cmd(Command):
         try:
             lv2 = MarketApi.Instance()
             rst = lv2.GetQuotes5(self._stocks)
-            json_obj = {"quote5":[]}
+            json_obj = {"quote5": []}
             for i in rst:
                 i["名称"] = getStockName(i["代码"])
                 json_obj["quote5"].append(i)
             json_str = dumpUTF8Json(json_obj)
             self._handler.write(json_str)
         except QueryError as e:
-            err_str = dumpUTF8Json({"error":str(e)})
+            err_str = dumpUTF8Json({"error": str(e)})
             self._handler.write(err_str)
             self.complete()
         else:
             self.complete()
 
+
 class QueryTransactionCmd(Command):
+
     def __init__(self, stock, handler):
         Command.__init__(self, handler)
         self._stock = stock
@@ -101,7 +110,7 @@ class QueryTransactionCmd(Command):
             ret_val = dumpUTF8Json(data)
             self._handler.write(ret_val)
         except QueryError as e:
-            ret_val = dumpUTF8Json({"error":str(e)})
+            ret_val = dumpUTF8Json({"error": str(e)})
             self._handler.write(ret_val)
             self.complete()
         except:
@@ -112,6 +121,7 @@ class QueryTransactionCmd(Command):
 
 
 class QueryTransactionDetailCmd(Command):
+
     def __init__(self, stock, handler):
         Command.__init__(self, handler)
         self._stock = stock
@@ -125,7 +135,7 @@ class QueryTransactionDetailCmd(Command):
             ret_val = dumpUTF8Json(data)
             self._handler.write(ret_val)
         except QueryError as e:
-            ret_val = dumpUTF8Json({"error":str(e)})
+            ret_val = dumpUTF8Json({"error": str(e)})
             self._handler.write(ret_val)
             self.complete()
         except:

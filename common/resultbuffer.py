@@ -2,26 +2,27 @@
 
 from ctypes import *
 from utils import *
-import datetime
 import time
 
 __all__ = ["ResultBuffer", "Feedback", "Result", "Error"]
 
+
 class ResultBuffer(object):
+
     def __init__(self, count=1):
         assert count > 0
         self._ResultList = []
         if count == 1:
-            self.ErrInfo = c_char_p('\000'*256)
-            self.Result = c_char_p('\000'*1024*1024)
+            self.ErrInfo = c_char_p('\000' * 256)
+            self.Result = c_char_p('\000' * 1024 * 1024)
             self.Count = 1
         else:
-            self.ErrInfo = (c_char_p*count)()
-            self.Result = (c_char_p*count)()
+            self.ErrInfo = (c_char_p * count)()
+            self.Result = (c_char_p * count)()
             self.Count = count
             for i in range(count):
-                self.ErrInfo[i] = c_char_p('\000'*256)
-                self.Result[i] = c_char_p('\000'*1024*1024)
+                self.ErrInfo[i] = c_char_p('\000' * 256)
+                self.Result[i] = c_char_p('\000' * 1024 * 1024)
 
     def __len__(self):
         return self.Count
@@ -31,9 +32,11 @@ class ResultBuffer(object):
         if not self._ResultList:
             if self.Count == 1:
                 if self.ErrInfo.value != "":
-                    self._ResultList = [ Error(self.ErrInfo.value.decode("GBK").encode("UTF8")) ]
+                    self._ResultList = [
+                        Error(self.ErrInfo.value.decode("GBK").encode("UTF8"))]
                 else:
-                    self._ResultList = [ Result(self.Result.value.decode("GBK").encode("UTF8")) ]
+                    self._ResultList = [
+                        Result(self.Result.value.decode("GBK").encode("UTF8"))]
             else:
                 for i in range(self.Count):
                     if self.ErrInfo[i] == "":
@@ -55,7 +58,9 @@ class ResultBuffer(object):
                 return False
         return True
 
+
 class Feedback(object):
+
     def __init__(self, result_string):
         self.raw = result_string
 
@@ -65,7 +70,9 @@ class Feedback(object):
     def __str__(self):
         return self.raw
 
+
 class Result(Feedback):
+
     u""" 解析返回结果的二维表格
         Result.attr -> 包含的属性，即表头
         Result[n] -> 返回第n行，结果为dict
@@ -76,10 +83,11 @@ class Result(Feedback):
         Result.items -> 返回数据的列表，列表的元素为dict
         Result.length -> len(Result) 返回有多少条数据（不包括头）
     """
+
     def __init__(self, result_string):
         Feedback.__init__(self, result_string)
         self.attr = []  # list of GBK string
-        self.items = [] # list of dict
+        self.items = []  # list of dict
         self.length = 0
         rows = result_string.split('\n')
         self.attr = rows[0].split('\t')
@@ -90,7 +98,7 @@ class Result(Feedback):
                 dic[self.attr[col]] = row_content[col]
             self.items.append(dic)
         self.length = len(self.items)
-        
+
     def __getitem__(self, index):
         if type(index) is int:
             return self.items[index]
@@ -101,7 +109,7 @@ class Result(Feedback):
         return len(self.items)
 
     def __nonzero__(self):
-        if self.attr: # 只有一行，items=[], length=0
+        if self.attr:  # 只有一行，items=[], length=0
             return True
         else:
             return False
@@ -109,7 +117,9 @@ class Result(Feedback):
     def toUTF8Result(self):
         return Result(self.raw.decode('gbk').encode('utf8'))
 
+
 class Error(Feedback):
+
     def __init__(self, error_string):
         Feedback.__init__(self, error_string)
 
@@ -118,14 +128,15 @@ class Error(Feedback):
 
     def __str__(self):
         return self.raw
-    
+
 if __name__ == "__main__":
     import sys
     sys.path.append("..")
     from trade import TradeApi
     api = TradeApi.Instance()
     if not api.isLogon():
-        api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
+        api.Logon(
+            "219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
     try:
         time.sleep(1)
         rst = api.Query("股份")
@@ -134,7 +145,7 @@ if __name__ == "__main__":
         print(type(rst[0]))
         print(rst[0]["证券名称"])
     except Error as e:
-        print type(e),e
+        print type(e), e
     finally:
         print "Log off"
         api.Logoff()

@@ -6,12 +6,16 @@ from common.utils import *
 from query import c_query
 import time
 
+
 class StockPoolAcquireError(TradeError):
     pass
 
+
 @Singleton
 class StockPool():
-    """ 管理可交易的股票 """    
+
+    """ 管理可交易的股票 """
+
     def __init__(self):
         self._tradeApi = TradeApi.Instance()
         # structure of pooled stocks
@@ -23,51 +27,52 @@ class StockPool():
         #   }
         # }
         self._stock_pool = {}
-        
+
     def acquire(self, stock, share):
         """ 获得相应数目股票, 返回撤消订单号,撤消订单股数，补充下单股数(涨停价)"""
         assert type(share) is int and share > 0
         assert share % 100 == 0
         if not self._stock_pool.has_key(stock):
             raise AcquireError("股票池中没有对应股票")
-            return [],[],0
+            return [], [], 0
 
         order_dict = self._stock_pool[stock]["订单列表"]
-        sorted_dict = sorted(order_dict.items(), key=lambda d:d[1], reverse=True)
-        
-        keys = [ i[0] for i in sorted_dict ]
-        values = [ i[1] for i in sorted_dict ]
-        
+        sorted_dict = sorted(
+            order_dict.items(), key=lambda d: d[1], reverse=True)
+
+        keys = [i[0] for i in sorted_dict]
+        values = [i[1] for i in sorted_dict]
+
         greater_pos = None
         out_key_list = []
         out_value_list = []
         if sum(values) < share:
             # raise exception
             raise AcquireError("股票池中股票数量不足")
-            return [],[],0
+            return [], [], 0
         for i in range(len(sorted_dict)):
             if not greater_pos:
                 if values[i] == share:
                     out_key_list.append(keys[i])
                     out_value_list.append(values[i])
-                    return out_key_list,out_value_list,0
+                    return out_key_list, out_value_list, 0
                 elif values[i] > share:
-                    if i == len(values)-1:
+                    if i == len(values) - 1:
                         out_key_list.append(keys[i])
                         out_value_list.append(values[i])
-                        return out_key_list,out_value_list,values[i]-share
+                        return out_key_list, out_value_list, values[i] - share
                     continue
                 else:
-                    greater_pos = i-1
+                    greater_pos = i - 1
                     s = sum(values[i:])
                     if s == share:
                         out_key_list = keys[i:]
                         out_value_list = values[i:]
-                        return out_key_list,out_value_list,0
+                        return out_key_list, out_value_list, 0
                     elif s < share:
                         out_key_list = keys[greater_pos]
                         out_value_list = values[greater_pos]
-                        return out_key_list,out_value_list,values[greater_pos]-share
+                        return out_key_list, out_value_list, values[greater_pos] - share
                     else:
                         share = share - values[i]
                         out_key_list.append(keys[i])
@@ -78,19 +83,19 @@ class StockPool():
             if share == values[i]:
                 out_key_list.append(keys[i])
                 out_value_list.append(values[i])
-                return out_key_list,out_value_list,0
+                return out_key_list, out_value_list, 0
             elif share < values[i]:
-                if i == len(values)-1:
+                if i == len(values) - 1:
                     out_key_list.append(keys[i])
                     out_value_list.append(values[i])
-                    return out_key_list,out_value_list,values[i]-share
+                    return out_key_list, out_value_list, values[i] - share
                 continue
             else:
                 share = share - values[i]
                 out_key_list.append(keys[i])
                 out_value_list.append(values[i])
                 if share == 0:
-                    return out_key_list,out_value_list,0
+                    return out_key_list, out_value_list, 0
 
     def addStock(self, stock_code, upper_limit):
         """在股票池中增加单只股票"""
@@ -104,10 +109,10 @@ class StockPool():
             _upper_limit = upper_limit[i]
             assert type(_upper_limit) is int and _upper_limit >= 0
             stock = {
-                     "融券数量": 0,
-                     "融券上限": _upper_limit,
-                     "订单列表": {}
-                    }
+                "融券数量": 0,
+                "融券上限": _upper_limit,
+                "订单列表": {}
+            }
             self._stock_pool[stock_code[i]] = stock
 
     def getStocks(self):
@@ -118,12 +123,12 @@ class StockPool():
         pool = self._stock_pool
 
         harden_price = c_query("涨停价", stock_code)
-        #print stock_code, harden_price, order_price, order_type
+        # print stock_code, harden_price, order_price, order_type
         if order_type == "融券卖出" and order_price == harden_price:
             if not pool.has_key(stock_code):
-                pool[stock_code] = {"融券上限":order_share,
-                                    "融券数量":order_share,
-                                    "订单列表":{order_id:order_share}
+                pool[stock_code] = {"融券上限": order_share,
+                                    "融券数量": order_share,
+                                    "订单列表": {order_id: order_share}
                                     }
                 return
             # 证券在股票池中
@@ -135,12 +140,12 @@ class StockPool():
                     pool["融券上限"] = pool["融券数量"]
 
     def removeOrder(self, order_id):
-        for k,v in self._stock_pool.iteritems():
+        for k, v in self._stock_pool.iteritems():
             if v["订单列表"].has_key(order_id):
                 v["订单列表"].pop(order_id)
                 return True
         return False
-    
+
     def setUpperLimit(self, stock_code, max_shares):
         """ 设置股票池中某只股票存储上限 """
         assert type(max_shares) is int and max_shares > 0
@@ -162,7 +167,7 @@ class StockPool():
         self._stock_pool = {}
         try:
             rst = c_query("可撤单")
-        except QueryError as e:
+        except QueryError:
             return
 
         # 整理重复订单 {证券代码：[订单信息]}
@@ -173,9 +178,9 @@ class StockPool():
             ndigits = len(record["委托价格"].split('.')[1])
             order_price = round(float(record["委托价格"]), ndigits)
             order_share = int(float(record["委托数量"]))
-            self.addOrder(stock_code,order_id,order_price,order_share,order_type)
+            self.addOrder(
+                stock_code, order_id, order_price, order_share, order_type)
 
-        
     def fill(self, stock_code, share):
         """ 从服务器获取股票 """
         assert type(share) is int and share > 0
@@ -190,7 +195,7 @@ class StockPool():
 
     def short_frompool(self, stock_code, price, share):
         self.sync()
-        i,c,s = self.acquire(stock_code, share)
+        i, c, s = self.acquire(stock_code, share)
         marketId = str(getMarketID(stock_code))
         if type(i) is list:
             marketId = [marketId] * len(i)
@@ -198,21 +203,21 @@ class StockPool():
 
         if s > 0:
             raising_price = c_query("涨停价", stock_code)
-            ## TODO: 20 应该配置成参数
+            # TODO: 20 应该配置成参数
             for x in range(20):
                 try:
-                    rst = self._tradeApi.SendOrders([3]*2, [stock_code]*2, [raising_price,price], [s,share])
-                except BatchTradeError as e:
+                    rst = self._tradeApi.SendOrders([3] * 2, [stock_code] * 2, [raising_price, price], [s, share])
+                except BatchTradeError:
                     continue
                 return rst
         else:
             for x in range(20):
                 try:
                     rst = self._tradeApi.Short(stock_code, price, share)
-                except TradeError as e:
+                except TradeError:
                     continue
                 return rst
-    
+
     def lock(self, stock, share):
         """ 买单锁定股票 """
         pass
@@ -224,13 +229,14 @@ class StockPool():
 if __name__ == "__main__":
     api = TradeApi.Instance()
     if not api.isLogon():
-        rst = api.Logon("219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
+        rst = api.Logon(
+            "219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
     sp = StockPool.Instance()
-    
+
     sp.sync()
     ss = sp.getStocks()
     print ss
     for k in ss:
-        print k,ss[k]["融券数量"],ss[k]["融券上限"],ss[k]["订单列表"]
+        print k, ss[k]["融券数量"], ss[k]["融券上限"], ss[k]["订单列表"]
 
-    #print sp.acquire("601318",100)
+    # print sp.acquire("601318",100)

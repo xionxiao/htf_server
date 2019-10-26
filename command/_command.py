@@ -3,14 +3,19 @@
 from threading import Thread
 from Queue import Queue
 
+
 class Receiver(object):
+
     """ Command callback object """
+
     def onComplete(self, cmd):
         print("after execute " + str(cmd))
 
+
 class Command(object):
+
     def __init__(self, receiver):
-        self._receiver = receiver 
+        self._receiver = receiver
 
     def execute(self):
         self.complete()
@@ -19,15 +24,19 @@ class Command(object):
         if self._receiver:
             self._receiver.onComplete(self)
 
+
 class Invoker(object):
+
     def __init__(self):
         pass
 
-    def call(self,cmd):
+    def call(self, cmd):
         print("pre execute " + str(cmd))
         cmd.execute()
 
+
 class ThreadInvoker(Invoker, Thread):
+
     def __init__(self, *args, **kwargs):
         Thread.__init__(self, *args, **kwargs)
         self.workQueue = Queue()
@@ -47,6 +56,7 @@ class ThreadInvoker(Invoker, Thread):
 if __name__ == "__main__":
     # TODO: Unit Test
     class BuyCmd(Command):
+
         def __init__(self, stock, price, share, receiver):
             Command.__init__(self, receiver)
 

@@ -4,7 +4,9 @@ import tornado.httpserver
 import tornado.ioloop
 import tornado.options
 import tornado.web
-import sys,os,json,ConfigParser
+import os
+import ConfigParser
+import sys
 sys.path.append("..")
 
 from command import *
@@ -12,16 +14,19 @@ from common.utils import dumpUTF8Json
 from common.error import *
 from query_cmd import *
 from market import MarketApi
-
 from tornado.options import define, options
 
+
 class IndexHandler(tornado.web.RequestHandler):
+
     def get(self):
         self.render("static\\index.html")
+
 
 class QueryHandler(tornado.web.RequestHandler, Receiver):
     _quote_invoker = Invoker()
     _invoker = ThreadInvoker()
+
     @tornado.web.asynchronous
     def get(self):
         self.set_header("Access-Control-Allow-Origin", "*")
@@ -51,7 +56,7 @@ class QueryHandler(tornado.web.RequestHandler, Receiver):
                 cmd = QueryMinuteTimeDataCmd(stock, self)
                 self._invoker.call(cmd)
         except Exception as e:
-            self.write(dumpUTF8Json({'error':str(e)}))
+            self.write(dumpUTF8Json({'error': str(e)}))
             self.finish()
 
     def onComplete(self, cmd):
@@ -59,6 +64,7 @@ class QueryHandler(tornado.web.RequestHandler, Receiver):
 
 
 class MarketServer(tornado.web.Application):
+
     def __init__(self, *args, **kwargs):
         tornado.web.Application.__init__(self, *args, **kwargs)
         self._lv2_api = MarketApi.Instance()
@@ -74,14 +80,14 @@ if __name__ == "__main__":
     except ConfigParser.NoOptionError:
         port = 80
     define("port", default=port, help="run on the given port", type=int)
-    
+
     api = MarketApi.Instance()
     api.Connect(market_server_ip, int(market_server_port))
-    
+
     tornado.options.parse_command_line()
     settings = {
-    "static_path": os.path.join(os.path.dirname(__file__), "static").decode('gbk'),
-    "debug": True
+        "static_path": os.path.join(os.path.dirname(__file__), "static"),
+        "debug": True
     }
     router = [(r"/", IndexHandler),
               (r"/query", QueryHandler)]

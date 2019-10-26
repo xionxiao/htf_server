@@ -1,13 +1,13 @@
 # -*- coding: utf8 -*-
 
 from ctypes import *
+import os
 import sys
 sys.path.append("..")
 from common.error import *
 from common.utils import *
 from common.utils import c_array
 from common.resultbuffer import *
-import os
 
 
 @Singleton
@@ -157,7 +157,8 @@ class MarketApi(Singleton):
     def __del__(self):
         self.Disconnect()
 
-    def GetIndexBars(self):
+    def GetIndexBars(self, category, stock_code, start, count):
+        # self._dll.TdxL2Hq_GetIndexBars()
         pass
         # TdxL2Hq_GetIndexBars()
 
@@ -179,7 +180,7 @@ if __name__ == "__main__":
         rst = lv2.GetMinuteTimeData('600036')
         print(rst.attr)
         for i in rst.attr:
-            print(i)
+            print(i.decode('utf8'))
         print len(rst)
         lv2.Disconnect()
     except ErrorException as e:
