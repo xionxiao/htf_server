@@ -107,6 +107,9 @@ class MarketApi(Singleton):
             raise QueryError("分时数据", rst[0])
         return rst[0]
 
+    # def GetHistoryMinuteTime(self):
+    #     pass
+
     def GetTransactionData(self, stock, count, start=0):
         u""" 获取逐比成交数据 """
         assert self.isConnected()
@@ -123,6 +126,9 @@ class MarketApi(Singleton):
         if not rst:
             raise QueryError("逐比成交", rst[0])
         return rst[0]
+
+    # def GetHistoryTransactionData(self):
+    #     pass
 
     def GetDetailTransactionData(self, stock, count, start=0):
         u""" 获取逐比成交数据 """
@@ -170,10 +176,46 @@ class MarketApi(Singleton):
     def __del__(self):
         self.Disconnect()
 
-    def GetIndexBars(self, category, stock, start, count):
-        # self._dll.TdxL2Hq_GetIndexBars()
+    def GetIndexBars(self, stock, period='1d', start=0, count=800):
+        u""" 获取K线数据
+            period：K线周期 [1m,5m,15m,30m,1h,1d,1w,1M,1Q,1Y]
+                    或者0-11数字：
+                                    0->5分钟K线
+                                    1->15分钟K线
+                                    2->30分钟K线
+                                    3->1小时K线
+                                    4->日K线
+                                    5->周K线
+                                    6->月K线
+                                    7->1分钟
+                                    8->1分钟K线
+                                    9->日K线
+                                    10->季K线
+                                    11->年K线
+            start: K线开始位置,最后一条K线位置是0, 前一条是1, 依此类推
+            count: 请求K线的数目, 最大值为800
+        """
         pass
+        # self._dll.TdxL2Hq_GetIndexBars()
         # TdxL2Hq_GetIndexBars()
+
+    #  def GetSecurityBars():
+    #    pass
+
+    # def GetBuySellQueue(self, stock):
+    #     pass
+
+    # def GetCompanyInfoCategory(self):
+    #     pass
+
+    # def GetCompanyInfo(self):
+    #     pass
+
+    # def GetXDXRInfo(self):
+    #     pass
+
+    # def GetFinanceInfo(self):
+    #     pass
 
 if __name__ == "__main__":
     import msvcrt
