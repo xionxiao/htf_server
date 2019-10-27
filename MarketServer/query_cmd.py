@@ -6,7 +6,7 @@ import os
 sys.path.append("..")
 from command import *
 from common.error import *
-from common.utils import dumpUTF8Json, getStockName
+from common.utils import dumpUTF8Json, StockCode
 from common.cache import Cache
 from market import MarketApi
 
@@ -57,7 +57,7 @@ class QueryQuote10Cmd(Command):
             rst = lv2.GetQuotes10(self._stocks)
             obj = {"quote10": []}
             for i in rst:
-                i["名称"] = getStockName(i["代码"])
+                i["名称"] = StockCode(i["代码"], i["市场"]).getStockName()
                 obj["quote10"].append(i)
             json_str = dumpUTF8Json(obj)
             self._handler.write(json_str)
@@ -83,7 +83,7 @@ class QueryQuote5Cmd(Command):
             rst = lv2.GetQuotes5(self._stocks)
             json_obj = {"quote5": []}
             for i in rst:
-                i["名称"] = getStockName(i["代码"])
+                i["名称"] = StockCode(i["代码"], i["市场"]).getStockName()
                 json_obj["quote5"].append(i)
             json_str = dumpUTF8Json(json_obj)
             self._handler.write(json_str)
@@ -105,7 +105,7 @@ class QueryTransactionCmd(Command):
     def execute(self):
         try:
             lv2 = MarketApi.Instance()
-            rst = lv2.GetTransactionData(self._stock, 0, 30)
+            rst = lv2.GetTransactionData(self._stock, 30)
             data = {"transaction": [i for i in rst]}
             ret_val = dumpUTF8Json(data)
             self._handler.write(ret_val)
@@ -130,7 +130,7 @@ class QueryTransactionDetailCmd(Command):
     def execute(self):
         try:
             lv2 = MarketApi.Instance()
-            rst = lv2.GetDetailTransactionData(self._stock, 0, 30)
+            rst = lv2.GetDetailTransactionData(self._stock, 30)
             data = {"transaction_detail": [i for i in rst]}
             ret_val = dumpUTF8Json(data)
             self._handler.write(ret_val)

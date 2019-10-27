@@ -22,7 +22,7 @@ class MarketApi(Singleton):
         self._dll = windll.LoadLibrary(path + '\\market.dll')
 
     def Connect(self, ip, port):
-        """ 连接服务器 """
+        u""" 连接服务器 """
         assert(isValidIpAddress(ip))
         assert(type(port) is int)
         self._ip = ip
@@ -43,17 +43,18 @@ class MarketApi(Singleton):
 
     def GetQuotes5(self, stocks):
         u""" 获得五档行情 """
-        assert type(stocks) in [list, str]
+        assert type(stocks) in [list, str, StockCode]
         assert self.isConnected()
 
-        if type(stocks) is str:
+        if type(stocks) is not list:
             stocks = [stocks]
         count = len(stocks)
-        markets = []
-        for i in stocks:
-            markets.append(getMarketID(i))
-        c_stocks = c_array(stocks, c_char_p)
-        c_markets = c_array(markets, c_byte)
+        for i in range(count):
+            if type(stocks[i]) is not StockCode:
+                stocks[i] = StockCode(stocks[i])
+
+        c_stocks = c_array(map(lambda x: x.stock_code, stocks), c_char_p)
+        c_markets = c_array(map(lambda x: x.market_id, stocks), c_byte)
         c_count = c_short()
         c_count.value = count
         c_count_ref = byref(c_count)
@@ -66,18 +67,20 @@ class MarketApi(Singleton):
 
     def GetQuotes10(self, stocks):
         u""" 获得十档报价 """
+        assert type(stocks) in [list, str, StockCode]
         assert self.isConnected()
-        assert type(stocks) in [list, str]
 
-        if type(stocks) is str:
+        if type(stocks) is not list:
             stocks = [stocks]
         count = len(stocks)
-        markets = []
-        for i in stocks:
-            markets.append(getMarketID(i))
-        c_stocks = c_array(stocks, c_char_p)
-        c_markets = c_array(markets, c_byte)
-        c_count = c_short(count)
+        for i in range(count):
+            if type(stocks[i]) is not StockCode:
+                stocks[i] = StockCode(stocks[i])
+
+        c_stocks = c_array(map(lambda x: x.stock_code, stocks), c_char_p)
+        c_markets = c_array(map(lambda x: x.market_id, stocks), c_byte)
+        c_count = c_short()
+        c_count.value = count
         c_count_ref = byref(c_count)
         rst = ResultBuffer()
         self._dll.TdxL2Hq_GetSecurityQuotes10(
@@ -89,42 +92,47 @@ class MarketApi(Singleton):
     def GetMinuteTimeData(self, stock):
         u""" 获取分时数据 """
         assert self.isConnected()
-        assert(isValidStockCode(stock))
+        assert(type(stock) in (StockCode, str))
 
-        market = c_byte(getMarketID(stock))
+        stock = StockCode(stock)
+        market = c_byte(stock.market_id)
         rst = ResultBuffer()
         self._dll.TdxL2Hq_GetMinuteTimeData(
-            market, stock, rst.Result, rst.ErrInfo)
+            market, stock.stock_code, rst.Result, rst.ErrInfo)
         if not rst:
             raise QueryError("分时数据", rst[0])
         return rst[0]
 
-    def GetTransactionData(self, stock, start, count):
+    def GetTransactionData(self, stock, count, start=0):
         u""" 获取逐比成交数据 """
         assert self.isConnected()
-        assert(isValidStockCode(stock))
+        assert(type(stock) in (StockCode, str))
         assert(type(start) is int and start >= 0)
 
-        market = c_byte(getMarketID(stock))
+        stock = StockCode(stock)
+        market = c_byte(stock.market_id)
         count_ref = byref(c_short(count))
         rst = ResultBuffer()
         self._dll.TdxL2Hq_GetTransactionData(
-            market, stock, start, count_ref, rst.Result, rst.ErrInfo)
+            market, stock.stock_code, start, count_ref,
+            rst.Result, rst.ErrInfo)
         if not rst:
             raise QueryError("逐比成交", rst[0])
         return rst[0]
 
-    def GetDetailTransactionData(self, stock, start, count):
+    def GetDetailTransactionData(self, stock, count, start=0):
         u""" 获取逐比成交数据 """
         assert self.isConnected()
-        assert(isValidStockCode(stock))
+        assert(type(stock) in (StockCode, str))
         assert(type(start) is int and start >= 0)
 
-        market = c_byte(getMarketID(stock))
+        stock = StockCode(stock)
+        market = c_byte(stock.market_id)
         count_ref = byref(c_short(count))
         rst = ResultBuffer()
         self._dll.TdxL2Hq_GetDetailTransactionData(
-            market, stock, start, count_ref, rst.Result, rst.ErrInfo)
+            market, stock.stock_code, start, count_ref,
+            rst.Result, rst.ErrInfo)
         if not rst:
             raise QueryError("逐比成交", rst[0])
         return rst[0]
@@ -132,6 +140,7 @@ class MarketApi(Singleton):
     def GetSecurityCount(self, market):
         u""" 获得股票数量 返回股票数量 """
         assert self.isConnected()
+
         res = ResultBuffer()
         count = c_short()
         count_ref = byref(count)
@@ -157,7 +166,7 @@ class MarketApi(Singleton):
     def __del__(self):
         self.Disconnect()
 
-    def GetIndexBars(self, category, stock_code, start, count):
+    def GetIndexBars(self, category, stock, start, count):
         # self._dll.TdxL2Hq_GetIndexBars()
         pass
         # TdxL2Hq_GetIndexBars()
@@ -177,11 +186,15 @@ if __name__ == "__main__":
     lv2.Connect("119.97.185.4", 7709)
 
     try:
-        rst = lv2.GetMinuteTimeData('600036')
-        print(rst.attr)
-        for i in rst.attr:
-            print(i.decode('utf8'))
-        print len(rst)
+        rst = lv2.GetQuotes10(['600036.SH', "sh000001"])
+        for i in rst:
+            print("------")
+            for k, v in i.iteritems():
+                print k.decode('utf8'), v.decode('utf8')
+
+        rst = lv2.GetTransactionData("000001.SH", 10)
+        print str(rst).decode("utf8")
+
         lv2.Disconnect()
     except ErrorException as e:
         print e

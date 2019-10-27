@@ -71,6 +71,12 @@ class StockCode(object):
             "SZ": 深圳，0
         e.g. "600036", "sh600036", "600036.sh"
         """
+        # Copy constructure
+        if type(code) is StockCode:
+            self.stock_code = code.stock_code
+            self.market_id = code.market_id
+            return
+
         if str(market).upper() in ('0', "SZ", "深圳", u"深圳"):
             self.market_id = 0
             self.stock_code = code
@@ -103,16 +109,16 @@ class StockCode(object):
         if not isValidStockCode(self.stock_code):
             raise(ValueError, "Invalidate stock code " + code)
 
-        if not StockCodeHashmap.has_key(str(self)):
+        if self.format() not in StockCodeHashmap:
             raise(ValueError, "do not have stock code " + code)
 
     def __str__(self):
-        return self.stock_code + "." + self.getMarketSuffix()
+        return self.format()
 
     def getMarketSuffix(self):
         return "SH" if self.market_id == 1 else "SZ"
 
-    def formate(self, suffix=True, prefix=False):
+    def format(self, suffix=True, prefix=False):
         if suffix:
             return self.stock_code + "." + self.getMarketSuffix()
         elif prefix:
@@ -125,6 +131,9 @@ class StockCode(object):
 
     def getStockCode(self):
         return self.stock_code
+
+    def getStockName(self):
+        return StockCodeHashmap[self.format()]
 
     def getMarketName(self):
         return "上海" if self.market_id == 1 else "深圳"
@@ -268,4 +277,5 @@ if __name__ == "__main__":
         sc = StockCode(i)
         print sc.stock_code
         print sc
+        print unicode(sc.getStockName(), 'utf8')
         print unicode(sc.getMarketName(), 'utf8')
