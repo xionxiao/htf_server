@@ -33,6 +33,10 @@ class MarketApi(Singleton):
             raise LogonError(ip, port, rst[0])
         self._isConnected = True
 
+    def ReConnect(self):
+        u""" 重新连接服务器 """
+        self.Connect(self._ip, self._port)
+
     def isConnected(self):
         return self._isConnected
 

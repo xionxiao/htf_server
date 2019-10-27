@@ -168,6 +168,7 @@ def getMarketID(stock, byName=False):
             return "深圳"
         return 0
 
+
 def c_array(src_list, TYPE):
     assert type(src_list) is list
 
