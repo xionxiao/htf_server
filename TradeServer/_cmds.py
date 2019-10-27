@@ -6,7 +6,7 @@ sys.path.append("..")
 from trade import TradeApi
 from trade.stockpool import StockPool
 from trade.query import c_query
-from command import *
+from common.command import *
 from common.resultbuffer import Result
 from common.error import TradeError, QueryError, CancelError, AcquireError
 from common.utils import dumpUTF8Json, getMarketID

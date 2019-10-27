@@ -114,10 +114,6 @@ class Result(Feedback):
         else:
             return False
 
-    def toUTF8Result(self):
-        return Result(self.raw.decode('gbk').encode('utf8'))
-
-
 class Error(Feedback):
 
     def __init__(self, error_string):

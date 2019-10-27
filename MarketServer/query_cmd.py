@@ -4,7 +4,7 @@ import sys
 import json
 import os
 sys.path.append("..")
-from command import *
+from common.command import *
 from common.error import *
 from common.utils import dumpUTF8Json, StockCode
 from common.cache import Cache

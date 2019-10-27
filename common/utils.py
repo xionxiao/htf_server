@@ -168,17 +168,6 @@ def getMarketID(stock, byName=False):
             return "深圳"
         return 0
 
-
-def getStockCode(name):
-    pass
-
-
-def getStockName(stock):
-    if len(stock) == 6:
-        stock += ".SH" if getMarketID(stock) else ".SZ"
-    return StockCodeHashmap[stock.upper()]
-
-
 def c_array(src_list, TYPE):
     assert type(src_list) is list
 
@@ -201,37 +190,6 @@ def round_up_decimal(number, ndigits=2):
     decimal.getcontext().rounding = decimal.ROUND_HALF_UP
     format_str = '{:.' + str(ndigits) + 'f}'
     return float(format_str.format(decimal.Decimal(str(number))))
-
-
-def printd(obj):
-    """Debug print"""
-    if type(obj) is ResultBuffer:
-        return __print_ResultBuffer(obj)
-    if type(obj) is Result:
-        return __print_Result(obj)
-    if type(obj) is list:
-        return __print_list(obj)
-    print obj
-
-
-def __print_list(l):
-    for i in l:
-        if i not in [Result, ResultBuffer]:
-            print str(l).decode('string_escape')
-            return
-        printd(i)
-    print ""
-
-
-def __print_ResultBuffer(r):
-    for i in r:
-        printd(i)
-    print ""
-
-
-def __print_Result(r):
-    print str(r.attr).decode('string_escape')
-    print str(r.items).decode('string_escape')
 
 
 if __name__ == "__main__":

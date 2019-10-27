@@ -9,7 +9,7 @@ import ConfigParser
 import sys
 sys.path.append("..")
 
-from command import *
+from common.command import *
 from common.utils import dumpUTF8Json
 from common.error import *
 from query_cmd import *

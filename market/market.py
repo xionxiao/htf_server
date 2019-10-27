@@ -193,7 +193,7 @@ if __name__ == "__main__":
                 print k.decode('utf8'), v.decode('utf8')
 
         rst = lv2.GetTransactionData("000001.SH", 10)
-        print str(rst).decode("utf8")
+        print unicode(str(rst), 'utf8')
 
         lv2.Disconnect()
     except ErrorException as e:
