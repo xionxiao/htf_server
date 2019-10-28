@@ -3,8 +3,6 @@
 from ctypes import *
 from Utils import *
 from ResultBuffer import *
-import datetime
-import time
 
 
 class Order(object):

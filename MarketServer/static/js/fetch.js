@@ -1,7 +1,7 @@
 var host = "http://" + window.location.host;
 
 (function Init() {
-	g_stock_1 = '600036';
+	g_stock_1 = '000001.SH';
 	g_stock_2 = '000625';
 
 	var num = ["十","九","八","七","六","五","四","三","二","一"];

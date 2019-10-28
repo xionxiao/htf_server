@@ -1,12 +1,19 @@
 # -*- coding: utf8 -*-
 
 from ctypes import *
-import sys,os
-sys.path.append("..")
-from common.error import *
-from common.utils import *
-from common.resultbuffer import *
+import os
 import numbers
+try:
+    from common.error import *
+    from common.utils import *
+    from common.resultbuffer import *
+except ImportError:
+    import sys
+    sys.path.append("..")
+    from common.error import *
+    from common.utils import *
+    from common.resultbuffer import *
+
 
 @Singleton
 class TradeApi():
@@ -32,7 +39,8 @@ class TradeApi():
     def Close(self):
         self._dll.CloseTdx()
 
-    def Logon(self, ip, port, branch, account, password, tradeAccount="", TxPassword="", version="9.01"):
+    def Logon(self, ip, port, branch, account, password,
+              tradeAccount="", TxPassword="", version="9.01"):
         u""" 登录服务器 """
         assert isValidIpAddress(ip)
         assert type(port) is int
@@ -44,7 +52,11 @@ class TradeApi():
         if tradeAccount == "":
             tradeAccount = account
         rst = ResultBuffer()
-        client = self._dll.Logon(ip, c_short(port), version, c_short(branch), account, tradeAccount, password, TxPassword, rst.ErrInfo)
+        client = self._dll.Logon(ip, c_short(port),
+                                 version, c_short(branch),
+                                 account, tradeAccount,
+                                 password, TxPassword,
+                                 rst.ErrInfo)
         if client == -1:
             raise LogonError(ip, port, rst[0])
         self._clientId = client
@@ -73,7 +85,15 @@ class TradeApi():
 
     def QueryData(self, category):
         u""" 查询各种交易数据
-             0资金  1股份   2当日委托  3当日成交    4可撤单   5股东代码  6融资余额   7融券余额  8可融证券
+             0->资金
+             1->股份
+             2->当日委托
+             3->当日成交
+             4->可撤单
+             5->股东代码
+             6->融资余额
+             7->融券余额
+             8->可融证券
         """
 
         assert self.isLogon()
@@ -81,7 +101,8 @@ class TradeApi():
         assert category in range(9)  # 0-8
 
         res = ResultBuffer()
-        self._dll.QueryData(self._clientId, category, res.Result, res.ErrInfo)
+        self._dll.QueryData(self._clientId, category,
+                            res.Result, res.ErrInfo)
         if not res:
             raise QueryError(category, res[0])
         return res[0]
@@ -89,7 +110,15 @@ class TradeApi():
     def QueryDatas(self, categories):
         u""" 查询各种交易数据:
              categories is query type list.
-             0资金  1股份   2当日委托  3当日成交    4可撤单   5股东代码  6融资余额   7融券余额  8可融证券
+             0->资金
+             1->股份
+             2->当日委托
+             3->当日成交
+             4->可撤单
+             5->股东代码
+             6->融资余额
+             7->融券余额
+             8->可融证券
         """
         assert self.isLogon()
         assert type(categories) is list
@@ -100,14 +129,17 @@ class TradeApi():
             assert cat in range(9)  # 0-8
         _category = c_array(category, c_int)
         res = ResultBuffer(count)
-        self._dll.QueryDatass(self._clientId, _category, count, res.Result, res.ErrInfo)
+        self._dll.QueryDatass(self._clientId, _category, count,
+                              res.Result, res.ErrInfo)
         if not res:
             raise BatchQueryError(categories, res.getResults())
         return res.getResults()
 
     def QueryHistoryData(self, histQueryType, startDate, endDate):
         u""" 查询历史交易数据：
-             0历史委托  1历史成交   2交割单
+             0->历史委托
+             1->历史成交
+             2->交割单
              日期格式: 20140301
         """
         assert self.isLogon()
@@ -116,9 +148,14 @@ class TradeApi():
         assert isValidDate(endDate)
 
         res = ResultBuffer()
-        self._dll.QueryHistoryData(self._clientId, histQueryType, startDate, endDate, res.Result, res.ErrInfo)
+        self._dll.QueryHistoryData(self._clientId,
+                                   histQueryType,
+                                   startDate, endDate,
+                                   res.Result, res.ErrInfo)
         if not res:
-            raise(QueryError(histQueryType, res[0], startDate=startDate, endDate=endDate))
+            raise(QueryError(histQueryType, res[0],
+                             startDate=startDate,
+                             endDate=endDate))
         return res[0]
 
     def GetQuote(self, stocks):
@@ -132,7 +169,8 @@ class TradeApi():
                 return self.GetQuote(stocks[0])
             _stocks = c_array(stocks, c_char_p)
             res = ResultBuffer(count)
-            self._dll.GetQuotes(self._clientId, _stocks, count, res.Result, res.ErrInfo)
+            self._dll.GetQuotes(self._clientId, _stocks, count,
+                                res.Result, res.ErrInfo)
             if not res:
                 raise QueryError("quote", res.getResults(), stocks=stocks)
             return res.getResults()
@@ -148,7 +186,8 @@ class TradeApi():
         market_id = getMarketID(stock, True)
         return self._shareholder[market_id]
 
-    def SendOrder(self, category, stock, price, quantity, priceType=0, shareholder=''):
+    def SendOrder(self, category, stock, price, quantity,
+                  priceType=0, shareholder=''):
         u"""
         category:
             # 0买入
@@ -170,8 +209,8 @@ class TradeApi():
 
         # 参数检查
         assert self.isLogon()
-        assert type(category) is int and category in range(7) # 0-6
-        assert type(priceType) is int and priceType in range(7) # 0-6
+        assert type(category) is int and category in range(7)  # 0-6
+        assert type(priceType) is int and priceType in range(7)  # 0-6
         assert isValidStockCode(stock)
         assert isinstance(price, numbers.Number)
         assert type(quantity) is int and quantity > 0
@@ -179,12 +218,17 @@ class TradeApi():
         res = ResultBuffer()
         # 处理股东代码
         shareholder = self._getShareholderID(stock)
-        self._dll.SendOrder(self._clientId, category, priceType, shareholder, stock, c_float(price), quantity, res.Result, res.ErrInfo)
+        self._dll.SendOrder(self._clientId,
+                            category, priceType, shareholder,
+                            stock, c_float(price), quantity,
+                            res.Result, res.ErrInfo)
         if not res:
-            raise(TradeError(category, stock, price, quantity, priceType, res[0]))
+            raise(TradeError(category, stock, price, quantity,
+                             priceType, res[0]))
         return res[0]
 
-    def SendOrders(self, categories, stocks, prices, quantities, priceTypes=[0], shareholder=['']):
+    def SendOrders(self, categories, stocks, prices, quantities,
+                   priceTypes=[0], shareholder=['']):
         u""" 批量下单接口 """
         assert self.isLogon()
         assert type(categories) is list
@@ -195,7 +239,9 @@ class TradeApi():
         assert type(shareholder) is list
 
         count = len(categories)
-        assert len(stocks)==count and len(prices)==count and len(quantities)==count
+        assert len(stocks) == count
+        assert len(prices) == count
+        assert len(quantities) == count
 
         if len(priceTypes) == 1:
             priceTypes = priceTypes * count
@@ -207,9 +253,13 @@ class TradeApi():
 
         # Bug when only one command in banch
         if count == 1:
-            res = self.SendOrder(categories[0], stocks[0], prices[0], quantities[0], priceTypes[0], shareholder[0])
+            res = self.SendOrder(categories[0],
+                                 stocks[0], prices[0], quantities[0],
+                                 priceTypes[0], shareholder[0])
             if not res:
-                raise(BatchTradeError(categories, stocks, prices, quantities, priceTypes, [res]))
+                raise(BatchTradeError(categories,
+                                      stocks, prices, quantities,
+                                      priceTypes, [res]))
             return [res]
 
         _categories = c_array(categories, c_int)
@@ -225,9 +275,14 @@ class TradeApi():
         _shareholder = c_array(shareholder, c_char_p)
 
         res = ResultBuffer(count)
-        self._dll.SendOrders(self._clientId, _categories, _priceTypes, _shareholder, _stocks, _prices, _quantities, count, res.Result, res.ErrInfo)
+        self._dll.SendOrders(self._clientId, _categories,
+                             _priceTypes, _shareholder,
+                             _stocks, _prices, _quantities, count,
+                             res.Result, res.ErrInfo)
         if not res:
-            raise(BatchTradeError(categories, stocks, prices, quantities, priceTypes, res.getResults()))
+            raise(BatchTradeError(categories,
+                                  stocks, prices, quantities,
+                                  priceTypes, res.getResults()))
         return res.getResults()
 
     def CancelOrder(self, exchangeId, orderId):
@@ -243,13 +298,18 @@ class TradeApi():
             res = ResultBuffer(count)
             _orderId = c_array(orderId, c_char_p)
             _exchangeId = c_array(exchangeId, c_char_p)
-            self._dll.CancelOrders(self._clientId, _exchangeId, _orderId, count, res.Result, res.ErrInfo)
+            self._dll.CancelOrders(self._clientId,
+                                   _exchangeId,
+                                   _orderId, count,
+                                   res.Result, res.ErrInfo)
             if not res:
                 raise BatchCancelError(res[0], order_id=orderId)
             return res.getResults()
         elif type(orderId) is str:
             res = ResultBuffer()
-            self._dll.CancelOrder(self._clientId, exchangeId, orderId, res.Result, res.ErrInfo)
+            self._dll.CancelOrder(self._clientId,
+                                  exchangeId, orderId,
+                                  res.Result, res.ErrInfo)
             if not res:
                 raise CancelError(res.getResults(), order_id=orderId)
             return res[0]
@@ -319,7 +379,9 @@ class TradeApi():
         elif u_str in self.HISTORY_QUERY_TYPE:
             x = self.HISTORY_QUERY_TYPE.index(u_str)
             if len(args) == 0 and kwargs['startDate'] and kwargs['endDate']:
-                return self.QueryHistoryData(x, kwargs['startDate'], kwargs['endDate'])
+                return self.QueryHistoryData(x,
+                                             kwargs['startDate'],
+                                             kwargs['endDate'])
             elif len(args) == 2:
                 return self.QueryHistoryData(x, args[0], args[1])
             else:
@@ -332,34 +394,40 @@ class TradeApi():
 
 if __name__ == "__main__":
     api = TradeApi.Instance()
-    #f = open('out.txt', 'w+')
-    #import sys
-    #sys.stdout=f
+    # f = open('out.txt', 'w+')
+    # import sys
+    # sys.stdout=f
     try:
         if not api.isLogon():
             # 银河证券
-            api.Logon("124.74.242.153", 7708, 0, "221199993996", "456456", version="2.19")
+            api.Logon("124.74.242.153", 7708, 0,
+                      "221199993996", "456456",
+                      version="2.19")
             # 华泰证券
-            #api.Logon("61.132.54.83", 7708, 0, "666622963937", "001639","", TxPassword="830916", version="6.52")
+            # api.Logon("61.132.54.83", 7708, 0,
+            #           "666622963937", "001639",
+            #           "", TxPassword="830916", version="6.52")
             # 招商证券
-            #api.Logon("202.106.83.206", 443, 0, "77810652", "001639", version="2.41")
+            # api.Logon("202.106.83.206", 443, 0,
+            #           "77810652", "001639", version="2.41")
             # 宏源证券
-            #api.Logon("123.127.243.5", 7708, 8021, "100410015652", "830916", version="6.00")
-            
-##        rst = api.CancelOrder(['1','1'],['4533','4536'])
-##        print rst
-##        rst = api.QueryData(5)
-##        print(rst)
-        #rst = api.Query("资金")
-        #print(rst)
-##        print(rst.attr[4] == "冻结资金")
-        #print(u"======== 股份")
-        #rst = api.Query("股份")
-        #print(rst)
-        #print(u"======== 当日委托")
-        #print(api.Query("当日委托"))
-        #print(u"======== 当日成交")
-        #print(api.Query("当日成交"))
+            # api.Logon("123.127.243.5", 7708, 8021,
+            #           "100410015652", "830916", version="6.00")
+
+        # rst = api.CancelOrder(['1','1'],['4533','4536'])
+        # print rst
+        # rst = api.QueryData(5)
+        # print(rst)
+        # rst = api.Query("资金")
+        # print(rst)
+        # print(rst.attr[4] == "冻结资金")
+        # print(u"======== 股份")
+        # rst = api.Query("股份")
+        # print(rst)
+        # print(u"======== 当日委托")
+        # print(api.Query("当日委托"))
+        # print(u"======== 当日成交")
+        # print(api.Query("当日成交"))
         n = 0
         from datetime import datetime
         import time
@@ -369,40 +437,42 @@ if __name__ == "__main__":
             print(u"======== 可撤单 " + str(n))
             time.sleep(10)
             rst = api.Query("可撤单")
-            #print(rst)
-        #print(u"======== 股东代码")
-        #print(api.Query("股东代码"))
-        #print(u"======== 融资余额")
-        #print(api.Query("融资余额"))
-        #print(u"======== 融券余额")
-        #print(api.Query("融券余额")) # 系统暂不支持该功能
-        #print(u"======== 可融证券")
-        #print(api.Query("可融证券"))
-##
-##        print(u"======== 历史委托")
-##        rst = api.QueryHistoryData(0, "20150429", "20150504")
-##        print(rst)
-##        rst = api.Query("历史委托", "20150708", "20150709")
-##        print(len(rst))
-##        print(u"======== 历史成交")
-##        print(api.Query("历史成交", "20150429", "20150501"))
-##        print(u"======== 交割单")
-##        print(api.Query("交割单", startDate="20150429", endDate="20150501"))
-##
-##        print(u"======== 行情")
-##        rst = api.Query("行情", "000002")
-##        print(rst)
+            # print(rst)
+        # print(u"======== 股东代码")
+        # print(api.Query("股东代码"))
+        # print(u"======== 融资余额")
+        # print(api.Query("融资余额"))
+        # print(u"======== 融券余额")
+        # print(api.Query("融券余额")) # 系统暂不支持该功能
+        # print(u"======== 可融证券")
+        # print(api.Query("可融证券"))
 
-        #print api.Repay("1000")
-        #rst = api.CancelOrder(["1799","1798"])
-        #print rst
-        
-        #rst = api.SendOrder(3, "000655", 0.22, 100)
-        #print rst
-        #print api.SendOrders([3,3,3], ["000655", "000625","600005"], [0.22, 0.11, 0.4], [100,100,200])
-        #print api.Buy("159901", 3.3, 100)
-        #print api.Sell("000690", 10.10, 100)
-        #print api.Short("600005", 6.4, 100)
+        # print(u"======== 历史委托")
+        # rst = api.QueryHistoryData(0, "20150429", "20150504")
+        # print(rst)
+        # rst = api.Query("历史委托", "20150708", "20150709")
+        # print(len(rst))
+        # print(u"======== 历史成交")
+        # print(api.Query("历史成交", "20150429", "20150501"))
+        # print(u"======== 交割单")
+        # print(api.Query("交割单", startDate="20150429", endDate="20150501"))
+
+        # print(u"======== 行情")
+        # rst = api.Query("行情", "000002")
+        # print(rst)
+
+        # print api.Repay("1000")
+        # rst = api.CancelOrder(["1799","1798"])
+        # print rst
+
+        # rst = api.SendOrder(3, "000655", 0.22, 100)
+        # print rst
+        # print api.SendOrders([3,3,3],
+        #                      ["000655", "000625","600005"],
+        #                      [0.22, 0.11, 0.4], [100,100,200])
+        # print api.Buy("159901", 3.3, 100)
+        # print api.Sell("000690", 10.10, 100)
+        # print api.Short("600005", 6.4, 100)
     except ErrorException as e:
         print "!!!!!!!!!!!!!!!!!!!!!"
         from datetime import datetime
@@ -412,4 +482,4 @@ if __name__ == "__main__":
         print "Log off"
         api.Logoff()
 
-    #f.close()
+    # f.close()

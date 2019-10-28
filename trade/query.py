@@ -1,12 +1,20 @@
 # -*- coding: utf8 -*-
 
 from trade import TradeApi
-import sys
 import datetime
-sys.path.append("..")
-from common.cache import Cache
-from common.utils import dumpUTF8Json, isValidStockCode, round_up_decimal
-from common.resultbuffer import Result
+
+try:
+    from common.cache import Cache
+    from common.utils import isValidStockCode
+    from common.utils import round_up_decimal
+    from common.resultbuffer import Result
+except:
+    import sys
+    sys.path.append("..")
+    from common.cache import Cache
+    from common.utils import isValidStockCode
+    from common.utils import round_up_decimal
+    from common.resultbuffer import Result
 
 _cache = Cache()
 
@@ -120,7 +128,8 @@ if __name__ == "__main__":
     api = TradeApi.Instance()
     if not api.isLogon():
         api.Logon(
-            "219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
+            "219.143.214.201", 7708, 0,
+            "221199993903", "787878", version="2.19")
     print(c_query("涨停价", "510300"))
     r1 = _query_quote("510300")
     r2 = _query_quote("600150")

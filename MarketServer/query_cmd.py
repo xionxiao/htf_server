@@ -1,14 +1,19 @@
 # -*- coding: utf8 -*-
 
-import sys
-import json
-import os
-sys.path.append("..")
-from common.command import *
-from common.error import *
-from common.utils import dumpUTF8Json, StockCode
-from common.cache import Cache
-from market import MarketApi
+try:
+    import sys
+    sys.path.append("..")
+    from common.command import *
+    from common.error import *
+    from common.utils import dumpUTF8Json, StockCode
+    from market import MarketApi
+except ImportError:
+    import sys
+    sys.path.append("..")
+    from common.command import *
+    from common.error import *
+    from common.utils import dumpUTF8Json, StockCode
+    from market import MarketApi
 
 
 def _check_and_reconnect(feedback):

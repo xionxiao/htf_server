@@ -6,14 +6,19 @@ import tornado.options
 import tornado.web
 import os
 import ConfigParser
-import sys
-sys.path.append("..")
-
-from common.command import *
-from common.utils import dumpUTF8Json
-from common.error import *
+try:
+    from common.command import *
+    from common.utils import dumpUTF8Json
+    from common.error import *
+    from market import MarketApi
+except ImportError:
+    import sys
+    sys.path.append("..")
+    from common.command import *
+    from common.utils import dumpUTF8Json
+    from common.error import *
+    from market import MarketApi
 from query_cmd import *
-from market import MarketApi
 from tornado.options import define, options
 
 
@@ -86,7 +91,8 @@ if __name__ == "__main__":
 
     tornado.options.parse_command_line()
     settings = {
-        "static_path": os.path.join(os.path.dirname(__file__).decode('GBK'), "static"),
+        "static_path": os.path.join(os.path.dirname(__file__).decode('GBK'),
+                                    "static"),
         "debug": True
     }
     router = [(r"/", IndexHandler),

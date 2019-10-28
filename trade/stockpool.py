@@ -4,7 +4,6 @@ from trade import TradeApi
 from common.error import *
 from common.utils import *
 from query import c_query
-import time
 
 
 class StockPoolAcquireError(TradeError):
@@ -32,7 +31,7 @@ class StockPool():
         """ 获得相应数目股票, 返回撤消订单号,撤消订单股数，补充下单股数(涨停价)"""
         assert type(share) is int and share > 0
         assert share % 100 == 0
-        if not self._stock_pool.has_key(stock):
+        if stock not in self._stock_pool:
             raise AcquireError("股票池中没有对应股票")
             return [], [], 0
 
@@ -72,7 +71,9 @@ class StockPool():
                     elif s < share:
                         out_key_list = keys[greater_pos]
                         out_value_list = values[greater_pos]
-                        return out_key_list, out_value_list, values[greater_pos] - share
+                        return (out_key_list,
+                                out_value_list,
+                                values[greater_pos] - share)
                     else:
                         share = share - values[i]
                         out_key_list.append(keys[i])
@@ -118,14 +119,15 @@ class StockPool():
     def getStocks(self):
         return self._stock_pool
 
-    def addOrder(self, stock_code, order_id, order_price, order_share, order_type):
+    def addOrder(self, stock_code, order_id,
+                 order_price, order_share, order_type):
         """ 向订单列表增加订单 """
         pool = self._stock_pool
 
         harden_price = c_query("涨停价", stock_code)
         # print stock_code, harden_price, order_price, order_type
         if order_type == "融券卖出" and order_price == harden_price:
-            if not pool.has_key(stock_code):
+            if stock_code not in pool:
                 pool[stock_code] = {"融券上限": order_share,
                                     "融券数量": order_share,
                                     "订单列表": {order_id: order_share}
@@ -133,7 +135,7 @@ class StockPool():
                 return
             # 证券在股票池中
             pool = pool[stock_code]
-            if not pool["订单列表"].has_key(order_id):
+            if order_id not in pool["订单列表"]:
                 pool["订单列表"][order_id] = order_share
                 pool["融券数量"] += order_share
                 if pool["融券数量"] > pool["融券上限"]:
@@ -141,7 +143,7 @@ class StockPool():
 
     def removeOrder(self, order_id):
         for k, v in self._stock_pool.iteritems():
-            if v["订单列表"].has_key(order_id):
+            if order_id in v["订单列表"]:
                 v["订单列表"].pop(order_id)
                 return True
         return False
@@ -149,12 +151,12 @@ class StockPool():
     def setUpperLimit(self, stock_code, max_shares):
         """ 设置股票池中某只股票存储上限 """
         assert type(max_shares) is int and max_shares > 0
-        if self._stock_pool.has_key(stock_code):
+        if stock_code in self._stock_pool:
             self._stock_pool[stock_code]["融券上限"] = max_shares
 
     def getUpperLimit(self, stock_code):
         """ 获取股票池中某只股票存储上限 """
-        if self._stock_pool.has_key(stock_code):
+        if stock_code in self._stock_pool:
             return self._stock_pool[stock_code]["融券上限"]
         else:
             return 0
@@ -206,7 +208,9 @@ class StockPool():
             # TODO: 20 应该配置成参数
             for x in range(20):
                 try:
-                    rst = self._tradeApi.SendOrders([3] * 2, [stock_code] * 2, [raising_price, price], [s, share])
+                    rst = self._tradeApi.SendOrders(
+                        [3] * 2, [stock_code] * 2,
+                        [raising_price, price], [s, share])
                 except BatchTradeError:
                     continue
                 return rst
@@ -230,7 +234,8 @@ if __name__ == "__main__":
     api = TradeApi.Instance()
     if not api.isLogon():
         rst = api.Logon(
-            "219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
+            "219.143.214.201", 7708, 0,
+            "221199993903", "787878", version="2.19")
     sp = StockPool.Instance()
 
     sp.sync()

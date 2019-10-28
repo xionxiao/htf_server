@@ -2,12 +2,19 @@
 
 from ctypes import *
 import os
-import sys
-sys.path.append("..")
-from common.error import *
-from common.utils import *
-from common.utils import c_array
-from common.resultbuffer import *
+
+try:
+    from common.error import *
+    from common.utils import *
+    from common.utils import c_array
+    from common.resultbuffer import *
+except ImportError:
+    import sys
+    sys.path.append("..")
+    from common.error import *
+    from common.utils import *
+    from common.utils import c_array
+    from common.resultbuffer import *
 
 
 @Singleton
@@ -110,8 +117,8 @@ class MarketApi(Singleton):
     # def GetHistoryMinuteTime(self):
     #     pass
 
-    def GetTransactionData(self, stock, count, start=0):
-        u""" 获取逐比成交数据 """
+    def GetTransactionData(self, stock, count=2000, start=0):
+        u""" 获取逐比成交数据 count 最大2000"""
         assert self.isConnected()
         assert(type(stock) in (StockCode, str))
         assert(type(start) is int and start >= 0)
@@ -130,8 +137,8 @@ class MarketApi(Singleton):
     # def GetHistoryTransactionData(self):
     #     pass
 
-    def GetDetailTransactionData(self, stock, count, start=0):
-        u""" 获取逐比成交数据 """
+    def GetDetailTransactionData(self, stock, count=2000, start=0):
+        u""" 获取逐比成交数据 count 最大2000"""
         assert self.isConnected()
         assert(type(stock) in (StockCode, str))
         assert(type(start) is int and start >= 0)
