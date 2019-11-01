@@ -1,1 +1,2 @@
-#SWTradeSystem
+# High Frequecy Trade System
+
