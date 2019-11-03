@@ -17,6 +17,15 @@ var host = "http://" + window.location.host;
 		}
 	}
 	slice_place = -4;
+	if(!window.console) {
+		var console = {
+			log : function(){},
+			warn : function(){},
+			error : function(){},
+			time : function(){},
+			timeEnd : function(){}
+		}
+	}
 }());
 
 function RefreshQuote10() {
@@ -154,8 +163,8 @@ function fill_transaction_table(id, data) {
 			td.eq(0).text(data[i]["时间"]).css('color','gray');
 			td.eq(1).text(data[i]["价格"].slice(0, slice_place));
 			td.eq(2).text(data[i]["现量"].split('.')[0]);
-			td.eq(3).text(data[i]["买卖"]);
-			td.eq(4).text(data[i]["笔数"]).css('color','gray');
+			td.eq(3).text(data[i]["买卖"]).css('text-align','center').css('width','1em').css('padding-right','0px').css('padding-left','0px');
+			td.eq(4).text(data[i]["笔数"]).css('color','gray').css('text-align','center');
 		}
 	}
 }

@@ -21,7 +21,7 @@ def _check_and_reconnect(feedback):
     # Check in ThreadInvoker
     if feedback.raw == "发送数据失败, 请重新连接服务器":
         lv2 = MarketApi.Instance()
-        lv2.Connect("119.97.185.4", 7709)
+        lv2.ReConnect()
 
 
 class QueryMinuteTimeDataCmd(Command):

@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
     <head> 
         <title>股票行情</title> 
-        <meta charset="utf-8" /> 
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="static/css/bootstrap.min.css" rel="stylesheet" /> 
         <!-- 包括所有已编译的插件 --> 
         <script src="static/js/jquery.min.js"></script>
@@ -47,17 +49,28 @@
 			.blue {
 				color:blue;
 			}
-			th{
-				text-align: center;
-			}
 			.table-line {
 				border-top: 2px solid gray;
-			}
-			#left-transaction table {
-				font-size: 6px;
-			}
+            }
+            .table-nowrap {
+                table-layout:fixed;
+            }
+            .table-nowrap td {
+                text-align: center;
+                white-space: nowrap;
+                overflow: hidden;
+            }
 			#minute-panel {
                 border: 0px solid white;
+                border-radius: 0px;
+                -webkit-box-shadow: 0 0px 0px rgba(0,0,0,.05);
+                box-shadow: 0 0px 0px rgba(0,0,0,.05);
+            }
+            #candle-stick-panel {
+                border: 0px solid white;
+                border-radius: 0px;
+                -webkit-box-shadow: 0 0px 0px rgba(0,0,0,.05);
+                box-shadow: 0 0px 0px rgba(0,0,0,.05);
             }
         </style>
     </head> 
@@ -71,7 +84,7 @@
 							<h3 class="panel-title"><span id="name"></span><span class="pull-right" id="code"></span></h3>
 						</div>
 						<input id="left-input" class="form-control input-sm" type="text" placeholder="输入股票代码" />
-						<table class="table table-hover table-condensed" id="left-quote-table"> 
+						<table class="table table-hover table-condensed table-nowrap" id="left-quote-table"> 
 							<tr> <td class="green">卖十</td> <td></td> <td></td> </tr> 
 							<tr> <td class="green">卖九</td> <td></td> <td></td> </tr> 
 							<tr> <td class="green">卖八</td> <td></td> <td></td> </tr> 
@@ -98,6 +111,13 @@
 
 				<!-- 分时图 -->
                 <div class="col-xs-6">
+                    <div class="panel panel-primary" id="candle-stick-panel">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">K线图 - 1分钟</h3>
+                        </div>  
+                        <div id="chart" style="height:230px">
+                        </div>
+                    </div>
                     <div class="panel panel-info" id="minute-panel">
                         <div class="panel-heading">
                             <h3 class="panel-title">分时图</h3>
@@ -107,6 +127,7 @@
                         <div id="minute-chart-volume" style="height:125px">
                         </div>
                     </div>
+                    
                 </div> <!-- 分时图 -->
 
 				<!-- 逐笔成交 -->
@@ -115,7 +136,7 @@
                         <div class="panel-heading">
 							<h3 class="panel-title">逐笔成交</h3>
 						</div> 
-						<table class="table table-hover table-condensed"> 
+						<table class="table table-hover table-condensed table-nowrap"> 
 							<tr> <th>价格</th> <th>成交</th> <th>买卖</th> <th>时间</th> </tr> 
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
 							<tr> <td></td> <td></td> <td></td> <td></td> </tr> 
@@ -147,7 +168,7 @@
                         <div class="panel-heading">
 							<h3 class="panel-title">分时成交明细</h3>
 						</div> 
-						<table class="table table-hover table-condensed"> 
+						<table class="table table-hover table-condensed table-nowrap"> 
 							<tr> <th>时间</th> <th>价格</th> <th>现量</th> <th></th> <th>笔数</th> </tr> 
 							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> 
 							<tr> <td></td> <td></td> <td></td> <td></td> <td></td> </tr> 
