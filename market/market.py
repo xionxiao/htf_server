@@ -183,7 +183,19 @@ class MarketApi(Singleton):
     def __del__(self):
         self.Disconnect()
 
-    def GetIndexBars(self, stock, period='1d', start=0, count=800):
+    _CATEGORYIES = {'1m': 7,
+                    '5m': 0,
+                    '15m': 1,
+                    '30m': 2,
+                    '1h': 3,
+                    '1d': 4,
+                    '1w': 5,
+                    '1M': 6,
+                    '1Q': 10,
+                    '1Y': 11,
+                    }
+
+    def GetCandleStickData(self, stock, period='1d', start=0, count=1):
         u""" 获取K线数据
             period：K线周期 [1m,5m,15m,30m,1h,1d,1w,1M,1Q,1Y]
                     或者0-11数字：
@@ -201,10 +213,29 @@ class MarketApi(Singleton):
                                     11->年K线
             start: K线开始位置,最后一条K线位置是0, 前一条是1, 依此类推
             count: 请求K线的数目, 最大值为800
+            ===注意===
+                根据测试，count目前只能为1，大于1返回结构不对
         """
-        pass
-        # self._dll.TdxL2Hq_GetIndexBars()
-        # TdxL2Hq_GetIndexBars()
+        assert(self.isConnected())
+        assert(type(stock) in (StockCode, str))
+        assert(period in self._CATEGORYIES or period in range(12))
+        assert(type(start) is int and start >= 0)
+        assert(type(count) is int and count in range(801))
+
+        res = ResultBuffer()
+        _stock = StockCode(stock)
+        _market = c_byte(_stock.market_id)
+        if type(period) is str:
+            _category = c_byte(self._CATEGORYIES[period])
+        elif type(period) is int:
+            _category = c_byte(period)
+        count_ref = byref(c_short(count))
+        rst = self._dll.TdxL2Hq_GetIndexBars(
+            _category, _market, _stock.stock_code, start, count_ref,
+            res.Result, res.ErrInfo)
+        if not rst:
+            raise QueryError("K线数据", res[0])
+        return res[0]
 
     #  def GetSecurityBars():
     #    pass
@@ -236,17 +267,25 @@ if __name__ == "__main__":
 
     signal.signal(signal.SIGINT, OnExit)
     lv2 = MarketApi.Instance()
-    lv2.Connect("119.97.185.4", 7709)
+    lv2.Connect("61.135.142.90", 443)
 
     try:
-        rst = lv2.GetQuotes10(['600036.SH', "sh000001"])
-        for i in rst:
-            print("------")
-            for k, v in i.iteritems():
-                print k.decode('utf8'), v.decode('utf8')
+##        rst = lv2.GetQuotes10(['600036.SH', "sh000001"])
+##        for i in rst:
+##            print("------")
+##            for k, v in i.iteritems():
+##                print k.decode('utf8'), v.decode('utf8')
+##
+##        rst = lv2.GetTransactionData("000001.SH", 10)
+##        print unicode(str(rst), 'utf8')
 
-        rst = lv2.GetTransactionData("000001.SH", 10)
-        print unicode(str(rst), 'utf8')
+        # 日线到2199
+        rst = lv2.GetCandleStickData("000001.SH", '1d', 2199)
+        #print rst.raw
+        for i in rst:
+            print('==========')
+            for k,v in i.iteritems():
+                print k.decode('utf8'), v.decode('utf8')
 
         lv2.Disconnect()
     except ErrorException as e:

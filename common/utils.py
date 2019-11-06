@@ -140,7 +140,7 @@ class StockCode(object):
 
 
 def isValidStockCode(stock):
-    return bool(re.match("[01235678][0-9]{5}$", stock))
+    return bool(re.match("[012356789][0-9]{5}$", stock))
 
 
 def isValidIpAddress(ip):
@@ -230,11 +230,12 @@ if __name__ == "__main__":
 
     print(c1)
 
-    codes = ['600036', 'sh600036', '000625.sz',
+    codes = ['600036', 'sh600036', '000625.sz', '900916.SH',
              'ss600036', '000001.ss', '000001', "600036.SZ"]
     for i in codes:
         sc = StockCode(i)
         print sc.stock_code
         print sc
+        print sc.format(suffix=False, prefix=True)
         print unicode(sc.getStockName(), 'utf8')
         print unicode(sc.getMarketName(), 'utf8')
