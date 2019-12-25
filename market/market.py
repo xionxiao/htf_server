@@ -187,6 +187,7 @@ class MarketApi(Singleton):
                     '5m': 0,
                     '15m': 1,
                     '30m': 2,
+                    '60m' : 3,
                     '1h': 3,
                     '1d': 4,
                     '1w': 5,
@@ -197,7 +198,7 @@ class MarketApi(Singleton):
 
     def GetCandleStickData(self, stock, period='1d', start=0, count=1):
         u""" 获取K线数据
-            period：K线周期 [1m,5m,15m,30m,1h,1d,1w,1M,1Q,1Y]
+            period：K线周期 [1m,5m,15m,30m,60m,1h,1d,1w,1M,1Q,1Y]
                     或者0-11数字：
                                     0->5分钟K线
                                     1->15分钟K线
@@ -279,9 +280,18 @@ if __name__ == "__main__":
 ##        rst = lv2.GetTransactionData("000001.SH", 10)
 ##        print unicode(str(rst), 'utf8')
 
-        # 日线到2199
-        rst = lv2.GetCandleStickData("000001.SH", '1d', 2199)
-        #print rst.raw
+        # 日线到 2199
+        # 1分钟线到 240*30-1 = 6000-1 (2015/10/9)
+        # 5分钟线到 48*500-1 = 24000-1 (2013/10/29-2015/11/12)
+        # 15分钟线 16*500-1 = 8000-1 (2013/10/29-2015/11/12)
+        # 30分钟线 8*500-1 = 4000-1 (2013/10/29-2015/11/12)
+        # 60分钟线 4*500-1 = 2000-1 (2013/10/29-2015/11/12)
+        # 周线 1260 （1990/12/21）
+        # 月线 299 (1990/12/31)
+        # 季线 100 (1990/12/31)
+        # 年线 25 （1990/12/31)
+        rst = lv2.GetCandleStickData("000001.SH", '60m', 4*500-1)
+        print rst.raw
         for i in rst:
             print('==========')
             for k,v in i.iteritems():
