@@ -63,13 +63,16 @@ class TradeApi():
         self._ip = ip
         self._port = port
         # 获得股东代码
-        rst = self.QueryData(5)
+        try:
+            rst = self.QueryData(5)
+        except QueryError as e:
+            raise LogonError(ip, port, rst, extra=e.extra)
         if rst[0]["股东代码"][0] in ("E", "A"):
-            self._shareholder["沪市"] = rst[0]["股东代码"]
-            self._shareholder["深市"] = rst[1]["股东代码"]
+            self._shareholder["上海"] = rst[0]["股东代码"]
+            self._shareholder["深圳"] = rst[1]["股东代码"]
         elif rst[0]["股东代码"][0] == "0":
-            self._shareholder["沪市"] = rst[1]["股东代码"]
-            self._shareholder["深市"] = rst[0]["股东代码"]
+            self._shareholder["上海"] = rst[1]["股东代码"]
+            self._shareholder["深圳"] = rst[0]["股东代码"]
         else:
             raise LogonError(ip, port, rst, extra="wrong shareholder")
 
@@ -399,18 +402,22 @@ if __name__ == "__main__":
     # sys.stdout=f
     try:
         if not api.isLogon():
-            # 银河证券
-            api.Logon("124.74.242.153", 7708, 0,
-                      "221199993996", "456456",
-                      version="2.19")
+            # 模拟证券
+            #api.Logon("202.103.36.69", 7708, 0,
+            #          "040114", "123456", TxPassword="d87f9",
+            #          version="6.00")
+            # 平安证券
+            #api.Logon("202.69.19.56", 7738, 19,
+            #          "303819087733", "123456", "",
+            #          version="6.53")
             # 华泰证券
-            # api.Logon("61.132.54.83", 7708, 0,
-            #           "666622963937", "001639",
-            #           "", TxPassword="830916", version="6.52")
+            api.Logon("61.132.54.83", 7708, 0,
+                      "666622963937", "006096",
+                      "", TxPassword="830916", version="6.52")
             # 招商证券
             # api.Logon("202.106.83.206", 443, 0,
             #           "77810652", "001639", version="2.41")
-            # 宏源证券
+            # 宏源证券 (失败，需要抓包分析)
             # api.Logon("123.127.243.5", 7708, 8021,
             #           "100410015652", "830916", version="6.00")
 
@@ -418,25 +425,27 @@ if __name__ == "__main__":
         # print rst
         # rst = api.QueryData(5)
         # print(rst)
-        # rst = api.Query("资金")
-        # print(rst)
+        rst = api.Query("资金")
+        print(rst)
         # print(rst.attr[4] == "冻结资金")
-        # print(u"======== 股份")
-        # rst = api.Query("股份")
-        # print(rst)
+        print(u"======== 股份")
+        rst = api.Query("股份")
+        print(rst)
+        rst = api.Buy('000697', 26.68, 100)
+        print(str(rst).decode('utf8'))
         # print(u"======== 当日委托")
         # print(api.Query("当日委托"))
         # print(u"======== 当日成交")
         # print(api.Query("当日成交"))
-        n = 0
-        from datetime import datetime
-        import time
-        while True:
-            print datetime.now()
-            n = n + 1
-            print(u"======== 可撤单 " + str(n))
-            time.sleep(10)
-            rst = api.Query("可撤单")
+##        n = 0
+##        from datetime import datetime
+##        import time
+##        while False:
+##            print datetime.now()
+##            n = n + 1
+##            print(u"======== 可撤单 " + str(n))
+##            time.sleep(10)
+##            rst = api.Query("可撤单")
             # print(rst)
         # print(u"======== 股东代码")
         # print(api.Query("股东代码"))
