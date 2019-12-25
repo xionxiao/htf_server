@@ -34,8 +34,65 @@ $(function(){
         	enabled : false
         },
     });
-
 }());
+
+function drawCandleStickChart() {
+    var data = []
+    for (var i=0; i<sh000001.length; i++) {
+        var x = sh000001[i];
+        var d = Date.parse(x['date'].substr(0, 4)+'/'+x['date'].substr(4, 2) + '/' + x['date'].substr(6, 2));
+        var open = parseFloat(x['open']);
+        var high = parseFloat(x['high']);
+        var low = parseFloat(x['low']);
+        var close = parseFloat(x['close']);
+        data.push([d, open, high, low, close])
+    }
+
+    function by_date(a, b) {
+        return parseInt(a[0]) - parseInt(b[0]);
+    }
+
+    var datae = data.sort(by_date);
+    // create the chart
+    $('#candle-stick-chart').highcharts('StockChart', {
+        rangeSelector : {
+            selected : 0,
+            inputEnabled : false,
+        },
+
+        title : {
+            enabled : false
+        },
+
+        navigator : {
+            enabled : false,
+        },
+
+        scrollbar : {
+            enabled : false
+        },
+        
+        series : [{
+            type : 'candlestick',
+            name : 'AAPL Stock Price',
+            data : datae,
+            dataGrouping : {
+                enabled : false,
+                units : [
+                    [
+                        'day', // unit name
+                        [1], // allowed multiples
+                    ], [
+                        'week',
+                        [1, 2, 3, 4, 6],
+                    ],
+                ]
+            },
+            colors : [/*'#2f7ed8'*/'red', 'red', 'red', 'red', '#1aadce', 
+   '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a'],
+        }]
+    });
+}
 
 function drawMinuteChart(mPrice, mVolume, mAxis) {
     console.log(mAxis);

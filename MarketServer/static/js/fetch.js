@@ -316,6 +316,7 @@ $(document).ready(function() {
 	});
 
 	Refresh();
+	drawCandleStickChart();
 })
 
 function Refresh() {
