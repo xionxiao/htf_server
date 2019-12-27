@@ -3,18 +3,10 @@
 from ctypes import *
 import os
 
-try:
-    from common.error import *
-    from common.utils import *
-    from common.utils import c_array
-    from common.resultbuffer import *
-except ImportError:
-    import sys
-    sys.path.append("..")
-    from common.error import *
-    from common.utils import *
-    from common.utils import c_array
-    from common.resultbuffer import *
+from hft.common.error import *
+from hft.common.utils import *
+from hft.common.utils import c_array
+from hft.common.resultbuffer import *
 
 
 @Singleton

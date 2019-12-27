@@ -6,18 +6,12 @@ import tornado.options
 import tornado.web
 import os
 import ConfigParser
-try:
-    from common.command import *
-    from common.utils import dumpUTF8Json
-    from common.error import *
-    from market import MarketApi
-except ImportError:
-    import sys
-    sys.path.append("..")
-    from common.command import *
-    from common.utils import dumpUTF8Json
-    from common.error import *
-    from market import MarketApi
+
+from hft.common.command import *
+from hft.common.utils import dumpUTF8Json
+from hft.common.error import *
+from hft.market import MarketApi
+
 from query_cmd import *
 from tornado.options import define, options
 

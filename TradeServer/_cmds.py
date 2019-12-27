@@ -1,16 +1,14 @@
 # -*- coding: utf8 -*-
 
-import sys
 import time
-sys.path.append("..")
-from trade import TradeApi
-from trade.stockpool import StockPool
-from trade.query import c_query
-from common.command import *
-from common.resultbuffer import Result
-from common.error import TradeError, QueryError, CancelError, AcquireError
-from common.utils import dumpUTF8Json, getMarketID
-from common.cache import Cache
+from hft.trade import TradeApi
+from hft.trade.stockpool import StockPool
+from hft.trade.query import c_query
+from hft.common.command import *
+from hft.common.resultbuffer import Result
+from hft.common.error import TradeError, QueryError, CancelError, AcquireError
+from hft.common.utils import dumpUTF8Json, getMarketID
+from hft.common.cache import Cache
 
 
 class GetStockPoolCmd(Command):
@@ -236,21 +234,3 @@ class CancelCmd(Command):
             self._handler.write(err_str)
         finally:
             self.complete()
-
-if __name__ == "__main__":
-    api = TradeApi.Instance()
-    if not api.isLogon():
-        api.Logon(
-            "219.143.214.201", 7708, 0, "221199993903", "787878", version="2.19")
-
-    class ResponseReceiver(Receiver):
-
-        def write(self, msg):
-            print msg
-
-    r = ResponseReceiver()
-    invoker = Invoker()
-    # b = SellCmd("600036", 18.0, 100, r)
-    s = ShortCmd("601318", 32.80, 300, r)
-    # c = CancelCmd("601318", "146159", r)
-    invoker.call(s)
